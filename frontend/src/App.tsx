@@ -1,7 +1,7 @@
 
 
 import './App.css'
-import Header from './components/shared-ui/Header.tsx'
+import Header from './components/header/Header.tsx'
 import Login from './pages/Authentication/Login'
 // import LandingPage from './pages/landingPage/LandingPage.tsx'
 import { Routes, Route } from 'react-router-dom'
