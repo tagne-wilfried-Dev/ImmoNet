@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, Plus } from 'lucide-react';
+import { Menu, X, Plus, User } from 'lucide-react';
 
 interface HeaderProps {
     currentExplore: 'rent' | 'sell';
@@ -103,11 +103,13 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate }) => {
             </button>
             
             <div className="pt-6 border-t border-cyan-100 space-y-4">
-              <button className="w-full py-4 text-slate-700 font-medium text-lg border border-cyan-200 rounded-2xl hover:bg-cyan-50">
+              <button className=" flex items-center justify-center gap-2 w-full py-4 text-slate-700 font-medium text-lg border border-cyan-200 rounded-2xl hover:bg-cyan-50">
+                <User className="w-5 h-5" />
                 Se connecter
               </button>
               <button className="w-full py-4 bg-linear-to-r from-cyan-600 to-cyan-400 text-white font-medium text-lg rounded-2xl flex items-center justify-center gap-2">
-                <Plus className="w-5 h-5" />
+                {/* <Plus className="w-5 h-5" /> */}
+                <User className="w-5 h-5" />
                 Publier une annonce
               </button>
             </div>
