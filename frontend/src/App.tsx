@@ -1,21 +1,8 @@
 
-
 import './App.css'
-import Header from './components/header/Header.tsx'
-import Login from './pages/Authentication/Login'
-// import LandingPage from './pages/landingPage/LandingPage.tsx'
-import { Routes, Route } from 'react-router-dom'
 
 function App(){
-
-  return (
-    <>
-    <Header />
-      <Routes>
-        {/* <Route path="/" element={<LandingPage />} /> */}
-        <Route path="/login" element={<Login />} />
-
-      </Routes></>
-  )
+  
+  return ()
 }
 export default App
