@@ -105,8 +105,6 @@ const Footer: React.FC = () => {
             <a href="#" className="hover:text-cyan-600 transition-colors">Mentions légales</a>
             <a href="#" className="hover:text-cyan-600 transition-colors">Nous contacter</a>
           </div>
-          
-          <p className="text-xs">Made with ❤️ au Cameroun</p>
         </div>
       </div>
     </footer>
