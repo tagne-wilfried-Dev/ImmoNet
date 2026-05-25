@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { Menu, X, Plus } from 'lucide-react';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+    currentExplore: 'rent' | 'sell';
+    onNavigate: (type: 'rent' | 'sell') => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -24,18 +29,32 @@ const Header: React.FC = () => {
 
           {/* Navigation Desktop */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <a href="#" className="text-slate-700 hover:text-cyan-600 transition-colors duration-200">
-              À Vendre
-            </a>
-            <a href="#" className="text-slate-700 hover:text-cyan-600 transition-colors duration-200">
-              À Louer
-            </a>
-            <a href="#" className="text-slate-700 hover:text-cyan-600 transition-colors duration-200">
+            <button 
+                onClick={() => onNavigate('sell')}
+                className={`transition-colors duration-200 ${
+                    currentExplore === 'sell'
+                    ? 'text-cyan-600 font-semibold' 
+                    : 'text-slate-700 hover:text-cyan-600'
+                    }`}
+                >
+                À Vendre
+            </button>
+            <button 
+                onClick={() => onNavigate('rent')}
+                className={`transition-colors duration-200 ${
+                    currentExplore === 'rent'
+                    ? 'text-cyan-600 font-semibold' 
+                    : 'text-slate-700 hover:text-cyan-600'
+                    }`}
+                >
+                À Louer
+            </button>
+            <button className="text-slate-700 hover:text-cyan-600 transition-colors duration-200">
               Annonces
-            </a>
-            <a href="#" className="text-slate-700 hover:text-cyan-600 transition-colors duration-200">
+            </button>
+            <button className="text-slate-700 hover:text-cyan-600 transition-colors duration-200">
               Propriétaires
-            </a>
+            </button>
           </nav>
 
           {/* Actions Desktop */}
@@ -64,10 +83,24 @@ const Header: React.FC = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-cyan-100 bg-white">
           <div className="px-6 py-8 space-y-6">
-            <a href="#" className="block py-3 text-lg text-slate-700 hover:text-cyan-600 font-medium">À Vendre</a>
-            <a href="#" className="block py-3 text-lg text-slate-700 hover:text-cyan-600 font-medium">À Louer</a>
-            <a href="#" className="block py-3 text-lg text-slate-700 hover:text-cyan-600 font-medium">Annonces</a>
-            <a href="#" className="block py-3 text-lg text-slate-700 hover:text-cyan-600 font-medium">Propriétaires</a>
+            <button 
+              onClick={() => { onNavigate('sell'); setIsMobileMenuOpen(false); }}
+              className="block w-full text-left py-3 text-lg text-slate-700 hover:text-cyan-600 font-medium"
+            >
+              À Vendre
+            </button>
+            <button 
+              onClick={() => { onNavigate('rent'); setIsMobileMenuOpen(false); }}
+              className="block w-full text-left py-3 text-lg text-slate-700 hover:text-cyan-600 font-medium"
+            >
+              À Louer
+            </button>
+            <button className="block w-full text-left  py-3 text-lg text-slate-700 hover:text-cyan-600 font-medium">
+              Annonces
+            </button>
+            <button className="block w-full text-left  py-3 text-lg text-slate-700 hover:text-cyan-600 font-medium">
+              Propriétaires
+            </button>
             
             <div className="pt-6 border-t border-cyan-100 space-y-4">
               <button className="w-full py-4 text-slate-700 font-medium text-lg border border-cyan-200 rounded-2xl hover:bg-cyan-50">
