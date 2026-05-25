@@ -108,8 +108,7 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate }) => {
                 Se connecter
               </button>
               <button className="w-full py-4 bg-linear-to-r from-cyan-600 to-cyan-400 text-white font-medium text-lg rounded-2xl flex items-center justify-center gap-2">
-                {/* <Plus className="w-5 h-5" /> */}
-                <User className="w-5 h-5" />
+                <Plus className="w-5 h-5" />                
                 Publier une annonce
               </button>
             </div>
