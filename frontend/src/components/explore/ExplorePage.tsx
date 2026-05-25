@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Search, Filter, X } from 'lucide-react';
+import { MapPin, Search, Filter, X, Menu } from 'lucide-react';
 
 interface ExplorePageProps {
   title: string; // "Immobilier à vendre" ou "Immobilier à louer"
@@ -94,7 +94,8 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title, mode }) => {
                   Activer ma recherche
                 </button>
 
-                <button className="flex-1 py-4 border border-cyan-200 hover:bg-cyan-50 text-slate-700 font-medium rounded-2xl transition-all">
+                <button className="flex-1 flex gap-2 justify-center items-center py-4 border border-cyan-200 hover:bg-cyan-50 text-slate-700 font-medium rounded-2xl transition-all">
+                  <Menu className="w-5 h-5" />
                   Afficher tout
                 </button>
               </div>
