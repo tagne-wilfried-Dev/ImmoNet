@@ -1,33 +1,32 @@
+import React from 'react';
+// import { Routes, Route} from 'react-router-dom';
+import DashboardPage from './pages/proprietaire/DashboardPage';
+// import Home from './pages/basePages/Home';
 
-import './App.css'
-import Footer from './components/layout/Footer'
-import Header from './components/layout/Header'
-import ExploreSellings from './pages/explorePages/ExploreSellings';
-import ExploreRenting from './pages/explorePages/ExploreRenting';
-import { useState } from 'react';
+// Placeholder pour les autres pages
+// const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => {
+//   return (
+//     <div className="flex items-center justify-center min-h-[60vh]">
+//       <div className="text-center">
+//         <h1 className="font-display text-3xl font-bold text-slate-900 mb-2">
+//           {title}
+//         </h1>
+//         <p className="text-slate-600">Page en cours de développement</p>
+//       </div>
+//     </div>
+//   );
+// };
 
-/* pour la gestion des liens de base */
-type ExploreType = 'rent' | 'sell';
-
-function App(){
-  const [currentExplore, setCurrentExplore] = useState<ExploreType>('rent');
-
-  let content;
-  if(currentExplore === 'rent') {
-    content = <ExploreRenting />;
-  } else if(currentExplore === 'sell') {
-    content = <ExploreSellings />;
-  }
+const App: React.FC = () => {
   return (
-    <>
-      <Header currentExplore={currentExplore}
-      onNavigate={setCurrentExplore} />
-      <main className="container mx-auto px-6 py-12">
-        {content}
-      </main>
-      {/* Footer */}
-      <Footer />
-    </>
-  )
-}
-export default App
+    <DashboardPage />
+    // <Routes>
+
+    //   {/* Routes protégées Dashboard */}
+    //   <Route path="/dashboard" element={<DashboardPage  />} />
+
+    // </Routes>
+  );
+};
+
+export default App;
