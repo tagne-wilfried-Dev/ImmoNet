@@ -16,6 +16,7 @@ interface HeaderConnectedProps {
   userRole: 'CLIENT' | 'PRO' | 'ADMIN';
   notificationCount: number;
   onToggleSidebar: () => void;
+  onOpenNotifications: () => void; 
 }
 
 const HeaderConnected: React.FC<HeaderConnectedProps> = ({
@@ -23,6 +24,7 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
   userRole,
   notificationCount,
   onToggleSidebar,
+  onOpenNotifications,
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -110,10 +112,14 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
           </button>
 
           {/* Notifications */}
-          <button className="relative p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+          <button 
+            onClick={onOpenNotifications}
+            className="relative p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+            aria-label="Ouvrir les notifications"
+          >
             <Bell size={20} />
             {notificationCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              <span className="absolute top-1 right-1 w-4 h-4 bg-cyan-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                 {notificationCount}
               </span>
             )}
