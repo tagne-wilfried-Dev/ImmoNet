@@ -1,0 +1,73 @@
+{
+  "kpis": [
+    {
+      "id": "views",
+      "title": "Nombre de vues aujourd'hui",
+      "value": "58",
+      "previousValue": "42",
+      "trend": "+38%",
+      "positive": true,
+      "icon": "Eye"
+    },
+    {
+      "id": "sales",
+      "title": "Mes ventes aujourd'hui",
+      "value": "125 000 CFA",
+      "previousValue": "80 000 CFA",
+      "trend": "+56%",
+      "positive": true,
+      "icon": "TrendingUp"
+    },
+    {
+      "id": "account",
+      "title": "Sur votre compte",
+      "value": "1 250 000 CFA",
+      "previousValue": "1 100 000 CFA",
+      "trend": "+13.6%",
+      "positive": true,
+      "icon": "Wallet"
+    }
+  ],
+  "chartData": [
+    { "date": "04 Mai", "vues": 12, "clics": 3 },
+    { "date": "05 Mai", "vues": 18, "clics": 5 },
+    { "date": "06 Mai", "vues": 15, "clics": 4 },
+    { "date": "07 Mai", "vues": 22, "clics": 7 },
+    { "date": "08 Mai", "vues": 28, "clics": 9 },
+    { "date": "09 Mai", "vues": 25, "clics": 8 },
+    { "date": "10 Mai", "vues": 32, "clics": 11 },
+    { "date": "11 Mai", "vues": 38, "clics": 14 },
+    { "date": "12 Mai", "vues": 35, "clics": 12 },
+    { "date": "13 Mai", "vues": 42, "clics": 16 },
+    { "date": "14 Mai", "vues": 48, "clics": 18 },
+    { "date": "15 Mai", "vues": 45, "clics": 15 },
+    { "date": "16 Mai", "vues": 52, "clics": 20 },
+    { "date": "17 Mai", "vues": 58, "clics": 22 }
+  ],
+  "quickActions": [
+    {
+      "id": "annonces",
+      "title": "Mes annonces",
+      "description": "Gérer vos annonces, modifier votre planning, promotions etc...",
+      "icon": "MapPin",
+      "path": "/dashboard/annonces",
+      "count": 12
+    },
+    {
+      "id": "reservations",
+      "title": "Mes réservations",
+      "description": "Gérer, annuler vos réservations",
+      "icon": "Calendar",
+      "path": "/dashboard/reservations",
+      "count": 5
+    },
+    {
+      "id": "messages",
+      "title": "Mes messages",
+      "description": "Suivez toutes vos conversations importantes",
+      "icon": "MessageSquare",
+      "path": "/dashboard/messages",
+      "count": 3
+    }
+  ]
+}
