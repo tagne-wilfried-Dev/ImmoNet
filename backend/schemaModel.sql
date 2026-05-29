@@ -16,16 +16,16 @@ USE immonet_db;
 -- 1. TABLE UTILISATEURS
 -- ============================================================
 CREATE TABLE utilisateurs (
-    id VARCHAR(36) PRIMARY KEY COMMENT 'UUID',
-    nom VARCHAR(100) NOT NULL,
-    prenom VARCHAR(100) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    mot_de_passe_hash VARCHAR(255) NOT NULL COMMENT 'BCrypt',
-    telephone VARCHAR(20) NOT NULL,
-    date_inscription DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id VARCHAR(36) PRIMARY KEY COMMENT 'UUID',--
+    nom VARCHAR(100) NOT NULL,--
+    prenom VARCHAR(100) NOT NULL,--
+    email VARCHAR(255) NOT NULL UNIQUE,--
+    mot_de_passe_hash VARCHAR(255) NOT NULL COMMENT 'BCrypt',--
+    telephone VARCHAR(20) NOT NULL,--
+    date_inscription DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,--
     dernier_login DATETIME NULL,
-    statut ENUM('ACTIVE', 'PENDING_VERIFICATION', 'SUSPENDED', 'BANNED') NOT NULL DEFAULT 'PENDING_VERIFICATION',
-    role ENUM('CLIENT', 'PRO', 'ADMIN') NOT NULL DEFAULT 'CLIENT',
+    statut ENUM('ACTIVE','SUSPENDED', 'BANNED') NOT NULL DEFAULT 'ACTIVE',
+    role ENUM('VISITEUR','CLIENT', 'PRO', 'ADMIN') NOT NULL DEFAULT 'CLIENT',--
     email_verifie BOOLEAN NOT NULL DEFAULT FALSE,
     avatar_url VARCHAR(500) NULL,
     consentement_cgu_date DATETIME NULL,
@@ -47,23 +47,17 @@ CREATE TABLE abonnements_pro (
     utilisateur_id VARCHAR(36) NOT NULL,
     type_abonnement ENUM('STARTER', 'BUSINESS', 'PREMIUM') NOT NULL,
     date_debut DATETIME NOT NULL,
-    date_fin DATETIME NOT NULL,
     stripe_subscription_id VARCHAR(255) NULL,
     stripe_payment_id VARCHAR(255) NULL,
     actif BOOLEAN NOT NULL DEFAULT FALSE,
-    valide_par_admin BOOLEAN NOT NULL DEFAULT FALSE,
-    valide_par_admin_date DATETIME NULL,
-    admin_validateur_id VARCHAR(36) NULL,
-    montant_paye DECIMAL(10, 2) NOT NULL,
+    montant_paye INT NOT NULL,
     devise VARCHAR(3) NOT NULL DEFAULT 'XAF',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
-    FOREIGN KEY (admin_validateur_id) REFERENCES utilisateurs(id) ON DELETE SET NULL,
     INDEX idx_utilisateur (utilisateur_id),
-    INDEX idx_actif (actif),
-    INDEX idx_dates (date_debut, date_fin)
+    INDEX idx_actif (actif)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
