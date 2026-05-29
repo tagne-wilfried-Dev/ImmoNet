@@ -4,17 +4,17 @@
 -- table utilisateurs
 
 CREATE TABLE utilisateurs (
-    id VARCHAR(36) PRIMARY KEY COMMENT 'UUID',--
-    nom VARCHAR(100) NOT NULL,--
-    prenom VARCHAR(100) NOT NULL,--
-    email VARCHAR(255) NOT NULL UNIQUE,--
-    mot_de_passe_hash VARCHAR(255) NOT NULL COMMENT 'BCrypt',--
-    telephone VARCHAR(20) NOT NULL,--
-    date_inscription DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,--
+    id VARCHAR(36) PRIMARY KEY COMMENT 'UUID',
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    mot_de_passe_hash VARCHAR(255) NOT NULL COMMENT 'BCrypt cost 12',
+    telephone VARCHAR(20) NOT NULL,
+    date_inscription DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     dernier_login DATETIME NULL,
-    statut ENUM('ACTIVE','SUSPENDED', 'BANNED') NOT NULL DEFAULT 'ACTIVE',
-    role ENUM('VISITEUR','CLIENT', 'PRO', 'ADMIN') NOT NULL DEFAULT 'CLIENT',--
-    email_verifie BOOLEAN NOT NULL DEFAULT FALSE,
+    statut ENUM('ACTIVE', 'SUSPENDED', 'BANNED') NOT NULL DEFAULT 'ACTIVE' COMMENT 'Plus de validation admin. Activation directe.',
+    role ENUM('CLIENT', 'PRO', 'ADMIN') NOT NULL DEFAULT 'CLIENT',
+    email_verifie BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Vérification technique obligatoire via lien email.',
     avatar_url VARCHAR(500) NULL,
     consentement_cgu_date DATETIME NULL,
     reset_token VARCHAR(255) NULL,
@@ -36,8 +36,8 @@ CREATE TABLE abonnements_pro (
     date_debut DATETIME NOT NULL,
     stripe_subscription_id VARCHAR(255) NULL,
     stripe_payment_id VARCHAR(255) NULL,
-    actif BOOLEAN NOT NULL DEFAULT FALSE,
-    montant_paye INT NOT NULL,
+    actif BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Passe à TRUE via webhook Stripe après paiement.',
+    montant_paye DECIMAL(10, 2) NOT NULL,
     devise VARCHAR(3) NOT NULL DEFAULT 'XAF',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

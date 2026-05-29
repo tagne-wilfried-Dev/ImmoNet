@@ -56,8 +56,7 @@ CREATE TABLE abonnements_pro (
     
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
     INDEX idx_utilisateur (utilisateur_id),
-    INDEX idx_actif (actif),
-    INDEX idx_dates (date_debut, date_fin)
+    INDEX idx_actif (actif)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
