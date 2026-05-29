@@ -58,4 +58,4 @@ hs_err_pid*
 replay_pid*
 
 # personal
-config/
+backend/src/main/resources/META-INF/additional-spring-configuration-metadata.json
