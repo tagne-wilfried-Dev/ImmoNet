@@ -1,11 +1,10 @@
-
--- ImmoNet - Base de données complète
--- Version: 1.0
+-- ============================================================
+-- ImmoNet - Base de données (Phase 1 - Sans validation Admin)
+-- Version: 1.1
 -- Date: Mai 2026
 -- SGBD: MySQL 8.0+
 -- ============================================================
 
--- Création de la base de données
 CREATE DATABASE IF NOT EXISTS immonet_db 
 CHARACTER SET utf8mb4 
 COLLATE utf8mb4_unicode_ci;
@@ -13,20 +12,20 @@ COLLATE utf8mb4_unicode_ci;
 USE immonet_db;
 
 -- ============================================================
--- 1. TABLE UTILISATEURS
+-- 1. TABLE UTILISATEURS (Inscription directe → ACTIVE)
 -- ============================================================
 CREATE TABLE utilisateurs (
-    id VARCHAR(36) PRIMARY KEY COMMENT 'UUID',--
-    nom VARCHAR(100) NOT NULL,--
-    prenom VARCHAR(100) NOT NULL,--
-    email VARCHAR(255) NOT NULL UNIQUE,--
-    mot_de_passe_hash VARCHAR(255) NOT NULL COMMENT 'BCrypt',--
-    telephone VARCHAR(20) NOT NULL,--
-    date_inscription DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,--
+    id VARCHAR(36) PRIMARY KEY COMMENT 'UUID',
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    mot_de_passe_hash VARCHAR(255) NOT NULL COMMENT 'BCrypt cost 12',
+    telephone VARCHAR(20) NOT NULL,
+    date_inscription DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     dernier_login DATETIME NULL,
-    statut ENUM('ACTIVE','SUSPENDED', 'BANNED') NOT NULL DEFAULT 'ACTIVE',
-    role ENUM('VISITEUR','CLIENT', 'PRO', 'ADMIN') NOT NULL DEFAULT 'CLIENT',--
-    email_verifie BOOLEAN NOT NULL DEFAULT FALSE,
+    statut ENUM('ACTIVE', 'SUSPENDED', 'BANNED') NOT NULL DEFAULT 'ACTIVE' COMMENT 'Plus de validation admin. Activation directe.',
+    role ENUM('CLIENT', 'PRO', 'ADMIN') NOT NULL DEFAULT 'CLIENT',
+    email_verifie BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Vérification technique obligatoire via lien email.',
     avatar_url VARCHAR(500) NULL,
     consentement_cgu_date DATETIME NULL,
     reset_token VARCHAR(255) NULL,
@@ -40,7 +39,7 @@ CREATE TABLE utilisateurs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 2. TABLE ABONNEMENTS PRO
+-- 2. TABLE ABONNEMENTS PRO (Activation via Stripe Webhook)
 -- ============================================================
 CREATE TABLE abonnements_pro (
     id VARCHAR(36) PRIMARY KEY,
@@ -49,19 +48,20 @@ CREATE TABLE abonnements_pro (
     date_debut DATETIME NOT NULL,
     stripe_subscription_id VARCHAR(255) NULL,
     stripe_payment_id VARCHAR(255) NULL,
-    actif BOOLEAN NOT NULL DEFAULT FALSE,
-    montant_paye INT NOT NULL,
+    actif BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Passe à TRUE via webhook Stripe après paiement.',
+    montant_paye DECIMAL(10, 2) NOT NULL,
     devise VARCHAR(3) NOT NULL DEFAULT 'XAF',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
     INDEX idx_utilisateur (utilisateur_id),
-    INDEX idx_actif (actif)
+    INDEX idx_actif (actif),
+    INDEX idx_dates (date_debut, date_fin)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 3. TABLE BIENS IMMOBILIERS
+-- 3. TABLE BIENS (Publication directe par le propriétaire)
 -- ============================================================
 CREATE TABLE biens (
     id VARCHAR(36) PRIMARY KEY,
@@ -77,7 +77,7 @@ CREATE TABLE biens (
     latitude DECIMAL(10, 8) NULL,
     longitude DECIMAL(11, 8) NULL,
     prix DECIMAL(15, 2) NOT NULL,
-    prix_nuit DECIMAL(15, 2) NULL COMMENT 'Pour location courte durée',
+    prix_nuit DECIMAL(15, 2) NULL COMMENT 'Location courte durée',
     prix_semaine DECIMAL(15, 2) NULL,
     prix_mois DECIMAL(15, 2) NULL,
     charges_incluses BOOLEAN NOT NULL DEFAULT FALSE,
@@ -87,9 +87,9 @@ CREATE TABLE biens (
     surface DECIMAL(10, 2) NOT NULL COMMENT 'en m²',
     nb_pieces INT NULL,
     nb_chambres INT NULL,
-    nb_sdb INT NULL COMMENT 'Nombre de salles de bain',
+    nb_sdb INT NULL,
     etage INT NULL,
-    statut ENUM('BROUILLON', 'EN_ATTENTE_VALIDATION', 'PUBLIE', 'EN_LOCATION', 'VENDU', 'ARCHIVE', 'SUSPENDU') NOT NULL DEFAULT 'BROUILLON',
+    statut ENUM('BROUILLON', 'PUBLIE', 'EN_LOCATION', 'VENDU', 'ARCHIVE', 'SUSPENDU') NOT NULL DEFAULT 'BROUILLON' COMMENT 'Publication directe. Plus de validation admin.',
     date_publication DATETIME NULL,
     date_expiration DATETIME NULL,
     nb_vues INT NOT NULL DEFAULT 0,
@@ -143,7 +143,7 @@ CREATE TABLE equipements (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 6. TABLE DISPONIBILITES (Pour locations)
+-- 6. TABLE DISPONIBILITES
 -- ============================================================
 CREATE TABLE disponibilites (
     id VARCHAR(36) PRIMARY KEY,
@@ -159,7 +159,7 @@ CREATE TABLE disponibilites (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 7. TABLE RESERVATIONS (Location, Visite, Achat)
+-- 7. TABLE RESERVATIONS
 -- ============================================================
 CREATE TABLE reservations (
     id VARCHAR(36) PRIMARY KEY,
@@ -190,7 +190,7 @@ CREATE TABLE reservations (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 8. TABLE CONTRATS (PDF générés)
+-- 8. TABLE CONTRATS (PDF)
 -- ============================================================
 CREATE TABLE contrats (
     id VARCHAR(36) PRIMARY KEY,
@@ -262,7 +262,7 @@ CREATE TABLE paiements_loyers (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 11. TABLE CONVERSATIONS (Messagerie)
+-- 11. TABLE CONVERSATIONS
 -- ============================================================
 CREATE TABLE conversations (
     id VARCHAR(36) PRIMARY KEY,
@@ -442,7 +442,7 @@ CREATE TABLE historique_modifications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 19. TABLE REFRESH TOKENS
+-- 19. TABLE REFRESH TOKENS (Sécurité JWT)
 -- ============================================================
 CREATE TABLE refresh_tokens (
     id VARCHAR(36) PRIMARY KEY,
@@ -483,23 +483,7 @@ CREATE TABLE signalements (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- DONNÉES DE TEST - UTILISATEUR ADMIN
--- ============================================================
--- Mot de passe: Admin@2026 (à hasher avec BCrypt en production)
-INSERT INTO utilisateurs (
-    id, nom, prenom, email, mot_de_passe_hash, telephone, 
-    statut, role, email_verifie, date_inscription
-) VALUES (
-    '550e8400-e29b-41d4-a716-446655440000',
-    'ADMIN', 'Super',
-    'admin@immonet.cm',
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.XEQOwEhK5VqG0C',
-    '+237600000000',
-    'ACTIVE', 'ADMIN', TRUE, NOW()
-);
-
--- ============================================================
--- VUES UTILES
+-- VUES UTILES (Mises à jour pour la nouvelle logique)
 -- ============================================================
 
 -- Vue: Statistiques des biens par propriétaire
@@ -552,29 +536,15 @@ ORDER BY mois DESC;
 -- ============================================================
 -- INDEX SUPPLÉMENTAIRES POUR PERFORMANCES
 -- ============================================================
-
--- Index composites pour recherches avancées
 CREATE INDEX idx_biens_recherche ON biens(type_operation, type_bien, ville, statut, prix);
 CREATE INDEX idx_biens_geo ON biens(latitude, longitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
 CREATE INDEX idx_reservations_dispo ON reservations(bien_id, date_debut, date_fin, statut);
 
 -- ============================================================
--- TRIGGERS
+-- ÉVÉNEMENT AUTOMATISÉ (Archivage des biens expirés)
 -- ============================================================
-
--- Trigger: Mettre à jour nb_vues
 DELIMITER $$
-CREATE TRIGGER trg_increment_vues
-AFTER INSERT ON biens
-FOR EACH ROW
-BEGIN
-    -- Logique future pour tracker les vues
-END$$
-DELIMITER ;
-
--- Trigger: Archiver automatiquement les biens expirés
-DELIMITER $$
-CREATE EVENT evt_archiver_biens_expires
+CREATE EVENT IF NOT EXISTS evt_archiver_biens_expires
 ON SCHEDULE EVERY 1 DAY
 STARTS CURRENT_DATE + INTERVAL 1 DAY
 DO
@@ -588,10 +558,26 @@ END$$
 DELIMITER ;
 
 -- ============================================================
--- CONFIGURATION FINALE
+-- DONNÉES DE TEST (Utilisateurs de base)
 -- ============================================================
+-- Mot de passe: Test1234! (hash BCrypt cost 12 généré)
+INSERT INTO utilisateurs (
+    id, nom, prenom, email, mot_de_passe_hash, telephone, 
+    statut, role, email_verifie, date_inscription
+) VALUES 
+('550e8400-e29b-41d4-a716-446655440000', 'ADMIN', 'Super', 'admin@immonet.cm', 
+ '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.XEQOwEhK5VqG0C', 
+ '+237600000000', 'ACTIVE', 'ADMIN', TRUE, NOW()),
+('660e8400-e29b-41d4-a716-446655440001', 'DUPONT', 'Jean', 'jean@immonet.cm', 
+ '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.XEQOwEhK5VqG0C', 
+ '+237699999999', 'ACTIVE', 'CLIENT', TRUE, NOW()),
+('770e8400-e29b-41d4-a716-446655440002', 'MARTIN', 'Paul', 'paul@immonet.cm', 
+ '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.XEQOwEhK5VqG0C', 
+ '+237688888888', 'ACTIVE', 'PRO', TRUE, NOW());
 
--- Afficher le nombre de tables créées
+-- ============================================================
+-- VÉRIFICATION FINALE
+-- ============================================================
 SELECT 
     COUNT(*) as nombre_tables,
     TABLE_SCHEMA as base_de_donnees
@@ -599,7 +585,6 @@ FROM information_schema.TABLES
 WHERE TABLE_SCHEMA = 'immonet_db' 
   AND TABLE_TYPE = 'BASE TABLE';
 
--- Afficher la taille de la base
 SELECT 
     table_schema as 'Base de données',
     ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS 'Taille (MB)'
