@@ -1,27 +1,32 @@
 package com.immoteam.entity;
 
-import com.mobiloc.entity.enums.RoleUtilisateur;
-import com.mobiloc.entity.enums.StatutUtilisateur;
+import com.immoteam.entity.enums.RoleUtilisateur;
+import com.immoteam.entity.enums.StatutUtilisateur;
+// import com.immoteam.entity.Signalement;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name="utilisateurs")
-@Data 
+@Table(name = "utilisateurs")
+@Data
 @Getter
 @Setter
-@NoArgsConstructor 
-@AllArgsConstructor 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long  id;
+    private Long id;
 
     @NotBlank(message = "Le nom est obligatoire")
     @Column(nullable = false)
@@ -30,23 +35,22 @@ public class Utilisateur {
     String prenom;
 
     @Email
-    @Column(unique=true, nullable=false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @NotBlank(message = "Le mot de passe est obligatoire")
-    @Column(nullable=false)
+    @Column(nullable = false)
     String motDePasseHash;
 
     @NotBlank
-    @Column
-    private String telephone
+    private String telephone;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    LocalDateTime dateInscription
-    
+    LocalDateTime dateInscription;
+
     @Column
-    LocalDateTime dernierLogin
+    LocalDateTime dernierLogin;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -58,26 +62,27 @@ public class Utilisateur {
     @Builder.Default
     RoleUtilisateur role = RoleUtilisateur.CLIENT;
 
-    // on va changer apres mettre a true pour faciliter 
-    @Column(columnDefinition="boolean default true")
-    boolean emailVerifie
-    
+    // on va changer apres mettre a true pour faciliter
+    @Column(columnDefinition = "boolean default true")
+    boolean emailVerifie;
+
     @Column
-    String avatarUrl
+    String avatarUrl;
+
     // date d'acceptation des CGU
-    LocalDateTime consentementCguDate
-    
+    LocalDateTime consentementCguDate;
+
     @Column
-    String resetToken
-    
+    String resetToken;
+
     @Column
-    String resetTokenExpires
-    
+    String resetTokenExpires;
+
     @CreationTimestamp
-    LocalDateTime createdAt
-    
+    LocalDateTime createdAt;
+
     @UpdateTimestamp
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt;
 
     // les associations
     @OneToMany(mappedBy = "proprietaire", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -89,9 +94,9 @@ public class Utilisateur {
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private List<AbonnementPro> abonnements = new ArrayList<>();
 
-    @OneToMany(mappedBy = "signalant", cascade = CascadeType.ALL)
-    private List<Signalement> signalements = new ArrayList<>();
-
+    // @OneToMany(mappedBy = "signalant", cascade = CascadeType.ALL)
+    // private List<Signalement> signalements = new ArrayList<>();
+    
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 }
