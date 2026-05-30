@@ -30,6 +30,10 @@ public class Message {
     @JoinColumn(name = "expediteur_id", nullable = false)
     private Utilisateur expediteur;
 
+    @ManyToOne
+    @JoinColumn(name = "destinataire_id", nullable = false)
+    private Utilisateur destinataire;
+
     @NotBlank(message = "Le contenu du message est obligatoire")
     @Column(columnDefinition = "TEXT", nullable = false)
     private String contenu;
@@ -40,7 +44,7 @@ public class Message {
 
     @Column(nullable = false)
     @Builder.Default
-    private boolean estLu = false;
+    private boolean lu = false;
 
     @Column
     private LocalDateTime dateLu;

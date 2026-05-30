@@ -7,7 +7,7 @@ import java.util.List;
 
 @Repository
 public interface OffreAchatRepository extends JpaRepository<OffreAchat, Long> {
-    List<OffreAchat> findByBienIdOrderByDateCreationDesc(Long bienId);
-    List<OffreAchat> findByClientUtilisateurIdOrderByDateCreationDesc(Long clientId);
+    List<OffreAchat> findByBienIdOrderByCreatedAtDesc(Long bienId);
+    List<OffreAchat> findByClientIdOrderByCreatedAtDesc(Long clientId);
     List<OffreAchat> findByBienIdAndStatut(Long bienId, String statut);
 }

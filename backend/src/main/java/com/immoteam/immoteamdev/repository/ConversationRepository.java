@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
-    List<Conversation> findByUtilisateur1IdOrUtilisateur2IdOrderByDateDernierMessageDesc(Long id1, Long id2);
-    Optional<Conversation> findByBienIdAndUtilisateur1IdAndUtilisateur2Id(Long bienId, Long id1, Long id2);
+    List<Conversation> findByParticipant1IdOrParticipant2IdOrderByDernierMessageAtDesc(Long id1, Long id2);
+    Optional<Conversation> findByBienIdAndParticipant1IdAndParticipant2Id(Long bienId, Long id1, Long id2);
 }

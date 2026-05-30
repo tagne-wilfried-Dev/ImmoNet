@@ -8,6 +8,6 @@ import java.util.Optional;
 @Repository
 public interface AbonnementProRepository extends JpaRepository<AbonnementPro, Long> {
     Optional<AbonnementPro> findByUtilisateurId(Long utilisateurId);
-    Optional<AbonnementPro> findByStripeSubId(String stripeSubId);
-    boolean existsByUtilisateurIdAndActifTrueAndValideParAdminTrue(Long utilisateurId);
+    Optional<AbonnementPro> findByStripeSubscriptionId(String stripeSubId);
+    boolean existsByUtilisateurIdAndActifTrue(Long utilisateurId);
 }

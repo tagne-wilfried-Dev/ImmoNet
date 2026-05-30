@@ -32,6 +32,10 @@ public class DemandeVisite {
     @JoinColumn(name = "client_id", nullable = false)
     private Utilisateur client;
 
+    @ManyToOne
+    @JoinColumn(name = "proprietaire_id", nullable = false)
+    private Utilisateur proprietaire;
+
     @NotNull
     @Column(nullable = false)
     private LocalDate dateSouhaitee;
@@ -47,7 +51,7 @@ public class DemandeVisite {
 
     @Column(columnDefinition = "TEXT")
     private String messageClient;
-
+    
     @Column(columnDefinition = "TEXT")
     private String motifRefus;
 

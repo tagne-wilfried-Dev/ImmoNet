@@ -56,7 +56,7 @@ public class AlerteRecherche {
 
     @Column(nullable = false)
     @Builder.Default
-    private boolean estActive = true;
+    private boolean estActif = true;
 
     @Column
     private LocalDateTime derniereNotification;
