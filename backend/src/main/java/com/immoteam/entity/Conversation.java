@@ -1,15 +1,57 @@
 package com.immoteam.entity;
 
-@Entity @Table(name="conversations")
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "conversations")
+@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Conversation {
-    @Id private String id;
-    @ManyToOne @JoinColumn(name="bien_id") private Bien bien;
-    @ManyToOne @JoinColumn(name="participant_1_id") private Utilisateur participant1;
-    @ManyToOne @JoinColumn(name="participant_2_id") private Utilisateur participant2;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "bien_id", nullable = false)
+    private Bien bien;
+
+    @ManyToOne
+    @JoinColumn(name = "participant_1_id", nullable = false)
+    private Utilisateur participant1;
+
+    @ManyToOne
+    @JoinColumn(name = "participant_2_id", nullable = false)
+    private Utilisateur participant2;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime dateCreation;
+
+    @Column
     private LocalDateTime dernierMessageAt;
-    private boolean estArchiveParticipant1;
-    private boolean estArchiveParticipant2;
-    @CreationTimestamp private LocalDateTime createdAt;
-    @UpdateTimestamp private LocalDateTime updatedAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean estArchiveParticipant1 = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean estArchiveParticipant2 = false;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 }
