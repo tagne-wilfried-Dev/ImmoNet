@@ -86,17 +86,18 @@ public class Utilisateur {
 
     // les associations
     @OneToMany(mappedBy = "proprietaire", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Bien> biens = new ArrayList<>();
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Reservation> reservations = new ArrayList<>();
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<AbonnementPro> abonnements = new ArrayList<>();
 
-    // @OneToMany(mappedBy = "signalant", cascade = CascadeType.ALL)
-    // private List<Signalement> signalements = new ArrayList<>();
-    
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 }

@@ -1,24 +1,59 @@
 package com.immoteam.entity;
 
+import com.immoteam.entity.enums.TypeMessage;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "messages")
+@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Message {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
-    @JoinColumn(name = "conversation_id")
+    @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
+
     @ManyToOne
-    @JoinColumn(name = "expediteur_id")
+    @JoinColumn(name = "expediteur_id", nullable = false)
     private Utilisateur expediteur;
-    @Column(columnDefinition = "TEXT")
+
+    @NotBlank(message = "Le contenu du message est obligatoire")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String contenu;
+
+    @NotNull
+    @Column(nullable = false)
     private LocalDateTime dateEnvoi;
-    private boolean estLu;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean estLu = false;
+
+    @Column
     private LocalDateTime dateLu;
+
     @Enumerated(EnumType.STRING)
-    private TypeMessage typeMessage; // TEXTE, IMAGE, DOCUMENT
+    @Column(nullable = false)
+    @Builder.Default
+    private TypeMessage typeMessage = TypeMessage.TEXTE;
+
+    @Column
     private String urlFichier;
+
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 }

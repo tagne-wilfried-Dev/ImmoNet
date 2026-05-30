@@ -1,16 +1,68 @@
 package com.immoteam.entity;
 
-@Entity @Table(name="contrats")
+import com.immoteam.entity.enums.TypeContrat;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "contrats")
+@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Contrat {
-    @Id private String id;
-    @OneToOne @JoinColumn(name="reservation_id") private Reservation reservation;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "reservation_id", nullable = false)
+    private Reservation reservation;
+
+    @NotBlank
+    @Column(nullable = false)
     private String urlPdf;
+
+    @NotBlank
+    @Column(nullable = false)
     private String publicIdCloudinary;
-    @Enumerated(EnumType.STRING) private TypeContrat typeContrat; // LOCATION, VENTE
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Column(nullable = false)
+    private TypeContrat typeContrat;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime dateGeneration;
-    private boolean estSigne;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean estSigne = false;
+
+    @Column
     private LocalDateTime dateSignatureClient;
+
+    @Column
     private LocalDateTime dateSignatureProprietaire;
-    private boolean signatureElectronique;
-    @CreationTimestamp private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean signatureElectronique = false;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 }
