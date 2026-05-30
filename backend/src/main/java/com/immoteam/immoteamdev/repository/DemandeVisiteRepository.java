@@ -7,7 +7,7 @@ import java.util.List;
 
 @Repository
 public interface DemandeVisiteRepository extends JpaRepository<DemandeVisite, Long> {
-    List<DemandeVisite> findByBienIdAndStatutOrderByDateDemandeDesc(Long bienId, String statut);
-    List<DemandeVisite> findByProprietaireUtilisateurIdAndStatutOrderByDateDemandeDesc(Long proprietaireId, String statut);
-    List<DemandeVisite> findByClientUtilisateurIdOrderByDateDemandeDesc(Long clientId);
+    List<DemandeVisite> findByBienIdAndStatutOrderByCreatedAtDesc(Long bienId, String statut);
+    List<DemandeVisite> findByProprietaireIdAndStatutOrderByCreatedAtDesc(Long proprietaireId, String statut);
+    List<DemandeVisite> findByClientIdOrderByCreatedAtDesc(Long clientId);
 }

@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface AlerteRechercheRepository extends JpaRepository<AlerteRecherche, Long> {
-    List<AlerteRecherche> findByUtilisateurIdAndActifTrue(Long utilisateurId);
+    List<AlerteRecherche> findByUtilisateurIdAndEstActifTrue(Long utilisateurId);
 }
