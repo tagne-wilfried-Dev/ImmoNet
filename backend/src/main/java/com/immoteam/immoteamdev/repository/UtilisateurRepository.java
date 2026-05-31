@@ -17,4 +17,5 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     // 🔍 CDC 2.2 & 3.9 : Gestion des rôles & validation Pro
     long countByRole(String role);
     // Si votre enum Role est typée, remplacez String par com.immoteam.entity.enums.RoleEnum
+    Optional<Utilisateur> findByRefreshToken(String refreshToken);
 }
