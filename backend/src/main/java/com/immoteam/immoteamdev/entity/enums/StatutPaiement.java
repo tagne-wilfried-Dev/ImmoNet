@@ -1,0 +1,7 @@
+package com.immoteam.immoteamdev.entity.enums;
+
+public enum StatutPaiement {
+    PAYE, 
+    EN_RETARD, 
+    EN_ATTENTE
+}
