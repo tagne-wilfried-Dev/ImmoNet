@@ -97,7 +97,6 @@ public class Utilisateur {
     @Builder.Default
     private List<AbonnementPro> abonnements = new ArrayList<>();
 
-    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<RefreshToken> refreshTokens = new ArrayList<>();
+    @Column
+    private String refreshToken;
 }
