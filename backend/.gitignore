@@ -58,7 +58,8 @@ hs_err_pid*
 replay_pid*
 
 # personal
-config/
-*.svg
-*.png
-*.avif
+<<<<<<< HEAD
+
+=======
+backend/src/main/resources/META-INF/additional-spring-configuration-metadata.json
+>>>>>>> f418ca054779d869c17812568e410392769c48fe
