@@ -12,6 +12,7 @@ import CreateAnnoncePage from './pages/proprietaire/CreateAnnoncePage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
+import Appp from '@/draft';
 
 // const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
 //   <div className="flex items-center justify-center min-h-[60vh]">
@@ -26,6 +27,7 @@ const App: React.FC = () => {
   return (
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/demo" element={<Appp />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
