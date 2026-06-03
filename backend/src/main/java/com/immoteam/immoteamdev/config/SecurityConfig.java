@@ -2,11 +2,9 @@ package com.immoteam.immoteamdev.config;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,7 +16,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.immoteam.immoteamdev.security.CustomUserDetailsService;
 import com.immoteam.immoteamdev.security.JwtAuthFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -29,13 +26,6 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
     
     private final JwtAuthFilter jwtAuthFilter;
-    private final CustomUserDetailsService userDetailsService;
-    
-    @Autowired
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
-        this.jwtAuthFilter = jwtAuthFilter;
-        this.userDetailsService = new CustomUserDetailsService();
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -47,6 +37,7 @@ public class SecurityConfig {
                 // Routes publiques
                 .requestMatchers(
                     "/api/auth/**",
+                    "/welcome/**",
                     "/api/biens",
                     "/api/biens/{id}",
                     "/api/biens/search/**",
@@ -61,13 +52,12 @@ public class SecurityConfig {
                 // Routes authentifiées
                 .anyRequest().authenticated()
             )
-            .authenticationManager(authenticationManager(http))
-            .userDetailsService(userDetailsService)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }
     
+    // pour authoriser react  a accdeder s l'api
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -82,11 +72,15 @@ public class SecurityConfig {
         return source;
     }
     
+    // @Bean
+    // public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+    //     AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+    //     builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    //     return builder.build();
+    // }
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-        return builder.build();
+    public AuthenticationManager authenticationManager(org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
     
     @Bean
