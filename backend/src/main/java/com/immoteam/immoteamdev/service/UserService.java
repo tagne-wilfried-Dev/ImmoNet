@@ -53,15 +53,24 @@ public class UserService {
         utilisateurRepository.save(utilisateur);
     }
 
+    public void forgotPassword(String email, String nouveauMotDePasse) {
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable : " + email));
+
+
+        utilisateur.setMotDePasseHash(passwordEncoder.encode(nouveauMotDePasse));
+        utilisateurRepository.save(utilisateur);
+    }
+
     private UserDto mapToDto(Utilisateur utilisateur) {
         UserDto dto = new UserDto();
-        dto.setId(utilisateur.getId());
+        // dto.setId(utilisateur.getId());
         dto.setNom(utilisateur.getNom());
         dto.setPrenom(utilisateur.getPrenom());
         dto.setEmail(utilisateur.getEmail());
         dto.setTelephone(utilisateur.getTelephone());
-        dto.setRole(utilisateur.getRole());
-        dto.setStatut(utilisateur.getStatut());
+        // dto.setRole(utilisateur.getRole());
+        // dto.setStatut(utilisateur.getStatut());
         dto.setDateInscription(utilisateur.getDateInscription());
         return dto;
     }

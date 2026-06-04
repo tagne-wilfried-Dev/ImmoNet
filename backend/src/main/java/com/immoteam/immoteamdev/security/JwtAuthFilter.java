@@ -9,6 +9,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.immoteam.immoteamdev.service.CustomUserDetailsService;
+
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,9 +20,13 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter{
 
-    private final JwtUtil jwtUtil = new JwtUtil();
-    private final CustomUserDetailsService userDetailsService = new CustomUserDetailsService();
+    private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService userDetailsService;
     
+    public JwtAuthFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+    }
     @Override
     protected void doFilterInternal(HttpServletRequest request, 
                                    HttpServletResponse response, 
