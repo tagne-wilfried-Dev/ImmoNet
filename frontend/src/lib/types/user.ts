@@ -3,10 +3,10 @@ export type UserStatus = 'ACTIVE' | 'PENDING_VERIFICATION' | 'SUSPENDED' | 'BANN
 
 export interface User {
   id: string;
-  firstName: string;
-  lastName: string;
+  nom: string;
+  prenom: string;
   email: string;
-  phone: string;
+  telephone: string;
   role: UserRole;
   status: UserStatus;
   isEmailVerified: boolean;
