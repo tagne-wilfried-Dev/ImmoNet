@@ -70,6 +70,7 @@ public class Utilisateur {
     String avatarUrl;
 
     // date d'acceptation des CGU
+    @CreationTimestamp
     LocalDateTime consentementCguDate;
 
     @Column
