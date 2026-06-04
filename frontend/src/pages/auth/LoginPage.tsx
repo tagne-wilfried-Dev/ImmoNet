@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <AuthInput
+        <AuthInput inputValue=''
           label="Adresse email"
           type="email"
           placeholder="exemple@domain.com"
@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
           {...register('email')}
           error={errors.email?.message}
         />
-        <AuthInput
+        <AuthInput inputValue=''
           label="Mot de passe"
           type="password"
           placeholder="••••••••"
