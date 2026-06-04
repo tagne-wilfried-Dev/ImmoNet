@@ -3,7 +3,7 @@ import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 interface AuthInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  inputValue: string;
+  inputValue?: string;
   inputName?: string;
   error?: string;
   icon?: React.ElementType;
