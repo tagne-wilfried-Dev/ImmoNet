@@ -1,44 +1,38 @@
 // src/components/ui/Card.tsx
 import { type HTMLAttributes, forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'statistic' | 'danger';
+  variant?: 'default' | 'interactive' | 'statistic' | 'danger';
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className = '', variant = 'default', children, ...props }, ref) => {
-    const baseStyles = `
-      relative overflow-hidden
-      rounded-[20px] p-6
-      backdrop-blur-[12px]
-      transition-all duration-200 ease-out
-    `;
-
-    const variants = {
-      default: `
-        bg-gradient-to-br from-cyan-900/30 to-slate-900/60
-        border border-cyan-400/10
-        shadow-[0_4px_24px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.03)]
-        hover:border-cyan-400/20
-      `,
-      statistic: `
-        bg-gradient-to-br from-cyan-900/40 to-slate-900/70
-        border border-cyan-400/15
-        shadow-[0_4px_24px_rgba(0,0,0,0.2)]
-        before:content-[""] before:absolute before:top-0 before:left-0 before:w-40 before:h-40 
-        before:bg-[radial-gradient(circle,rgba(34,211,238,0.08)_0%,transparent_70%)] before:rounded-full
-      `,
-      danger: `
-        bg-gradient-to-br from-red-950/40 to-slate-900/80
-        border border-red-500/20
-        shadow-[0_4px_24px_rgba(0,0,0,0.2)]
-      `,
-    };
-
+  ({ className, variant = 'default', children, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={`${baseStyles} ${variants[variant]} ${className}`}
+        className={cn(
+          // Base
+          'relative overflow-hidden rounded-[20px] bg-white border border-slate-200 transition-all duration-200 ease-out',
+          // Ombre douce multi-couches (DESIGN.md --shadow-sm)
+          'shadow-[0_1px_3px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)]',
+
+          variant === 'default' && 'p-6',
+
+          variant === 'interactive' && [
+            'p-6 cursor-pointer',
+            'hover:-translate-y-0.5 hover:border-cyan-200',
+            'hover:shadow-[0_4px_6px_-1px_rgba(15,23,42,0.06),0_2px_4px_-2px_rgba(15,23,42,0.04)]',
+          ],
+
+          // Accentuation gauche cyan (DESIGN.md §5.2 Statistic)
+          variant === 'statistic' && 'p-6 border-l-[3px] border-l-cyan-500',
+
+          // Zone dangereuse
+          variant === 'danger' && 'p-6 border-red-200 bg-red-50',
+
+          className,
+        )}
         {...props}
       >
         {children}
