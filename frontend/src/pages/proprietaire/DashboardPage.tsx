@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import Dashboard from './Dashboard';
 import MessageAlert from '@/components/ui/MessageAlert';
@@ -12,7 +12,7 @@ interface DashboardPageProps {
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = ({
-  userName = 'Wiliam Smith',
+  userName = 'bo1244525633',
   userRole = 'PRO',
   notificationCount = 3,
 }) => {
@@ -20,7 +20,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
   const locationState = location.state as { message?: string } | null;
   const [data, setData] = useState(dashboardMockData);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
+  if(userName === 'bo1244525633')
+    navigate('/login')
   useEffect(() => {
     // Simulation d'un appel API
     const fetchData = async () => {
