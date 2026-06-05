@@ -6,10 +6,11 @@ interface AuthInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   inputValue?: string;
   inputName?: string;
   error?: string;
+  autocomplete?:string;
   icon?: React.ElementType;
 }
 
-const AuthInput: React.FC<AuthInputProps> = ({ label,inputValue,inputName, error, icon: Icon, type = 'text', ...props }) => {
+const AuthInput: React.FC<AuthInputProps> = ({ label,inputValue,inputName, error,autoComplete, icon: Icon, type = 'text', ...props }) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
@@ -27,6 +28,7 @@ const AuthInput: React.FC<AuthInputProps> = ({ label,inputValue,inputName, error
           type={inputType}
           value={inputValue}
           name={inputName}
+          autoComplete={autoComplete}
           className={`w-full ${Icon ? 'pl-10' : 'pl-4'} ${isPassword ? 'pr-10' : 'pr-4'} py-3 bg-[rgba(4,47,61,0.6)] border ${
             error ? 'border-[#ef4444]' : 'border-[rgba(34,211,238,0.2)]'
           } rounded-lg text-white placeholder-[#94a3b8] focus:outline-none focus:border-[#22d3ee] focus:ring-[3px] focus:ring-[rgba(34,211,238,0.15)] transition-all text-sm`}

@@ -3,11 +3,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
-import AuthLayout from '../../components/layout/AuthLayout';
-import AuthInput from '../../components/auth/AuthInput';
-import AuthButton from '../../components/auth/AuthButton';
-import MessageAlert from '../../components/ui/MessageAlert';
-import { loginSchema, type LoginFormData } from '../../lib/validations/auth';
+import AuthLayout from '@/components/layout/AuthLayout';
+import AuthInput from '@/components/auth/AuthInput';
+import AuthButton from '@/components/auth/AuthButton';
+import MessageAlert from '@/components/ui/MessageAlert';
+import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import axios from '@/lib/axios';
 
 const LoginPage: React.FC = () => {
@@ -19,22 +19,45 @@ const LoginPage: React.FC = () => {
     mode: 'onBlur'
   });
   const [error,setError] = useState('');
+
+
   const onSubmit = async (data: LoginFormData) => {
-    setError('');
-    console.log('Login payload:', data);
-    await new Promise(res => setTimeout(res, 1500)); // Mock delay
-    try {
-      const response = await axios.post('/api/auth/login', data);
-      if (response.status === 200 || response.status === 201) {
-        navigate('/dashboard', { state: { message: 'Connexion réussie.' } });
-      } else {
-        setError(response?.data?.message || 'Email ou mot de passe incorrect. Vérifiez vos informations.');
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : JSON.stringify(err);
-      setError(`Une erreur est survenue lors de la connexion : ${message}`);
+  setError('');
+  console.log('Login payload:', data);
+  
+  // Optionnel : Retirer ce délai artificiel en production
+  // await new Promise(res => setTimeout(res, 1500)); 
+
+  try {
+    // Si votre instance Axios inclut déjà "/api" dans sa baseURL, 
+    // utilisez plutôt '/auth/login' au lieu de '/api/auth/login'
+    const response = await axios.post('/auth/login', data);
+
+    if (response.status === 200 || response.status === 201) {
+      // Alignement de la clé localStorage sur 'accessToken'
+      localStorage.setItem('accessToken', response.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      console.log(response);
+      navigate('/dashboard', { 
+        state: { message: `Nous sommes ravis de vous revoir, ${response.data.nom || 'Bienvenue'}.` } 
+      });
     }
-  };
+  } catch (err: any) {
+    // Axios bascule ici automatiquement pour les statuts HTTP 4xx et 5xx
+    if (err.response) {
+      const status = err.response.status;
+      const serverMessage = err.response.data?.message;
+
+      if (status === 401 || status === 403) {
+        setError(serverMessage || 'Email ou mot de passe incorrect. Vérifiez vos informations.');
+      } else {
+        setError(serverMessage || 'Une erreur est survenue lors de la connexion au serveur.');
+      }
+    } else {
+      setError('Impossible de contacter le serveur. Veuillez vérifier votre connexion.');
+    }
+  }
+};
 
   return (
     <AuthLayout>
@@ -57,6 +80,7 @@ const LoginPage: React.FC = () => {
         <AuthInput
           label="Adresse email"
           type="email"
+          autoComplete='username'
           placeholder="exemple@domain.com"
           icon={Mail}
           {...register('email')}
@@ -65,6 +89,7 @@ const LoginPage: React.FC = () => {
         <AuthInput
           label="Mot de passe"
           type="password"
+          autoComplete='current-password'
           placeholder="••••••••"
           icon={Lock}
           {...register('motDePasse')}
