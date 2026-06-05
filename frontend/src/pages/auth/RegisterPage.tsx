@@ -72,7 +72,7 @@ const RegisterPage: React.FC = () => {
           <AuthInput inputName='telephone' label="Téléphone" placeholder="+2376XXXXXXXX" icon={Phone} error={errors.telephone?.message} type="tel" {...register('telephone')} />
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <AuthInput inputName='motDePasse' label="Mot de passe" placeholder="Min. 8 caractères" icon={Lock} error={errors.motDePasse?.message} type="password" {...register('motDePasse')} />
+          <AuthInput inputName='motDePasse' label="Mot de passe" autoComplete='new-password' placeholder="Min. 8 caractères" icon={Lock} error={errors.motDePasse?.message} type="password" {...register('motDePasse')} />
           <AuthInput inputName='confirmPass' label="Confirmer le mot de passe" placeholder="••••••••" icon={Lock} error={errors.confirmPass?.message} type="password" {...register('confirmPass')} />
         </div>
         <label className="flex items-start gap-3 cursor-pointer group">
