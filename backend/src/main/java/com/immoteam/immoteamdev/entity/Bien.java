@@ -45,6 +45,7 @@ public class Bien {
     // CONVENTION : CascadeType.ALL uniquement si cohérent avec le cycle de vie (ici, suppression en cascade d'un bien supprime ses photos)
     @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
+    @OrderBy("ordre ASC")
     private List<PhotoBien> photos = new ArrayList<>();
 
     @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
