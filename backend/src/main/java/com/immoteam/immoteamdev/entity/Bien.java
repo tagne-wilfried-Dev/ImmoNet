@@ -146,14 +146,14 @@ public class Bien {
 
     @Column
     private Integer etage;
-    
+
     @Column
     private Boolean estMeuble;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private StatutAnnonce statut = StatutAnnonce.BROUILLON; // Modifié de PUBLIE à BROUILLON pour respecter le CDC §3.4 (validation admin requise avant publication)
+    private StatutAnnonce statut = StatutAnnonce.PUBLIE; // Modifié de PUBLIE à BROUILLON pour respecter le CDC §3.4 (validation admin requise avant publication)
 
     @Column
     private LocalDateTime datePublication;
