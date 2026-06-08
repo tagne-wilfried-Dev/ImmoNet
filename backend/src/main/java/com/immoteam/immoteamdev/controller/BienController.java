@@ -1,0 +1,63 @@
+package com.immoteam.immoteamdev.controller;
+
+import com.immoteam.immoteamdev.dto.BienCreateRequest;
+import com.immoteam.immoteamdev.dto.BienFilterRequest;
+import com.immoteam.immoteamdev.dto.BienSummaryResponse;
+import com.immoteam.immoteamdev.service.BienService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/biens")
+@RequiredArgsConstructor
+@Tag(name = "Biens Immobiliers", description = "Gestion et recherche des annonces immobilières")
+public class BienController {
+
+    private final BienService bienService;
+
+    @GetMapping
+    @Operation(summary = "Rechercher des biens", description = "Retourne une liste paginée de biens correspondant aux filtres. Accès public.")
+    @ApiResponse(responseCode = "200", description = "Succès", content = @Content(schema = @Schema(implementation = BienSummaryResponse.class)))
+    public ResponseEntity<Page<BienSummaryResponse>> rechercher(
+            @ModelAttribute @Valid BienFilterRequest filter,
+            @Parameter(description = "Numéro de page (commence à 0)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Taille de la page (max 50)") @RequestParam(defaultValue = "20") int size) {
+        
+        // Sécurité : limiter la taille de page pour éviter les attaques DOS (CDC §8.2)
+        int safeSize = Math.min(size, 50);
+        
+        Page<BienSummaryResponse> resultats = bienService.rechercherBiens(filter, page, safeSize);
+        return ResponseEntity.ok(resultats);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole('PRO', 'ADMIN')") // CDC §3.1 : Seuls les Pros et Admins peuvent créer
+    @Operation(summary = "Créer une annonce", description = "Crée une nouvelle annonce au statut BROUILLON. Nécessite un rôle PRO ou ADMIN.")
+    @ApiResponse(responseCode = "201", description = "Annonce créée avec succès")
+    @ApiResponse(responseCode = "400", description = "Données invalides")
+    @ApiResponse(responseCode = "401", description = "Non authentifié")
+    @ApiResponse(responseCode = "403", description = "Non autorisé (rôle insuffisant)")
+    public ResponseEntity<BienSummaryResponse> creerBien(
+            @Valid @RequestBody BienCreateRequest request,
+            Authentication authentication) {
+        
+        // Récupération de l'email de l'utilisateur authentifié via Spring Security
+        String userEmail = authentication.getName();
+        
+        BienSummaryResponse bienCree = bienService.creerBien(request, userEmail);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(bienCree);
+    }
+}
