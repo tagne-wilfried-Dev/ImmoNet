@@ -23,7 +23,7 @@ const MessageAlert: React.FC<MessageAlertProps> = ({ type, title, message }) => 
     },5000);
     if(!visible)
       return clearTimeout(timer);
-  },[]);
+  },[visible]);
 
   if(!visible)
     return null;
