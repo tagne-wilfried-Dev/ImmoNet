@@ -259,7 +259,7 @@ const getUserColumns = (
     header: 'Utilisateur',
     render: (row) => (
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-xs font-semibold shrink-0">
+        <div className="w-8 h-8 rounded-full bg-linear-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-xs font-semibold shrink-0">
           {row.nom.charAt(0).toUpperCase()}
         </div>
         <div>
