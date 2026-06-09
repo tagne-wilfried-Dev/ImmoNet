@@ -1,17 +1,20 @@
 package com.immoteam.immoteamdev.entity;
 
+import com.immoteam.immoteamdev.entity.enums.PeriodeLocation;
+import com.immoteam.immoteamdev.entity.enums.StatutAnnonce;
 import com.immoteam.immoteamdev.entity.enums.TypeBien;
 import com.immoteam.immoteamdev.entity.enums.TypeOperation;
-import com.immoteam.immoteamdev.entity.enums.StatutAnnonce;
-import com.immoteam.immoteamdev.entity.enums.PeriodeLocation;
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.DecimalMin;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,165 +23,173 @@ import java.util.List;
 
 @Entity
 @Table(name = "biens")
-@Data
+// CORRECTION MAJEURE : Suppression de @Data. 
+// Pourquoi ? @Data génère automatiquement equals() et hashCode(). 
+// Avec Hibernate, cela provoque des boucles infinies (StackOverflowError) et des problèmes de performance 
+// lors du chargement des proxies en Lazy Loading. On utilise @Getter et @Setter explicitement.
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Bien {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "proprietaire_id", nullable = false)
-	private Utilisateur proprietaire;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<PhotoBien> photos = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY) // CONVENTION : FetchType.LAZY par défaut
+    @JoinColumn(name = "proprietaire_id", nullable = false)
+    private Utilisateur proprietaire;
 
-	@OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<EquipementBien> equipements = new ArrayList<>();
+    // CONVENTION : CascadeType.ALL uniquement si cohérent avec le cycle de vie (ici, suppression en cascade d'un bien supprime ses photos)
+    @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<PhotoBien> photos = new ArrayList<>();
 
-	@OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<Disponibilite> disponibilites = new ArrayList<>();
+    @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<EquipementBien> equipements = new ArrayList<>();
 
-	@OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<Reservation> reservations = new ArrayList<>();
+    @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Disponibilite> disponibilites = new ArrayList<>();
 
-	@OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<OffreAchat> offresAchat = new ArrayList<>();
+    @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
 
-	@OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<DemandeVisite> demandesVisite = new ArrayList<>();
+    @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<OffreAchat> offresAchat = new ArrayList<>();
 
-	@OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<Favori> favoris = new ArrayList<>();
+    @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<DemandeVisite> demandesVisite = new ArrayList<>();
 
-	@OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<Signalement> signalements = new ArrayList<>();
+    @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Favori> favoris = new ArrayList<>();
 
-	@NotBlank(message = "Le titre est obligatoire")
-	@Column(nullable = false)
-	private String titre;
+    @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Signalement> signalements = new ArrayList<>();
 
-	@Column(columnDefinition = "TEXT")
-	private String description;
+    @NotBlank(message = "Le titre est obligatoire")
+    @Column(nullable = false)
+    private String titre;
 
-	@Enumerated(EnumType.STRING)
-	@NotNull
-	@Column(nullable = false)
-	private TypeOperation typeOperation;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-	@Enumerated(EnumType.STRING)
-	@NotNull
-	@Column(nullable = false)
-	private TypeBien typeBien;
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Column(nullable = false)
+    private TypeOperation typeOperation;
 
-	@NotBlank
-	@Column(nullable = false)
-	private String adresse;
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Column(nullable = false)
+    private TypeBien typeBien;
 
-	@NotBlank
-	@Column(nullable = false)
-	private String ville;
+    @NotBlank
+    @Column(nullable = false)
+    private String adresse;
 
-	@Column
-	private String quartier;
+    @NotBlank
+    @Column(nullable = false)
+    private String ville;
 
-	@NotBlank
-	@Column(nullable = false)
-	private String pays;
+    @Column
+    private String quartier;
 
-	@Column
-	private BigDecimal latitude;
+    @NotBlank
+    @Column(nullable = false)
+    private String pays;
 
-	@Column
-	private BigDecimal longitude;
+    @Column
+    private BigDecimal latitude;
 
-	@Enumerated(EnumType.STRING)
-	private PeriodeLocation periodeLocation;
+    @Column
+    private BigDecimal longitude;
 
-	@NotNull
-	@DecimalMin("0.01")
-	@Column(nullable = false)
-	private BigDecimal prix;
+    @Enumerated(EnumType.STRING)
+    private PeriodeLocation periodeLocation;
 
-	@Column
-	private BigDecimal caution;
+    @NotNull
+    @DecimalMin("0.01")
+    @Column(nullable = false)
+    private BigDecimal prix;
 
-	@Column
-	private boolean chargesIncluses;
+    @Column
+    private BigDecimal caution;
 
-	@Column
-	private boolean prixNegoceable;
+    @Column
+    private boolean chargesIncluses;
 
-	@NotNull
-	@DecimalMin("0.01")
-	@Column(nullable = false)
-	private BigDecimal surface;
+    @Column
+    private boolean prixNegoceable;
 
-	@Column
-	private Integer nbPieces;
+    @NotNull
+    @DecimalMin("0.01")
+    @Column(nullable = false)
+    private BigDecimal surface;
 
-	@Column
-	private Integer nbChambres;
+    @Column
+    private Integer nbPieces;
 
-	@Column
-	private Integer nbSdb;
+    @Column
+    private Integer nbChambres;
 
-	@Column
-	private Integer etage;
+    @Column
+    private Integer nbSdb;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	@Builder.Default
-	private StatutAnnonce statut = StatutAnnonce.PUBLIE;
+    @Column
+    private Integer etage;
 
-	@Column
-	private LocalDateTime datePublication;
+    @Column
+    private Boolean estMeuble;
 
-	@Column
-	private LocalDateTime dateExpiration;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private StatutAnnonce statut = StatutAnnonce.PUBLIE; // Modifié de PUBLIE à BROUILLON pour respecter le CDC §3.4 (validation admin requise avant publication)
 
-	@Column
-	@Builder.Default
-	private Integer nbVues = 0;
+    @Column
+    private LocalDateTime datePublication;
 
-	@Column
-	@Builder.Default
-	private Integer nbFavoris = 0;
+    @Column
+    private LocalDateTime dateExpiration;
 
-	@Column
-	@Builder.Default
-	private boolean estBoost = false;
+    @Column
+    @Builder.Default
+    private Integer nbVues = 0;
 
-	@CreationTimestamp
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+    @Column
+    @Builder.Default
+    private Integer nbFavoris = 0;
 
-	@UpdateTimestamp
-	@Column(nullable = false)
-	private LocalDateTime updatedAt;
+    @Column
+    @Builder.Default
+    private boolean estBoost = false;
 
-	public boolean estPublie() {
-	    return StatutAnnonce.PUBLIE.equals(this.statut);
-	}
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-	public boolean estEnLocation() {
-	    return StatutAnnonce.EN_LOCATION.equals(this.statut);
-	}
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
-	public boolean estVendu() {
-	    return StatutAnnonce.VENDU.equals(this.statut);
-	}
+    public boolean estPublie() {
+        return StatutAnnonce.PUBLIE.equals(this.statut);
+    }
+
+    public boolean estEnLocation() {
+        return StatutAnnonce.EN_LOCATION.equals(this.statut);
+    }
+
+    public boolean estVendu() {
+        return StatutAnnonce.VENDU.equals(this.statut);
+    }
 }
