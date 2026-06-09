@@ -1,0 +1,121 @@
+{
+  "kpis": [
+    {
+      "id": "favorites",
+      "title": "Biens en favoris",
+      "value": "8",
+      "previousValue": "5",
+      "trend": "+60%",
+      "positive": true,
+      "icon": "Heart"
+    },
+    {
+      "id": "visits",
+      "title": "Visites planifiées",
+      "value": "3",
+      "previousValue": "1",
+      "trend": "+200%",
+      "positive": true,
+      "icon": "CalendarCheck"
+    },
+    {
+      "id": "reservations",
+      "title": "Réservations actives",
+      "value": "1",
+      "previousValue": "0",
+      "trend": "Nouveau",
+      "positive": true,
+      "icon": "KeyRound"
+    },
+    {
+      "id": "messages",
+      "title": "Messages non lus",
+      "value": "4",
+      "previousValue": "2",
+      "trend": "+2",
+      "positive": false,
+      "icon": "MessageSquare"
+    }
+  ],
+  "recentActivity": [
+    {
+      "id": 1,
+      "type": "reservation",
+      "label": "Réservation confirmée",
+      "detail": "Studio meublé – Bastos, Yaoundé",
+      "date": "Aujourd'hui, 10h14",
+      "status": "success"
+    },
+    {
+      "id": 2,
+      "type": "visit",
+      "label": "Visite planifiée",
+      "detail": "Villa 4 pièces – Bonapriso, Douala",
+      "date": "Demain, 14h00",
+      "status": "pending"
+    },
+    {
+      "id": 3,
+      "type": "message",
+      "label": "Nouveau message",
+      "detail": "Propriétaire : Jean-Paul M.",
+      "date": "Hier, 18h32",
+      "status": "info"
+    },
+    {
+      "id": 4,
+      "type": "favorite",
+      "label": "Bien ajouté aux favoris",
+      "detail": "Appartement F3 – Akwa, Douala",
+      "date": "17 Jun, 09h05",
+      "status": "neutral"
+    }
+  ],
+  "quickActions": [
+    {
+      "id": "search",
+      "title": "Explorer les biens",
+      "description": "Recherchez des biens à louer ou acheter près de chez vous",
+      "icon": "Search",
+      "path": "/explorer"
+    },
+    {
+      "id": "reservations",
+      "title": "Mes réservations",
+      "description": "Suivez vos réservations et demandes de visite en cours",
+      "icon": "CalendarDays",
+      "path": "/dashboard/reservations",
+      "count": 1
+    },
+    {
+      "id": "messages",
+      "title": "Mes messages",
+      "description": "Retrouvez vos conversations avec les propriétaires",
+      "icon": "MessageSquare",
+      "path": "/dashboard/messages",
+      "count": 4
+    },
+    {
+      "id": "favorites",
+      "title": "Mes favoris",
+      "description": "Consultez et comparez les biens que vous avez sauvegardés",
+      "icon": "Heart",
+      "path": "/dashboard/favoris",
+      "count": 8
+    }
+  ],
+  "savedSearches": [
+    {
+      "id": 1,
+      "label": "Appartements à louer – Douala",
+      "criteria": "2–4 pièces · max 150 000 CFA/mois",
+      "newResults": 5
+    },
+    {
+      "id": 2,
+      "label": "Villas à acheter – Yaoundé",
+      "criteria": "Surface min. 200m² · max 50M CFA",
+      "newResults": 2
+    }
+  ]
+}
