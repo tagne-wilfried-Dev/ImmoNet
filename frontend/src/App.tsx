@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from '@/pages/basePages/Home'
 import DashboardPage from './pages/proprietaire/DashboardPage';
@@ -13,6 +13,10 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Appp from '@/draft';
+import { ProfilePage } from '@/pages/ProfilePage';
+import type { SimpleUser } from './types/user.types';
+import { toast } from 'sonner';
+import { userService } from './services/UserService';
 
 // const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
 //   <div className="flex items-center justify-center min-h-[60vh]">
@@ -24,23 +28,66 @@ import Appp from '@/draft';
 // );
 
 const App: React.FC = () => {
-  return (
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/demo" element={<Appp />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/dashboard/annonces" element={<AnnoncesPage />} />
-        <Route path="/dashboard/reservations" element={<ReservationsPage />} />
-        <Route path="/dashboard/messages" element={<MessagesPage />} />
-        <Route path="/dashboard/transactions" element={<TransactionsPage />} />
-        <Route path="/dashboard/validations" element={<ValidationsPage />} />
-        <Route path="/dashboard/catalogue" element={<CataloguePage />} />
-        <Route path="/publier" element={<CreateAnnoncePage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<SimpleUser>(
+    {
+      nom :'Wiliam Smith',
+      role : 'PRO',
+    }
+  );
+
+  const loadUserProfile = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await userService.getCurrentUser();
+      setUser({
+        nom:data.nom,
+        role:data.role,
+      });
+    } catch {
+      toast.error('Erreur lors du chargement du profil');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadUserProfile();
+  }, [loadUserProfile]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-10 rounded-full border-2 border-slate-200 border-t-cyan-500 animate-spin" />
+          <p className="text-[13px] text-slate-500 font-body">
+            Chargement du tableau de bord…
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/demo" element={<Appp />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      <Route path="/dashboard" element={<DashboardPage userName={user.nom} userRole={user.role === 'CLIENT'?'CLIENT':'PRO'} />} />
+      <Route path="/mon profile" element={<ProfilePage />} />
+      <Route path="/dashboard/annonces" element={<AnnoncesPage />} />
+      <Route path="/dashboard/reservations" element={<ReservationsPage />} />
+      <Route path="/dashboard/messages" element={<MessagesPage />} />
+      <Route path="/dashboard/transactions" element={<TransactionsPage />} />
+      <Route path="/dashboard/validations" element={<ValidationsPage />} />
+      <Route path="/dashboard/catalogue" element={<CataloguePage />} />
+      <Route path="/publier" element={<CreateAnnoncePage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 };
 

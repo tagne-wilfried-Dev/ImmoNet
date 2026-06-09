@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { userService } from '@/services/UserService'
 import {
   Bell,
   ChevronDown,
@@ -41,9 +42,10 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsProfileOpen(false);
-    // TODO: dispatch logout Redux
+    setTimeout(async()=>await userService.logout(),2000)
+    
     navigate('/login');
   };
 
@@ -157,7 +159,7 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
                   </div>
                   <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                     <User size={16} />
-                    Mon profil
+                    <a href='/mon profile'>Mon profil</a>
                   </button>
                   <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                     <Settings size={16} />
