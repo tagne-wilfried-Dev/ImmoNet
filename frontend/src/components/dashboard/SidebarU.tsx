@@ -160,7 +160,7 @@ const NavItem: React.FC<NavItemProps> = ({ item, isActive, isCollapsed, onClick 
     aria-current={isActive ? 'page' : undefined}
   >
     {isActive && (
-      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-cyan-500 rounded-r-full" />
+      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.75h-5 bg-cyan-500 rounded-r-full" />
     )}
 
     <item.icon
@@ -210,7 +210,7 @@ const RoleBadge: React.FC<{ userRole: UserRole }> = ({ userRole }) => {
 
   return (
     <div className="p-3 border-t border-slate-100">
-      <div className="bg-gradient-to-br from-cyan-50 to-cyan-100/60 rounded-xl p-3 border border-cyan-100">
+      <div className="bg-linear-to-br from-cyan-50 to-cyan-100/60 rounded-xl p-3 border border-cyan-100">
         <p className="text-xs font-semibold text-cyan-800">Compte {label}</p>
         <p className="text-[10px] text-cyan-500 mt-0.5">ImmoNet · Afrique Centrale</p>
       </div>
