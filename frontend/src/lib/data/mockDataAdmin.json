@@ -1,0 +1,146 @@
+{
+  "kpis": [
+    {
+      "id": "users",
+      "title": "Utilisateurs inscrits",
+      "value": "1 248",
+      "trend": "+34",
+      "trendLabel": "cette semaine",
+      "positive": true,
+      "icon": "Users"
+    },
+    {
+      "id": "annonces",
+      "title": "Annonces actives",
+      "value": "342",
+      "trend": "+12",
+      "trendLabel": "aujourd'hui",
+      "positive": true,
+      "icon": "Building2"
+    },
+    {
+      "id": "revenue",
+      "title": "Revenus abonnements",
+      "value": "4 890 000",
+      "unit": "FCFA",
+      "trend": "+18%",
+      "trendLabel": "vs mois dernier",
+      "positive": true,
+      "icon": "TrendingUp"
+    },
+    {
+      "id": "pending_pro",
+      "title": "Validations en attente",
+      "value": "7",
+      "trend": "+3",
+      "trendLabel": "depuis hier",
+      "positive": false,
+      "icon": "Clock",
+      "urgent": true
+    }
+  ],
+  "moderationQueue": [
+    {
+      "id": 1,
+      "type": "annonce",
+      "title": "Villa F5 – Bastos, Yaoundé",
+      "submittedBy": "Jean-Paul Mbarga",
+      "submittedAt": "Il y a 12 min",
+      "status": "pending"
+    },
+    {
+      "id": 2,
+      "type": "pro_request",
+      "title": "Demande Pro – Business",
+      "submittedBy": "Clarisse Etoa",
+      "submittedAt": "Il y a 45 min",
+      "status": "pending"
+    },
+    {
+      "id": 3,
+      "type": "annonce",
+      "title": "Studio meublé – Akwa, Douala",
+      "submittedBy": "Michel Nkoulou",
+      "submittedAt": "Il y a 1h",
+      "status": "pending"
+    },
+    {
+      "id": 4,
+      "type": "signalement",
+      "title": "Annonce signalée 3× – Appartement F3",
+      "submittedBy": "Système (auto)",
+      "submittedAt": "Il y a 2h",
+      "status": "flagged"
+    },
+    {
+      "id": 5,
+      "type": "pro_request",
+      "title": "Demande Pro – Premium",
+      "submittedBy": "Serge Ondoa",
+      "submittedAt": "Il y a 3h",
+      "status": "pending"
+    }
+  ],
+  "recentUsers": [
+    {
+      "id": 1,
+      "nom": "Awa Ndiaye",
+      "email": "awa.ndiaye@gmail.com",
+      "role": "CLIENT",
+      "status": "ACTIVE",
+      "registeredAt": "Aujourd'hui, 09h14"
+    },
+    {
+      "id": 2,
+      "nom": "Pierre Kamga",
+      "email": "pierre.kamga@yahoo.fr",
+      "role": "PRO",
+      "status": "ACTIVE",
+      "registeredAt": "Aujourd'hui, 08h02"
+    },
+    {
+      "id": 3,
+      "nom": "Sylvie Bello",
+      "email": "s.bello@outlook.com",
+      "role": "CLIENT",
+      "status": "PENDING_VERIFICATION",
+      "registeredAt": "Hier, 22h47"
+    },
+    {
+      "id": 4,
+      "nom": "Alain Fouda",
+      "email": "fouda.alain@gmail.com",
+      "role": "PRO",
+      "status": "ACTIVE",
+      "registeredAt": "Hier, 18h33"
+    },
+    {
+      "id": 5,
+      "nom": "Rose Mbida",
+      "email": "rose.mbida@gmail.com",
+      "role": "CLIENT",
+      "status": "SUSPENDED",
+      "registeredAt": "Hier, 15h20"
+    }
+  ],
+  "revenueChart": [
+    { "mois": "Jan", "abonnements": 280000, "transactions": 95000 },
+    { "mois": "Fév", "abonnements": 320000, "transactions": 110000 },
+    { "mois": "Mar", "abonnements": 410000, "transactions": 130000 },
+    { "mois": "Avr", "abonnements": 390000, "transactions": 125000 },
+    { "mois": "Mai", "abonnements": 520000, "transactions": 175000 },
+    { "mois": "Jun", "abonnements": 610000, "transactions": 210000 }
+  ],
+  "platformStats": {
+    "tauxOccupation": "68%",
+    "annoncesModereesAujourdhui": 14,
+    "logementsVendus": 23,
+    "logementsLoues": 87,
+    "signalements": 4,
+    "abonnementsActifs": {
+      "starter": 48,
+      "business": 31,
+      "premium": 12
+    }
+  }
+}
