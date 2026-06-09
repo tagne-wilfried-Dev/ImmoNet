@@ -1,8 +1,10 @@
 package com.immoteam.immoteamdev.service;
 
 import com.immoteam.immoteamdev.dto.BienCreateRequest;
+import com.immoteam.immoteamdev.dto.BienDetailResponse;
 import com.immoteam.immoteamdev.dto.BienFilterRequest;
 import com.immoteam.immoteamdev.dto.BienSummaryResponse;
+import com.immoteam.immoteamdev.dto.BienUpdateRequest;
 import com.immoteam.immoteamdev.entity.Bien;
 import com.immoteam.immoteamdev.entity.Utilisateur;
 import com.immoteam.immoteamdev.entity.enums.StatutAnnonce;
@@ -16,6 +18,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,5 +82,94 @@ public class BienService {
         Bien bienSauvegarde = bienRepository.save(nouveauBien);
 
         return bienMapper.toSummaryResponse(bienSauvegarde);
+    }
+    public BienDetailResponse getDetailById(Long id) {
+        // 1. Récupération du bien (Hibernate chargera le propriétaire et les photos en LAZY si appelés par le mapper)
+        Bien bien = bienRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucun bien trouvé avec l'ID : " + id));
+
+        // 2. Récupération du contexte de sécurité actuel
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAuthenticated = authentication != null && authentication.isAuthenticated();
+        
+        // 3. Règle de sécurité stricte : Visible par TOUS uniquement si PUBLIE
+        if (bien.getStatut() != StatutAnnonce.PUBLIE) {
+            if (!isAuthenticated) {
+                throw new AccessDeniedException("Accès refusé : Cette annonce n'est pas publiée.");
+            }
+
+            // Vérification des droits pour les statuts non publiés (BROUILLON, SUSPENDU, etc.)
+            String currentUsername = authentication.getName();
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+            
+            // On suppose que l'entité Bien a un getter getProprietaire() qui retourne un Utilisateur
+            boolean isOwner = bien.getProprietaire().getEmail().equals(currentUsername);
+
+            if (!isOwner && !isAdmin) {
+                throw new AccessDeniedException("Accès refusé : Vous n'êtes pas le propriétaire de cette annonce.");
+            }
+        }
+
+        // 4. Mapping et retour
+        return bienMapper.toDetailResponse(bien);
+    }
+
+    @Transactional
+    public BienDetailResponse updateBien(Long id, BienUpdateRequest request) {
+        // 1. Récupération du bien
+        Bien bien = bienRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucun bien trouvé avec l'ID : " + id));
+
+        // 2. Vérification de sécurité : Propriétaire ou ADMIN uniquement
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Utilisateur non authentifié.");
+        }
+
+        String currentUsername = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+        
+        boolean isOwner = bien.getProprietaire().getEmail().equals(currentUsername);
+
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("Accès refusé : Vous n'êtes pas le propriétaire de cette annonce.");
+        }
+
+        // 3. Application des modifications via MapStruct
+        bienMapper.updateBienFromRequest(request, bien);
+
+        // 4. Sauvegarde et retour du DTO mis à jour
+        // Note : Si tu utilises JPA Auditing (@LastModifiedDate), le champ updatedAt se mettra à jour automatiquement.
+        Bien savedBien = bienRepository.save(bien);
+        
+        return bienMapper.toDetailResponse(savedBien);
+    }
+
+    @Transactional
+    public void archiverBien(Long id) {
+        Bien bien = bienRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aucun bien trouvé avec l'ID : " + id));
+
+        // Vérification de sécurité : Propriétaire ou ADMIN uniquement
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Utilisateur non authentifié.");
+        }
+
+        String currentUsername = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+        
+        boolean isOwner = bien.getProprietaire().getEmail().equals(currentUsername);
+
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("Accès refusé : Vous n'êtes pas autorisé à archiver cette annonce.");
+        }
+
+        // Passage au statut ARCHIVE (Soft Delete)
+        bien.setStatut(StatutAnnonce.ARCHIVE);
+        bienRepository.save(bien);
     }
 }

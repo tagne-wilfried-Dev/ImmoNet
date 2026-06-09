@@ -42,7 +42,7 @@ public class Bien {
     @JoinColumn(name = "proprietaire_id", nullable = false)
     private Utilisateur proprietaire;
 
-    // CONVENTION : CascadeType.ALL uniquement si cohérent avec le cycle de vie (ici, suppression en cascade d'un bien supprime ses photos)
+    // suppression en cascade d'un bien supprime ses photos)
     @OneToMany(mappedBy = "bien", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     @OrderBy("ordre ASC")
