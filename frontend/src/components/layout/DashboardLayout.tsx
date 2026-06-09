@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import HeaderConnected from './HeaderConnected';
-import Sidebar from '../dashboard/Sidebar';
+import Sidebar from '../dashboard/SidebarU';
 import NotificationModal from './NotificationModale';
 
 interface DashboardLayoutProps {

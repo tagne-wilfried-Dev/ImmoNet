@@ -251,7 +251,7 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
 
           <button
             onClick={() => navigate('/explorer')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white text-sm font-semibold rounded-full shadow-[0_4px_14px_rgba(8,145,178,0.3)] hover:shadow-[0_6px_20px_rgba(8,145,178,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
+            className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-cyan-600 to-cyan-500 text-white text-sm font-semibold rounded-full shadow-[0_4px_14px_rgba(8,145,178,0.3)] hover:shadow-[0_6px_20px_rgba(8,145,178,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
           >
             <Sparkles size={15} aria-hidden="true" />
             Explorer les biens
@@ -346,7 +346,7 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
         </div>
 
         {/* ── Bannière upgrade PRO ──────────────────────────────────────── */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+        <div className="relative overflow-hidden bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           {/* Halos décoratifs */}
           <div className="absolute top-0 right-16 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-8 right-0 w-32 h-32 bg-cyan-400/5 rounded-full blur-2xl pointer-events-none" />

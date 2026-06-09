@@ -19,7 +19,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({
 
   const variants: Record<NonNullable<AuthButtonProps['variant']>, string> = {
     primary:
-      'py-3 px-6 bg-gradient-to-r from-[#0891b2] to-[#22d3ee] text-white shadow-[0_4px_20px_rgba(34,211,238,0.25)] hover:shadow-[0_6px_24px_rgba(34,211,238,0.4)] hover:-translate-y-[1px]',
+      'py-3 px-6 bg-linear-to-r from-[#0891b2] to-[#22d3ee] text-white shadow-[0_4px_20px_rgba(34,211,238,0.25)] hover:shadow-[0_6px_24px_rgba(34,211,238,0.4)] hover:-translate-y-[1px]',
     secondary:
       'py-3 px-6 bg-transparent border border-[rgba(34,211,238,0.35)] text-[#22d3ee] hover:bg-[rgba(34,211,238,0.06)] hover:border-[rgba(34,211,238,0.55)]',
     ghost:
