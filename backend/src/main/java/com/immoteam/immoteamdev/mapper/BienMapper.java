@@ -3,15 +3,19 @@ package com.immoteam.immoteamdev.mapper;
 import com.immoteam.immoteamdev.dto.BienCreateRequest;
 import com.immoteam.immoteamdev.dto.BienDetailResponse;
 import com.immoteam.immoteamdev.dto.BienSummaryResponse;
+import com.immoteam.immoteamdev.dto.BienUpdateRequest;
 import com.immoteam.immoteamdev.dto.ProprietaireSummaryDTO;
 import com.immoteam.immoteamdev.entity.Bien;
 import com.immoteam.immoteamdev.entity.PhotoBien;
 import com.immoteam.immoteamdev.entity.Utilisateur;
 import com.immoteam.immoteamdev.entity.enums.RoleUtilisateur;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,4 +75,17 @@ public interface BienMapper {
                 .telephone(utilisateur.getTelephone())
                 .build();
     }
+
+    /**
+     * Met à jour une entité Bien existante avec les valeurs du DTO.
+     * NullValuePropertyMappingStrategy.IGNORE empêche l'écrasement des champs 
+     * existants par null si le frontend ne les envoie pas.
+     */
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true) // On ne peut pas changer l'ID
+    @Mapping(target = "proprietaire", ignore = true) // On ne peut pas changer le propriétaire via cet endpoint
+    @Mapping(target = "statut", ignore = true) // Le statut se gère via un endpoint dédié
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "photos", ignore = true) // Les photos se gèrent via l'endpoint dédié /photos
+    void updateBienFromRequest(BienUpdateRequest request, @MappingTarget Bien bien);
 }
