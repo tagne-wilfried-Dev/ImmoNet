@@ -149,6 +149,7 @@ const RegisterPage: React.FC = () => {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const acceptTerms = watch('acceptTerms');
   const selectedRole = watch('role');
 
@@ -157,7 +158,8 @@ const RegisterPage: React.FC = () => {
 
     // Construction du payload — on retire les champs purement frontend
     // et on omet ville/pays s'ils sont vides
-    const { confirmPass, acceptTerms: _terms, ville, pays, ...rest } = data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPass: _unused, acceptTerms: _terms, ville, pays, ...rest } = data;
     const payload: RegisterPayload = {
       ...rest,
       ...(ville?.trim() ? { ville: ville.trim() } : {}),

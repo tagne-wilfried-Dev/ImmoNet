@@ -80,7 +80,7 @@ const MessageAlert: React.FC<MessageAlertProps> = ({
         {title && (
           <p className={`font-semibold text-sm mb-0.5 ${titleClass}`}>{title}</p>
         )}
-        <p className={`text-sm leading-5 break-words ${textClass}`}>{message}</p>
+        <p className={`text-sm leading-5 wrap-break-word ${textClass}`}>{message}</p>
       </div>
 
       {/* Bouton fermeture */}
@@ -95,7 +95,7 @@ const MessageAlert: React.FC<MessageAlertProps> = ({
 
       {/* Barre de progression en bas */}
       <div
-        className={`absolute bottom-0 left-0 h-[2px] transition-all ease-linear ${barClass}`}
+        className={`absolute bottom-0 left-0 h-0.5 transition-all ease-linear ${barClass}`}
         style={{ width: `${progress}%`, transitionDuration: '50ms' }}
         aria-hidden="true"
       />

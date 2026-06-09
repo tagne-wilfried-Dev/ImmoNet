@@ -3,18 +3,18 @@ import React from 'react';
 const AuthLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden bg-[#020617]">
-      {/* Gradient Hero Background — bg-linear-to-br est invalide en Tailwind, on utilise bg-gradient-to-br */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#020617] via-[#042f3d] to-[#064e6b]" />
+      {/* Gradient Hero Background — bg-linear-to-br est invalide en Tailwind, on utilise bg-linear-to-br */}
+      <div className="absolute inset-0 bg-linear-to-br from-[#020617] via-[#042f3d] to-[#064e6b]" />
 
       {/* Decorative Cyan Halo */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[rgba(34,211,238,0.12)] rounded-full blur-[120px] animate-pulse pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-[rgba(34,211,238,0.12)] rounded-full blur-[120px] animate-pulse pointer-events-none" />
 
       {/* Glass Card */}
       <div className="relative w-full max-w-md z-10">
         {/* Logo ImmoNet au-dessus de la card */}
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0891b2] to-[#22d3ee] flex items-center justify-center shadow-[0_4px_14px_rgba(34,211,238,0.4)]">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-[#0891b2] to-[#22d3ee] flex items-center justify-center shadow-[0_4px_14px_rgba(34,211,238,0.4)]">
               <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-white" stroke="currentColor" strokeWidth={2.5}>
                 <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
                 <path d="M9 21V12h6v9" />

@@ -18,7 +18,8 @@ import type { SimpleUser } from './types/user.types';
 import { toast } from 'sonner';
 import { userService } from './services/UserService';
 import ClientDashboardPage from './pages/client/ClientDashboardPage';
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminDashboardPage from './pages/admin/AdminDashboard';
+import ModerationPage from './pages/admin/ModerationPage';
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -58,7 +59,8 @@ const App: React.FC = () => {
     const init = async () => {
       await loadUserProfile();
     };
-    init();  }, [loadUserProfile]);
+    init();
+  }, [loadUserProfile]);
 
   if (isLoading) {
     return (
@@ -131,7 +133,15 @@ const App: React.FC = () => {
         }
       />
       // prochaine etape: créer les pages admin et les lier à ces routes
-      <Route path="/admin/moderation" element={<PlaceholderPage title="File de modération" />} />
+      <Route
+        path="/admin/moderation"
+        element={
+          <ModerationPage
+            userName={user.nom}
+            notificationCount={0}
+          />
+        }
+      />
       <Route path="/admin/utilisateurs" element={<PlaceholderPage title="Gestion des utilisateurs" />} />
       <Route path="/admin/statistiques" element={<PlaceholderPage title="Statistiques" />} />
       <Route path="/admin/configuration" element={<PlaceholderPage title="Configuration" />} />
