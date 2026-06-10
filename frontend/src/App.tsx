@@ -23,6 +23,7 @@ import ClientDashboardPage from './pages/client/ClientDashboardPage';
 import AdminDashboardPage from './pages/admin/AdminDashboard';
 import ModerationPage from './pages/admin/ModerationPage';
 import { ChangePasswordForm } from './pages/auth/ChangePasswordForm';
+import Home from './Home';
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -60,6 +61,7 @@ const ListRoutes: React.FC = () => {
     { path: '/admin/statistiques', label: 'Admin - Statistiques' },
     { path: '/admin/configuration', label: 'Admin - Configuration' },
     { path: '/routes', label: 'Liste des routes' },
+    { path: '/dashclient', label: 'DashboardClient' },
   ];
 
   return (
@@ -143,6 +145,8 @@ const App: React.FC = () => {
         <Route path="/reset-password" element={<ChangePasswordForm />} />
 
 // routes client/pro
+        <Route  path='/home' element={<Home />} />
+        <Route  path='/dashclient' element={<ClientDashboardPage />} />
         <Route
           path="/dashboard"
           element={
