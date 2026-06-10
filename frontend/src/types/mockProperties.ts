@@ -1,4 +1,4 @@
-import type { PropertySummary } from '@/types/property.types';
+import type { PropertySummary } from '@/lib/types/property.types';
 
 export const MOCK_PROPERTIES: PropertySummary[] = [
   {

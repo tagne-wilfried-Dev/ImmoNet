@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { MapPin, Maximize2, BedDouble, Heart, BadgeCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { PropertySummary } from '@/types/property.types';
-import { PROPERTY_TYPE_LABELS } from '@/types/property.types';
+import type { PropertySummary } from '@/lib/types/property.types';
+import { PROPERTY_TYPE_LABELS } from '@/lib/types/property.types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
