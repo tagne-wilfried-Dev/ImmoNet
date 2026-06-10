@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Home from '@/pages/basePages/Home'
 import DashboardPage from './pages/proprietaire/DashboardPage';
 import AnnoncesPage from './pages/proprietaire/AnnoncesPage';
@@ -14,6 +14,9 @@ import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Appp from '@/draft';
 import { ProfilePage } from '@/pages/ProfilePage';
+import ExploreRenting from '@/pages/explorePages/ExploreRenting';
+import ExploreSellings from '@/pages/explorePages/ExploreSellings';
+import NotificationsPage from './pages/proprietaire/NotificationsPage';
 import type { SimpleUser } from './types/user.types';
 import { toast } from 'sonner';
 import { userService } from './services/UserService';
@@ -30,6 +33,14 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
     </div>
   </div>
 );
+
+const SearchResults: React.FC = () => {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const typeOperation = params.get('typeOperation');
+  if (typeOperation === 'LOCATION') return <ExploreRenting />;
+  return <ExploreSellings />;
+};
 
 const App: React.FC = () => {
 
@@ -80,6 +91,8 @@ const App: React.FC = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/demo" element={<Appp />} />
+
+      //routes d'authentification
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/reset-password" element={<ChangePasswordForm />} />
@@ -148,7 +161,11 @@ const App: React.FC = () => {
       <Route path="/admin/statistiques" element={<PlaceholderPage title="Statistiques" />} />
       <Route path="/admin/configuration" element={<PlaceholderPage title="Configuration" />} />
 
-      <Route path="/mon profile" element={<ProfilePage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+      <Route path="/explore/louer" element={<ExploreRenting />} />
+      <Route path="/explore/vente" element={<ExploreSellings />} />
+      <Route path="/recherche" element={<SearchResults />} />
       <Route path="/dashboard/annonces" element={<AnnoncesPage />} />
       <Route path="/dashboard/reservations" element={<ReservationsPage />} />
       <Route path="/dashboard/messages" element={<MessagesPage />} />
