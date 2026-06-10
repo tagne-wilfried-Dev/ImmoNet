@@ -20,6 +20,7 @@ import { userService } from './services/UserService';
 import ClientDashboardPage from './pages/client/ClientDashboardPage';
 import AdminDashboardPage from './pages/admin/AdminDashboard';
 import ModerationPage from './pages/admin/ModerationPage';
+import { ChangePasswordForm } from './pages/auth/ChangePasswordForm';
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -35,7 +36,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<SimpleUser>(
     {
-      nom: 'Wiliam Smith',
+      nom: 'bo1244525633',
       role: 'PRO',
     }
   );
@@ -81,6 +82,7 @@ const App: React.FC = () => {
       <Route path="/demo" element={<Appp />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/reset-password" element={<ChangePasswordForm />} />
 
 // routes client/pro
       <Route

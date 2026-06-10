@@ -34,6 +34,29 @@ export const registerSchema = z
     path: ['confirmPass'],
   });
 
+export const changePasswordSchema = z
+  .object({
+    ancienMotDePasse: z.string().min(1, 'L\'ancien mot de passe est requis'),
+    nouveauMotDePasse: z
+      .string()
+      .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+      .regex(/[A-Z]/, 'Doit contenir au moins une majuscule')
+      .regex(/[a-z]/, 'Doit contenir au moins une minuscule')
+      .regex(/[0-9]/, 'Doit contenir au moins un chiffre'),
+    confirmationMotDePasse: z.string().min(1, 'La confirmation est requise'),
+  })
+  .refine((data) => data.nouveauMotDePasse === data.confirmationMotDePasse, {
+    message: 'Les mots de passe ne correspondent pas',
+    path: ['confirmationMotDePasse'],
+  });
+
+
+
+
+
+
+
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
 
