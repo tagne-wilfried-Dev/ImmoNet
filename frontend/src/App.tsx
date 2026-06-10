@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import Home from '@/pages/basePages/Home'
+import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import DashboardPage from './pages/proprietaire/DashboardPage';
 import AnnoncesPage from './pages/proprietaire/AnnoncesPage';
 import ReservationsPage from './pages/proprietaire/ReservationsPage';
@@ -33,6 +32,51 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
     </div>
   </div>
 );
+
+const ListRoutes: React.FC = () => {
+  const routes = [
+    { path: '/', label: 'Home' },
+    { path: '/explore/vente', label: 'Explore - Vente' },
+    { path: '/explore/louer', label: 'Explore - Louer' },
+    { path: '/recherche', label: 'Recherche (Results)' },
+    { path: '/login', label: 'Login' },
+    { path: '/register', label: 'Register' },
+    { path: '/reset-password', label: 'Reset Password' },
+    { path: '/dashboard', label: 'Dashboard' },
+    { path: '/dashboard/favoris', label: 'Favoris' },
+    { path: '/dashboard/locations', label: 'Locations' },
+    { path: '/dashboard/annonces', label: 'Annonces' },
+    { path: '/dashboard/reservations', label: 'Reservations' },
+    { path: '/dashboard/messages', label: 'Messages' },
+    { path: '/dashboard/transactions', label: 'Transactions' },
+    { path: '/dashboard/validations', label: 'Validations' },
+    { path: '/dashboard/catalogue', label: 'Catalogue' },
+    { path: '/dashboard/notifications', label: 'Notifications' },
+    { path: '/publier', label: 'Publier (Create Annonce)' },
+    { path: '/profile', label: 'Profile' },
+    { path: '/admin', label: 'Admin Dashboard' },
+    { path: '/admin/moderation', label: 'Admin - Moderation' },
+    { path: '/admin/utilisateurs', label: 'Admin - Utilisateurs' },
+    { path: '/admin/statistiques', label: 'Admin - Statistiques' },
+    { path: '/admin/configuration', label: 'Admin - Configuration' },
+    { path: '/routes', label: 'Liste des routes' },
+  ];
+
+  return (
+    <div className="max-w-3xl mx-auto py-8 px-4">
+      <h1 className="text-2xl font-bold mb-4">Liste des routes</h1>
+      <ul className="space-y-2">
+        {routes.map((r) => (
+          <li key={r.path}>
+            <Link to={r.path} className="text-cyan-700 hover:underline">
+              {r.label} — <span className="text-sm text-slate-500">{r.path}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 const SearchResults: React.FC = () => {
   const location = useLocation();
@@ -88,93 +132,95 @@ const App: React.FC = () => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/demo" element={<Appp />} />
+    <>
+      <Routes>
+        <Route path="/routes" element={<ListRoutes />} />
+        <Route path="/demo" element={<Appp />} />
 
       //routes d'authentification
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/reset-password" element={<ChangePasswordForm />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/reset-password" element={<ChangePasswordForm />} />
 
 // routes client/pro
-      <Route
-        path="/dashboard"
-        element={
-          user.role === 'CLIENT' ? (
+        <Route
+          path="/dashboard"
+          element={
+            user.role === 'CLIENT' ? (
+              <ClientDashboardPage
+                userName={user.nom}
+                userRole="CLIENT"
+                notificationCount={0}
+              />
+            ) : (
+              <DashboardPage
+                userName={user.nom}
+                userRole={user.role === 'CLIENT' ? 'CLIENT' : 'PRO'}
+              />
+            )
+          }
+        />
+        <Route
+          path="/dashboard/favoris"
+          element={
             <ClientDashboardPage
               userName={user.nom}
               userRole="CLIENT"
               notificationCount={0}
             />
-          ) : (
-            <DashboardPage
+          }
+        />
+        <Route
+          path="/dashboard/locations"
+          element={
+            <ClientDashboardPage
               userName={user.nom}
-              userRole={user.role === 'CLIENT' ? 'CLIENT' : 'PRO'}
+              userRole="CLIENT"
+              notificationCount={0}
             />
-          )
-        }
-      />
-      <Route
-        path="/dashboard/favoris"
-        element={
-          <ClientDashboardPage
-            userName={user.nom}
-            userRole="CLIENT"
-            notificationCount={0}
-          />
-        }
-      />
-      <Route
-        path="/dashboard/locations"
-        element={
-          <ClientDashboardPage
-            userName={user.nom}
-            userRole="CLIENT"
-            notificationCount={0}
-          />
-        }
-      />
+          }
+        />
       //-----------------------------------------------------------------------------
 
-      // routes admin
-      <Route
-        path="/admin"
-        element={
-          <AdminDashboardPage
-            userName={user.nom}
-            notificationCount={0}
-          />
-        }
-      />
+        // routes admin
+        <Route
+          path="/admin"
+          element={
+            <AdminDashboardPage
+              userName={user.nom}
+              notificationCount={0}
+            />
+          }
+        />
       // prochaine etape: créer les pages admin et les lier à ces routes
-      <Route
-        path="/admin/moderation"
-        element={
-          <ModerationPage
-            userName={user.nom}
-            notificationCount={0}
-          />
-        }
-      />
-      <Route path="/admin/utilisateurs" element={<PlaceholderPage title="Gestion des utilisateurs" />} />
-      <Route path="/admin/statistiques" element={<PlaceholderPage title="Statistiques" />} />
-      <Route path="/admin/configuration" element={<PlaceholderPage title="Configuration" />} />
+        <Route
+          path="/admin/moderation"
+          element={
+            <ModerationPage
+              userName={user.nom}
+              notificationCount={0}
+            />
+          }
+        />
+        <Route path="/admin/utilisateurs" element={<PlaceholderPage title="Gestion des utilisateurs" />} />
+        <Route path="/admin/statistiques" element={<PlaceholderPage title="Statistiques" />} />
+        <Route path="/admin/configuration" element={<PlaceholderPage title="Configuration" />} />
 
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/dashboard/notifications" element={<NotificationsPage />} />
-      <Route path="/explore/louer" element={<ExploreRenting />} />
-      <Route path="/explore/vente" element={<ExploreSellings />} />
-      <Route path="/recherche" element={<SearchResults />} />
-      <Route path="/dashboard/annonces" element={<AnnoncesPage />} />
-      <Route path="/dashboard/reservations" element={<ReservationsPage />} />
-      <Route path="/dashboard/messages" element={<MessagesPage />} />
-      <Route path="/dashboard/transactions" element={<TransactionsPage />} />
-      <Route path="/dashboard/validations" element={<ValidationsPage />} />
-      <Route path="/dashboard/catalogue" element={<CataloguePage />} />
-      <Route path="/publier" element={<CreateAnnoncePage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+        <Route path="/explore/louer" element={<ExploreRenting />} />
+        <Route path="/explore/vente" element={<ExploreSellings />} />
+        <Route path="/recherche" element={<SearchResults />} />
+        <Route path="/dashboard/annonces" element={<AnnoncesPage />} />
+        <Route path="/dashboard/reservations" element={<ReservationsPage />} />
+        <Route path="/dashboard/messages" element={<MessagesPage />} />
+        <Route path="/dashboard/transactions" element={<TransactionsPage />} />
+        <Route path="/dashboard/validations" element={<ValidationsPage />} />
+        <Route path="/dashboard/catalogue" element={<CataloguePage />} />
+        <Route path="/publier" element={<CreateAnnoncePage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
   );
 };
 
