@@ -13,11 +13,11 @@ import {
 import { cn } from '@/lib/utils';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import PropertyCard from '@/components/property/PropertyCard';
+import PropertyCard from '@/components/ui/PropertyCard';
 import { Button } from '@/components/ui/Button';
 import { MOCK_PROPERTIES } from '@/lib/data/mockProperties';
-import type { OperationType, PropertyType } from '@/types/property.types';
-import { PROPERTY_TYPE_LABELS, PAYS_OPTIONS } from '@/types/property.types';
+import type { OperationType, PropertyType } from '@/lib/types/property.types';
+import { PROPERTY_TYPE_LABELS, PAYS_OPTIONS } from '@/lib/types/property.types';
 
 // ─── Types internes ───────────────────────────────────────────────────────────
 
