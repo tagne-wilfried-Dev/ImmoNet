@@ -24,6 +24,7 @@ import {
   type RegisterPayload,
 } from '@/lib/validations/auth';
 import axios from '@/lib/axios';
+import { PasswordStrengthHint } from '@/lib/validations/PasswordStrengthHint';
 
 // ─── Sous-composant : sélecteur de rôle ──────────────────────────────────────
 
@@ -344,7 +345,7 @@ const RegisterPage: React.FC = () => {
               <button type="button" className="text-[#22d3ee] hover:text-[#a5f3fc] underline underline-offset-2 transition-colors">
                 Politique de Confidentialité
               </button>
-              . Le rôle <strong className="text-[#94a3b8] font-semibold">PROPRIÉTAIRE</strong> nécessite un abonnement et une validation admin.
+              . 
             </span>
           </label>
           {errors.acceptTerms && (
@@ -374,46 +375,6 @@ const RegisterPage: React.FC = () => {
         </button>
       </p>
     </AuthLayout>
-  );
-};
-
-// ─── Indicateur de force du mot de passe ─────────────────────────────────────
-// Composant isolé pour garder RegisterPage lisible
-
-interface PasswordStrengthHintProps {
-  password: string;
-}
-
-const rules = [
-  { label: '8 caractères min.', test: (p: string) => p.length >= 8 },
-  { label: 'Une majuscule', test: (p: string) => /[A-Z]/.test(p) },
-  { label: 'Un chiffre', test: (p: string) => /[0-9]/.test(p) },
-] as const;
-
-const PasswordStrengthHint: React.FC<PasswordStrengthHintProps> = ({ password }) => {
-  if (!password) return null;
-
-  return (
-    <div className="flex gap-3 flex-wrap -mt-1">
-      {rules.map(({ label, test }) => {
-        const ok = test(password);
-        return (
-          <span
-            key={label}
-            className={`flex items-center gap-1 text-[10px] font-medium transition-colors duration-200 ${
-              ok ? 'text-[#10b981]' : 'text-[#475569]'
-            }`}
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
-                ok ? 'bg-[#10b981]' : 'bg-[#334155]'
-              }`}
-            />
-            {label}
-          </span>
-        );
-      })}
-    </div>
   );
 };
 
