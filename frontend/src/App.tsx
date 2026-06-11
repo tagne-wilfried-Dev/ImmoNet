@@ -14,6 +14,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Appp from '@/draft';
 import { ProfilePage } from '@/pages/ProfilePage';
+import BienDetailPage from './pages/BienDetailPage';
 import type { SimpleUser } from './types/user.types';
 import { toast } from 'sonner';
 import { userService } from './services/UserService';
@@ -73,6 +74,7 @@ const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/biens/:id" element={<BienDetailPage />} />
       <Route path="/demo" element={<Appp />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
