@@ -2,30 +2,16 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { changePasswordSchema,type ChangePasswordFormData} from '@/lib/validations/auth';
 import { userService } from '@/services/UserService';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { toast } from 'sonner';
 
-const changePasswordSchema = z
-  .object({
-    ancienMotDePasse: z.string().min(1, 'L\'ancien mot de passe est requis'),
-    nouveauMotDePasse: z
-      .string()
-      .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-      .regex(/[A-Z]/, 'Doit contenir au moins une majuscule')
-      .regex(/[a-z]/, 'Doit contenir au moins une minuscule')
-      .regex(/[0-9]/, 'Doit contenir au moins un chiffre'),
-    confirmationMotDePasse: z.string().min(1, 'La confirmation est requise'),
-  })
-  .refine((data) => data.nouveauMotDePasse === data.confirmationMotDePasse, {
-    message: 'Les mots de passe ne correspondent pas',
-    path: ['confirmationMotDePasse'],
-  });
 
-type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+
+
 
 export function ChangePasswordForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);

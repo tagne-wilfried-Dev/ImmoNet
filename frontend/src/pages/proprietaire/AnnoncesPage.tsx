@@ -1,6 +1,7 @@
 import React from 'react';
-import DashboardLayout from '../../components/layout/DashboardLayout';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Building2, Edit, Eye, Trash2, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const mockAnnonces = [
   { id: 1, title: 'Studio meublé Centre-ville', type: 'Studio', price: '45 000 CFA/mois', status: 'Publiée', views: 124 },
@@ -16,6 +17,10 @@ const statusColors: Record<string, string> = {
 };
 
 const AnnoncesPage: React.FC = () => {
+  const navigate = useNavigate();
+  const handlePublish = () => {
+    navigate('/publier');
+  };
   return (
     <DashboardLayout userName="Wiliam Smith" userRole="PRO" notificationCount={3}>
       <div className="space-y-6">
@@ -24,7 +29,9 @@ const AnnoncesPage: React.FC = () => {
             <h1 className="font-display text-2xl font-bold text-slate-900">Mes annonces</h1>
             <p className="text-sm text-slate-600 mt-1">Gérez vos biens, photos et disponibilités</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-cyan-600 to-cyan-500 text-white text-sm font-medium rounded-full shadow-accent hover:shadow-accent-lg transition-all hover:-translate-y-0.5 active:scale-95">
+          <button
+            onClick={handlePublish}
+            className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-cyan-600 to-cyan-500 text-white text-sm font-medium rounded-full shadow-accent hover:shadow-accent-lg transition-all hover:-translate-y-0.5 active:scale-95">
             <Plus size={16} /> Nouvelle annonce
           </button>
         </div>

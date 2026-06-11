@@ -21,7 +21,7 @@ const buttonVariants = cva(
       variant: {
         // DESIGN.md — Primary : gradient cyan
         primary: [
-          'bg-gradient-to-br from-[#0891b2] to-[#06b6d4] text-white',
+          'bg-linear-to-br from-[#0891b2] to-[#06b6d4] text-white',
           'shadow-[0_4px_14px_rgba(8,145,178,0.15)]',
           'hover:-translate-y-px hover:from-[#0e7490] hover:to-[#0891b2]',
           'hover:shadow-[0_10px_25px_rgba(8,145,178,0.20)]',
@@ -41,7 +41,7 @@ const buttonVariants = cva(
 
         // DESIGN.md — Danger : gradient rouge
         danger: [
-          'bg-gradient-to-br from-[#dc2626] to-[#ef4444] text-white',
+          'bg-linear-to-br from-[#dc2626] to-[#ef4444] text-white',
           'shadow-[0_4px_14px_rgba(220,38,38,0.15)]',
           'hover:-translate-y-px hover:shadow-[0_10px_25px_rgba(220,38,38,0.20)]',
         ].join(' '),
