@@ -24,66 +24,19 @@ import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import MessageAlert from '@/components/ui/MessageAlert';
 import adminMockData from '@/lib/data/mockDataAdmin.json';
+import type {
+  ModerationItem,
+  ModerationItemType,
+  // ModerationStatus,
+  UserRole,
+  UserStatus,
+  RecentUser,
+  // KpiData,
+  AdminDashboardData,
+  // PlatformStats,
+} from '@/lib/types/admin.types';
 
-// ─── Types alignés sur mockDataAdmin.json ─────────────────────────────────────
 
-interface KpiData {
-  id: string;
-  title: string;
-  value: string;
-  unit?: string;
-  trend: string;
-  trendLabel: string;
-  positive: boolean;
-  icon: string;
-  urgent?: boolean;
-}
-
-type ModerationStatus = 'pending' | 'flagged';
-type ModerationItemType = 'annonce' | 'pro_request' | 'signalement';
-
-interface ModerationItem {
-  id: number;
-  type: ModerationItemType;
-  title: string;
-  submittedBy: string;
-  submittedAt: string;
-  status: ModerationStatus;
-}
-
-type UserRole = 'CLIENT' | 'PRO' | 'ADMIN';
-type UserStatus = 'ACTIVE' | 'PENDING_VERIFICATION' | 'SUSPENDED' | 'BANNED';
-
-interface RecentUser {
-  id: number;
-  nom: string;
-  email: string;
-  role: UserRole;
-  status: UserStatus;
-  registeredAt: string;
-}
-
-interface AbonnementStats {
-  starter: number;
-  business: number;
-  premium: number;
-}
-
-interface PlatformStats {
-  tauxOccupation: string;
-  annoncesModereesAujourdhui: number;
-  logementsVendus: number;
-  logementsLoues: number;
-  signalements: number;
-  abonnementsActifs: AbonnementStats;
-}
-
-interface AdminDashboardData {
-  kpis: KpiData[];
-  moderationQueue: ModerationItem[];
-  recentUsers: RecentUser[];
-  platformStats: PlatformStats;
-}
 
 // ─── Map icon string → Lucide ─────────────────────────────────────────────────
 
