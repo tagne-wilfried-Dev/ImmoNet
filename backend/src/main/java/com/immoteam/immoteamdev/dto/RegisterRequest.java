@@ -1,5 +1,6 @@
 package com.immoteam.immoteamdev.dto;
 
+import com.immoteam.immoteamdev.entity.enums.RoleUtilisateur;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -27,6 +28,7 @@ public class RegisterRequest {
     @Size(min = 7, max = 15, message = "Le numéro de téléphone doit contenir entre 7 et 15 caractères") 
     private String telephone;
 
+    private RoleUtilisateur role;
    
 }
 

@@ -2,7 +2,7 @@ import { UserCheck, Home } from "lucide-react";
 
 
 interface RoleOption {
-  value: 'CLIENT' | 'PROPRIETAIRE';
+  value: 'CLIENT' | 'PRO';
   label: string;
   description: string;
   Icon: React.ElementType;
@@ -16,7 +16,7 @@ const ROLE_OPTIONS: RoleOption[] = [
     Icon: UserCheck,
   },
   {
-    value: 'PROPRIETAIRE',
+    value: 'PRO',
     label: 'Propriétaire',
     description: 'Publier et gérer mes annonces (abonnement requis)',
     Icon: Home,
@@ -24,17 +24,17 @@ const ROLE_OPTIONS: RoleOption[] = [
 ];
 
 interface RoleSelectorProps {
-  value: 'CLIENT' | 'PROPRIETAIRE' | undefined;
-  onChange: (role: 'CLIENT' | 'PROPRIETAIRE') => void;
+  value: 'CLIENT' | 'PRO' | undefined;
+  onChange: (role: 'CLIENT' | 'PRO') => void;
   error?: string;
 }
 
 const RoleSelector: React.FC<RoleSelectorProps> = ({ value, onChange, error }) => (
-  <div className="space-y-2">
-    <label className="block text-xs font-medium text-slate-400 uppercase tracking-wide">
-      Je suis un…
+  <div className="space-y-3">
+    <label className="block text-[11px] font-bold text-slate-600 tracking-wider uppercase ml-1">
+      Je suis...
     </label>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {ROLE_OPTIONS.map(({ value: roleValue, label, description, Icon }) => {
         const isSelected = value === roleValue;
         return (
@@ -43,34 +43,31 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ value, onChange, error }) =
             type="button"
             onClick={() => onChange(roleValue)}
             className={`
-              relative flex items-start gap-3 p-4 rounded-xl border transition-all duration-300 text-left
+              relative flex flex-col items-start gap-3 p-5 rounded-2xl border-2 transition-all duration-300 text-left
               ${isSelected 
-                ? 'border-cyan-400 bg-cyan-500/10 shadow-[0_0_20px_rgba(34,211,238,0.15)] ring-1 ring-cyan-400' 
-                : 'border-slate-700 bg-slate-800/40 hover:border-slate-600 hover:bg-slate-800/60'
+                ? 'border-cyan-500 bg-cyan-50 shadow-sm ring-1 ring-cyan-500/20' 
+                : 'border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50/50'
               }
             `}
           >
             <div className={`
-              p-2 rounded-lg transition-all ${isSelected ? 'bg-cyan-400 text-slate-900 shadow-[0_0_10px_rgba(34,211,238,0.5)]' : 'bg-slate-700 text-slate-400'}
+              p-2.5 rounded-xl transition-all ${isSelected ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20' : 'bg-slate-100 text-slate-400'}
             `}>
-              <Icon size={18} />
+              <Icon size={20} />
             </div>
-            <div className="flex-1">
-              <p className={`text-sm font-semibold transition-colors ${isSelected ? 'text-cyan-300' : 'text-slate-200'}`}>
+            <div>
+              <p className={`text-[15px] font-bold transition-colors ${isSelected ? 'text-cyan-900' : 'text-slate-900'}`}>
                 {label}
               </p>
-              <p className={`text-xs leading-tight mt-0.5 ${isSelected ? 'text-cyan-200/70' : 'text-slate-500'}`}>
+              <p className={`text-[12px] leading-snug mt-1 font-medium ${isSelected ? 'text-cyan-700/80' : 'text-slate-500'}`}>
                 {description}
               </p>
             </div>
-            {isSelected && (
-              <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,1)]" />
-            )}
           </button>
         );
       })}
     </div>
-    {error && <p className="text-xs text-red-400 font-medium" role="alert">{error}</p>}
+    {error && <p className="text-[12px] text-red-600 font-medium ml-1 mt-1" role="alert">{error}</p>}
   </div>
 );
 export default RoleSelector;

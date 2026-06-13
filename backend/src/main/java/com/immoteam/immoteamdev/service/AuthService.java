@@ -48,7 +48,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .motDePasseHash(passwordEncoder.encode(request.getMotDePasse()))
                 .telephone(request.getTelephone())
-                .role(RoleUtilisateur.CLIENT)
+                .role(request.getRole())
                 .build();
 
         utilisateurRepository.save(utilisateur);

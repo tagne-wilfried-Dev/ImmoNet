@@ -80,32 +80,32 @@ const LoginPage: React.FC = () => {
   return (
     <AuthLayout>
       {/* En-tête */}
-      <div className="text-center mb-7">
+      <div className="text-center mb-10">
         <h1
-          className="text-2xl font-bold text-white tracking-tight"
+          className="text-3xl font-bold text-slate-900 tracking-tight"
           style={{ fontFamily: "'Syne', sans-serif" }}
         >
-          Login
+          Bon retour !
         </h1>
-        <p className="text-[#64748b] text-sm mt-1.5">
-          Connectez-vous à votre espace ImmoNet
+        <p className="text-slate-500 text-[15px] mt-2 font-medium">
+          Connectez-vous pour gérer vos biens
         </p>
       </div>
 
       {/* Alertes */}
       {locationState?.message && (
-        <div className="mb-5">
+        <div className="mb-6">
           <MessageAlert type="success" message={locationState.message} />
         </div>
       )}
       {error && (
-        <div className="mb-5">
+        <div className="mb-6">
           <MessageAlert type="error" title="Connexion impossible" message={error} />
         </div>
       )}
 
       {/* Formulaire */}
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
         <AuthInput
           label="Adresse email"
           type="email"
@@ -127,22 +127,22 @@ const LoginPage: React.FC = () => {
 
         {/* Options secondaires */}
         <div className="flex items-center justify-between pt-1">
-          <label className="flex items-center gap-2 text-xs text-[#64748b] cursor-pointer select-none">
+          <label className="flex items-center gap-2.5 text-[13px] text-slate-600 font-medium cursor-pointer select-none group">
             <input
               type="checkbox"
-              className="w-3.5 h-3.5 rounded border-[rgba(34,211,238,0.3)] bg-transparent accent-[#22d3ee]"
+              className="w-4 h-4 rounded-lg border-slate-200 bg-white text-cyan-600 focus:ring-cyan-500 transition-all cursor-pointer"
             />
             Se souvenir de moi
           </label>
           <button
             type="button"
-            className="text-xs text-[#22d3ee] hover:text-[#a5f3fc] transition-colors duration-150"
+            className="text-[13px] text-cyan-600 font-bold hover:text-cyan-700 transition-colors duration-200"
           >
             Mot de passe oublié ?
           </button>
         </div>
 
-        <div className="pt-1">
+        <div className="pt-2">
           <AuthButton type="submit" isLoading={isSubmitting}>
             Se connecter
           </AuthButton>
@@ -150,38 +150,26 @@ const LoginPage: React.FC = () => {
       </form>
 
       {/* Séparateur */}
-      <div className="relative my-6">
+      <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-[rgba(34,211,238,0.08)]" />
+          <div className="w-full border-t-2 border-slate-50" />
         </div>
         <div className="relative flex justify-center">
-          <span className="px-3 text-xs text-[#475569] bg-transparent">
+          <span className="px-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-white/50 backdrop-blur-sm rounded-full">
             ou
           </span>
         </div>
       </div>
 
-      {/* OAuth */}
-      {/* <div className="grid grid-cols-2 gap-3">
-        <AuthButton variant="secondary" type="button">
-          <GoogleIcon />
-          Google
-        </AuthButton>
-        <AuthButton variant="secondary" type="button">
-          <FacebookIcon />
-          Facebook
-        </AuthButton>
-      </div> */}
-
       {/* Lien inscription */}
-      <p className="text-center text-xs text-[#475569] mt-6">
+      <p className="text-center text-[14px] text-slate-500 font-medium mt-8">
         Pas encore de compte ?{' '}
         <button
           type="button"
           onClick={() => navigate('/register')}
-          className="text-[#22d3ee] font-medium hover:text-[#a5f3fc] transition-colors duration-150"
+          className="text-cyan-600 font-bold hover:text-cyan-700 transition-colors duration-200 underline underline-offset-4 decoration-cyan-500/30 hover:decoration-cyan-500"
         >
-          Créer un compte
+          Créer un compte gratuitement
         </button>
       </p>
     </AuthLayout>
