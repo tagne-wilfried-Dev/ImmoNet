@@ -1,7 +1,5 @@
-// import React, { useState, useCallback } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { motion, AnimatePresence } from 'framer-motion';
 import { motion } from 'framer-motion';
 import {
   Check,
@@ -15,20 +13,27 @@ import {
   Shield,
   Upload,
   X,
-//   FileText,
   Globe,
   Ruler,
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { propertyService } from '@/services/PropertyService';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-
 // ─── TYPES & INITIAL STATE ───────────────────────────────────────────────────────
 interface FormData {
   plan: 'starter' | 'business' | 'premium';
+  typeOperation: 'VENTE' | 'LOCATION';
   country: string;
+  ville: string;
   title: string;
   description: string;
   propertyType: string;
   surface: string;
+  nbPieces: string;
+  nbChambres: string;
+  nbSdb: string;
+  etage: string;
+  estMeuble: boolean;
   photos: File[];
   videos: File[];
   address: string;
@@ -44,11 +49,18 @@ interface FormData {
 
 const initialFormData: FormData = {
   plan: 'business',
+  typeOperation: 'LOCATION',
   country: '',
+  ville: '',
   title: '',
   description: '',
   propertyType: '',
   surface: '',
+  nbPieces: '',
+  nbChambres: '',
+  nbSdb: '',
+  etage: '',
+  estMeuble: false,
   photos: [],
   videos: [],
   address: '',
@@ -99,10 +111,76 @@ export default function CreateAnnoncePage() {
   };
 
   const handlePublish = async () => {
-    setIsSubmitting(true);
-    // TODO: Intégration API POST /api/annonces + upload Cloudinary
-    await new Promise((res) => setTimeout(res, 1500));
-    navigate('/dashboard/annonces');
+    try {
+      setIsSubmitting(true);
+      
+      const payload = {
+        titre: formData.title,
+        description: formData.description,
+        typeOperation: formData.typeOperation,
+        typeBien: formData.propertyType,
+        adresse: formData.address,
+        ville: formData.ville,
+        pays: formData.country,
+        prix: Number(formData.price),
+        caution: Number(formData.deposit) || 0,
+        chargesIncluses: Number(formData.charges) > 0,
+        surface: Number(formData.surface),
+        nbPieces: Number(formData.nbPieces) || 0,
+        nbChambres: Number(formData.nbChambres) || 0,
+        nbSdb: Number(formData.nbSdb) || 0,
+        etage: Number(formData.etage) || 0,
+        estMeuble: formData.estMeuble,
+      };
+
+      const createdProperty = await propertyService.createProperty(payload);
+      
+      if (formData.photos.length > 0) {
+        await propertyService.uploadPhotos(createdProperty.id, formData.photos);
+      }
+
+      await propertyService.updatePropertyStatus(createdProperty.id, 'PUBLIE');
+
+      toast.success('Annonce publiée avec succès !');
+      navigate('/dashboard/annonces');
+    } catch (err) {
+      console.error('Erreur lors de la publication:', err);
+      toast.error('Erreur lors de la publication de l\'annonce.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    try {
+      setIsSubmitting(true);
+      const payload = {
+        titre: formData.title || 'Brouillon sans titre',
+        description: formData.description,
+        typeOperation: formData.typeOperation,
+        typeBien: formData.propertyType,
+        adresse: formData.address,
+        ville: formData.ville,
+        pays: formData.country,
+        prix: Number(formData.price) || 0,
+        surface: Number(formData.surface) || 0,
+        estMeuble: formData.estMeuble,
+      };
+
+      const createdProperty = await propertyService.createProperty(payload);
+      
+      if (formData.photos.length > 0) {
+        await propertyService.uploadPhotos(createdProperty.id, formData.photos);
+      }
+
+      toast.success('Brouillon enregistré avec succès.');
+      navigate('/dashboard/annonces');
+    } catch (err) {
+      console.error('Erreur lors de la sauvegarde du brouillon:', err);
+      toast.error('Erreur lors de la sauvegarde du brouillon.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ─── SIDEBAR STEPS ─────────────────────────────────────────────────────────────
@@ -148,17 +226,28 @@ export default function CreateAnnoncePage() {
   // ─── FORM FOOTER ───────────────────────────────────────────────────────────────
   const FormFooter = () => (
     <div className="border-t border-slate-200 bg-white px-6 py-4 flex items-center justify-between">
-      <button
-        onClick={handlePrev}
-        disabled={currentStep === 1}
-        className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-          currentStep === 1
-            ? 'text-slate-300 cursor-not-allowed'
-            : 'text-slate-700 hover:bg-slate-50 hover:text-cyan-700'
-        }`}
-      >
-        <ChevronLeft size={18} /> Retour
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          onClick={handlePrev}
+          disabled={currentStep === 1}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            currentStep === 1
+              ? 'text-slate-300 cursor-not-allowed'
+              : 'text-slate-700 hover:bg-slate-50 hover:text-cyan-700'
+          }`}
+        >
+          <ChevronLeft size={18} /> Retour
+        </button>
+        {currentStep > 1 && (
+          <button
+            onClick={handleSaveDraft}
+            disabled={isSubmitting}
+            className="text-slate-500 hover:text-cyan-600 text-sm font-medium transition-colors"
+          >
+            Sauvegarder en brouillon
+          </button>
+        )}
+      </div>
       <span className="text-sm font-mono text-slate-500">
         {currentStep} / {steps.length}
       </span>
@@ -167,7 +256,7 @@ export default function CreateAnnoncePage() {
         disabled={isSubmitting}
         className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white text-sm font-medium rounded-full shadow-accent hover:shadow-accent-lg transition-all duration-200 hover:-translate-y-0.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
       >
-        {isSubmitting ? 'Publication...' : currentStep === steps.length ? 'Publier l\'annonce' : 'Continuer'}
+        {isSubmitting ? 'Opération en cours...' : currentStep === steps.length ? 'Publier l\'annonce' : 'Continuer'}
         {currentStep !== steps.length && <ChevronRight size={18} />}
       </button>
     </div>
@@ -223,14 +312,27 @@ export default function CreateAnnoncePage() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
+                <label className={labelBase}>Type d'opération</label>
+                <select value={formData.typeOperation} onChange={(e) => updateField('typeOperation', e.target.value)} className={inputBase}>
+                  <option value="LOCATION">À louer (Location)</option>
+                  <option value="VENTE">À vendre (Vente)</option>
+                </select>
+              </div>
+              <div>
                 <label className={labelBase}><Globe size={16} className="inline mr-1"/> Pays</label>
                 <select value={formData.country} onChange={(e) => updateField('country', e.target.value)} className={inputBase}>
                   <option value="">Sélectionner</option>
-                  <option value="SN">Sénégal</option>
-                  <option value="CI">Côte d'Ivoire</option>
-                  <option value="CM">Cameroun</option>
-                  <option value="FR">France</option>
+                  <option value="Bénin">Bénin</option>
+                  <option value="Sénégal">Sénégal</option>
+                  <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                  <option value="Cameroun">Cameroun</option>
                 </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className={labelBase}>Ville</label>
+                <input type="text" placeholder="Ex: Cotonou" value={formData.ville} onChange={(e) => updateField('ville', e.target.value)} className={inputBase} />
               </div>
               <div>
                 <label className={labelBase}>Titre de votre annonce</label>
@@ -246,16 +348,45 @@ export default function CreateAnnoncePage() {
                 <label className={labelBase}>Type de bien</label>
                 <select value={formData.propertyType} onChange={(e) => updateField('propertyType', e.target.value)} className={inputBase}>
                   <option value="">Sélectionner</option>
-                  <option value="studio">Studio</option>
-                  <option value="appartement">Appartement</option>
-                  <option value="maison">Maison</option>
-                  <option value="bureau">Bureau</option>
+                  <option value="APPARTEMENT">Appartement</option>
+                  <option value="MAISON">Maison</option>
+                  <option value="VILLA">Villa</option>
+                  <option value="STUDIO">Studio</option>
+                  <option value="BUREAU">Bureau</option>
                 </select>
               </div>
               <div>
                 <label className={labelBase}><Ruler size={16} className="inline mr-1"/> Surface (m²)</label>
                 <input type="number" placeholder="Ex: 45" value={formData.surface} onChange={(e) => updateField('surface', e.target.value)} className={inputBase} />
               </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className={labelBase}>Pièces</label>
+                <input type="number" value={formData.nbPieces} onChange={(e) => updateField('nbPieces', e.target.value)} className={inputBase} />
+              </div>
+              <div>
+                <label className={labelBase}>Chambres</label>
+                <input type="number" value={formData.nbChambres} onChange={(e) => updateField('nbChambres', e.target.value)} className={inputBase} />
+              </div>
+              <div>
+                <label className={labelBase}>SDB</label>
+                <input type="number" value={formData.nbSdb} onChange={(e) => updateField('nbSdb', e.target.value)} className={inputBase} />
+              </div>
+              <div>
+                <label className={labelBase}>Étage</label>
+                <input type="number" value={formData.etage} onChange={(e) => updateField('etage', e.target.value)} className={inputBase} />
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <input 
+                type="checkbox" 
+                id="estMeuble" 
+                checked={formData.estMeuble} 
+                onChange={(e) => updateField('estMeuble', e.target.checked)}
+                className="w-5 h-5 text-cyan-600 rounded focus:ring-cyan-500"
+              />
+              <label htmlFor="estMeuble" className="text-sm font-medium text-slate-700">Le bien est meublé</label>
             </div>
           </div>
         );
@@ -410,13 +541,13 @@ export default function CreateAnnoncePage() {
               <h3 className="font-display text-lg font-bold text-slate-900 mb-4">Récapitulatif de l'annonce</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <ReviewItem label="Formule" value={formData.plan} />
+                <ReviewItem label="Type d'opération" value={formData.typeOperation} />
                 <ReviewItem label="Titre" value={formData.title} />
                 <ReviewItem label="Type / Surface" value={`${formData.propertyType} • ${formData.surface} m²`} />
-                <ReviewItem label="Prix" value={`${formData.price} CFA/mois`} />
-                <ReviewItem label="Localisation" value={formData.address || 'Non définie'} />
-                <ReviewItem label="Disponibilité" value={`${formData.availabilityStart || '?'} au ${formData.availabilityEnd || '?'}`} />
-                <ReviewItem label="Politique" value={formData.cancellationPolicy} />
-                <ReviewItem label="Médias" value={`${formData.photos.length} photos, ${formData.videos.length} vidéos`} />
+                <ReviewItem label="Localisation" value={`${formData.ville}, ${formData.country}`} />
+                <ReviewItem label="Détails" value={`${formData.nbChambres} ch. • ${formData.nbSdb} SDB • ${formData.estMeuble ? 'Meublé' : 'Non meublé'}`} />
+                <ReviewItem label="Prix" value={`${formData.price} CFA`} />
+                <ReviewItem label="Médias" value={`${formData.photos.length} photos`} />
               </div>
             </div>
             <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-800 text-sm">

@@ -11,13 +11,13 @@ const equipements = [
   { id: 6, name: 'Climatisation', icon: Snowflake, count: 10 },
 ];
 
-const CataloguePage: React.FC = () => {
+const EquipementsPage: React.FC = () => {
   return (
     <DashboardLayout userName="Wiliam Smith" userRole="PRO" notificationCount={3}>
       <div className="space-y-6">
         <div>
-          <h1 className="font-display text-2xl font-bold text-slate-900">Catalogue équipements</h1>
-          <p className="text-sm text-slate-600 mt-1">Gérez les équipements standards associés à vos biens</p>
+          <h1 className="font-display text-2xl font-bold text-slate-900">Vos équipements</h1>
+          <p className="text-sm text-slate-600 mt-1">Gérez la liste des équipements que vous proposez dans vos biens</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -40,4 +40,4 @@ const CataloguePage: React.FC = () => {
   );
 };
 
-export default CataloguePage;
+export default EquipementsPage;

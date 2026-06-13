@@ -5,7 +5,7 @@ import { User, Check, X, Clock } from 'lucide-react';
 
 const mockReservations = [
   { id: 'RES-001', client: 'Marie K.', dates: '12 Mai - 18 Mai', amount: '270 000 CFA', status: 'En attente' },
-  { id: 'RES-002', client: 'Jean D.', dates: '01 Juin - 15 Juin', amount: '630 000 CFA', status: 'Confirmée' },
+  { id: 'RES-002', client: 'pauline D.', dates: '01 Juin - 15 Juin', amount: '630 000 CFA', status: 'Confirmée' },
   { id: 'RES-003', client: 'Aminata S.', dates: '20 Mai - 25 Mai', amount: '112 500 CFA', status: 'Annulée' },
 ];
 
