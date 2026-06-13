@@ -20,13 +20,13 @@ export const PasswordStrengthHint: React.FC<PasswordStrengthHintProps> = ({ pass
         return (
           <span
             key={label}
-            className={`flex items-center gap-1 text-[10px] font-medium transition-colors duration-200 ${
-              ok ? 'text-[#10b981]' : 'text-[#475569]'
+            className={`flex items-center gap-1.5 text-[11px] font-semibold transition-colors duration-200 ${
+              ok ? 'text-emerald-600' : 'text-slate-400'
             }`}
           >
             <span
               className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
-                ok ? 'bg-[#10b981]' : 'bg-[#334155]'
+                ok ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-slate-200'
               }`}
             />
             {label}

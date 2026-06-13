@@ -47,10 +47,10 @@ export function ChangePasswordForm() {
   return (
     <Card className="p-8">
       <div className="mb-6">
-        <h2 className="font-display text-2xl font-bold text-white">
+        <h2 className="font-display text-2xl font-bold text-slate-900">
           Changer le mot de passe
         </h2>
-        <p className="mt-2 text-sm text-slate-400">
+        <p className="mt-2 text-sm text-slate-500 font-medium">
           Mettez à jour votre mot de passe pour sécuriser votre compte
         </p>
       </div>

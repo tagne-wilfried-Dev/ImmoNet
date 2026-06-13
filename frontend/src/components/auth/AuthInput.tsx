@@ -22,14 +22,14 @@ const AuthInput: React.FC<AuthInputProps> = ({
 
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-[#a5f3fc]/80 tracking-wide uppercase">
+      <label className="block text-[11px] font-bold text-slate-600 tracking-wider uppercase ml-1">
         {label}
       </label>
 
-      <div className="relative">
+      <div className="relative group">
         {Icon && (
           <Icon
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748b]"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-cyan-600 transition-colors duration-200"
             aria-hidden="true"
           />
         )}
@@ -38,21 +38,22 @@ const AuthInput: React.FC<AuthInputProps> = ({
           type={inputType}
           className={`
             w-full
-            ${Icon ? 'pl-10' : 'pl-4'}
-            ${isPassword ? 'pr-10' : 'pr-4'}
-            py-3
-            bg-[rgba(4,47,61,0.6)]
-            border
-            ${error ? 'border-[#ef4444]' : 'border-[rgba(34,211,238,0.18)]'}
-            rounded-xl
-            text-white text-sm
-            placeholder-[#64748b]
+            ${Icon ? 'pl-11' : 'pl-4'}
+            ${isPassword ? 'pr-11' : 'pr-4'}
+            py-3.5
+            bg-white
+            border-2
+            ${error ? 'border-red-500 bg-red-50/30' : 'border-slate-100 group-hover:border-slate-200'}
+            rounded-2xl
+            text-slate-900 text-[15px]
+            placeholder-slate-400
             focus:outline-none
-            focus:border-[#22d3ee]
-            focus:ring-[3px]
-            focus:ring-[rgba(34,211,238,0.12)]
-            transition-all duration-150
-            autofill:bg-[rgba(4,47,61,0.6)]
+            focus:border-cyan-500
+            focus:bg-white
+            focus:ring-4
+            focus:ring-cyan-500/10
+            shadow-sm
+            transition-all duration-200
           `}
           {...props}
         />
@@ -63,16 +64,16 @@ const AuthInput: React.FC<AuthInputProps> = ({
             onClick={() => setShowPassword((prev) => !prev)}
             tabIndex={-1}
             aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b] hover:text-[#22d3ee] transition-colors duration-150"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-600 transition-colors duration-200"
           >
-            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         )}
       </div>
 
       {error && (
-        <p className="flex items-center gap-1.5 text-xs text-[#ef4444]" role="alert">
-          <AlertCircle size={11} aria-hidden="true" />
+        <p className="flex items-center gap-1.5 text-[12px] text-red-600 font-medium ml-1 mt-1" role="alert">
+          <AlertCircle size={14} aria-hidden="true" />
           {error}
         </p>
       )}

@@ -6,7 +6,7 @@ export const loginSchema = z.object({
 });
 
 // Valeurs strictement alignées sur les rôles backend Spring Boot
-export const ROLES = ['CLIENT', 'PROPRIETAIRE'] as const;
+export const ROLES = ['CLIENT', 'PRO'] as const;
 export type Role = (typeof ROLES)[number];
 
 export const registerSchema = z
@@ -24,9 +24,6 @@ export const registerSchema = z
       .regex(/[0-9]/, 'Au moins un chiffre'),
     confirmPass: z.string(),
     role: z.enum(ROLES, { message: 'Sélectionnez un rôle' }),
-    // Champs optionnels — omis du payload si vides grâce au transform en bas
-    ville: z.string().max(100).optional(),
-    pays: z.string().max(100).optional(),
     acceptTerms: z.literal(true, { message: 'Vous devez accepter les CGU' }),
   })
   .refine((data) => data.motDePasse === data.confirmPass, {
