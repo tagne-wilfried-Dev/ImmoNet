@@ -12,21 +12,21 @@ interface MessageAlertProps {
 const CONFIG = {
   error: {
     Icon: AlertTriangle,
-    containerClass: 'border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.07)]',
-    iconClass: 'text-[#ef4444]',
-    titleClass: 'text-[#fca5a5]',
-    textClass: 'text-[#fca5a5]/80',
-    barClass: 'bg-[#ef4444]',
-    closeClass: 'text-[#ef4444]/60 hover:text-[#ef4444]',
+    containerClass: 'border-red-100 bg-red-50/50 backdrop-blur-sm',
+    iconClass: 'text-red-600',
+    titleClass: 'text-red-900',
+    textClass: 'text-red-700',
+    barClass: 'bg-red-500',
+    closeClass: 'text-red-400 hover:text-red-600',
   },
   success: {
     Icon: CheckCircle2,
-    containerClass: 'border-[rgba(16,185,129,0.35)] bg-[rgba(16,185,129,0.07)]',
-    iconClass: 'text-[#10b981]',
-    titleClass: 'text-[#6ee7b7]',
-    textClass: 'text-[#6ee7b7]/80',
-    barClass: 'bg-[#10b981]',
-    closeClass: 'text-[#10b981]/60 hover:text-[#10b981]',
+    containerClass: 'border-emerald-100 bg-emerald-50/50 backdrop-blur-sm',
+    iconClass: 'text-emerald-600',
+    titleClass: 'text-emerald-900',
+    textClass: 'text-emerald-700',
+    barClass: 'bg-emerald-500',
+    closeClass: 'text-emerald-400 hover:text-emerald-600',
   },
 } as const;
 

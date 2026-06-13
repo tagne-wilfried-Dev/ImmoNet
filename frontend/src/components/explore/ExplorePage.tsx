@@ -1,14 +1,81 @@
-import React from 'react';
-import { MapPin, Search, Filter, X, Menu } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
+import Header from '@/components/layout/Header';
+import { MapPin, Search, X, Loader2 } from 'lucide-react';
+import { propertyService } from '@/services/PropertyService';
+import type { PropertySummary, SearchFilters } from '@/lib/types/property.types';
+import PropertyCard from '@/components/ui/PropertyCard';
 
 interface ExplorePageProps {
-  title: string; // "Immobilier à vendre" ou "Immobilier à louer"
+  title: string;
   mode: 'vendre' | 'louer';
 }
 
 const ExplorePage: React.FC<ExplorePageProps> = ({ title, mode }) => {
+  const [properties, setProperties] = useState<PropertySummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalElements, setTotalElements] = useState(0);
+  const [page, setPage] = useState(0);
+  
+  const [filters, setFilters] = useState<SearchFilters>({
+    typeOperation: mode === 'vendre' ? 'VENTE' : 'LOCATION',
+  });
+
+  const [currentExplore, setCurrentExplore] = useState<'rent' | 'sell'>(mode === 'vendre' ? 'sell' : 'rent');
+
+  const handleHeaderNavigate = (type: 'rent' | 'sell') => {
+    setCurrentExplore(type);
+    setFilters(prev => ({ ...prev, typeOperation: type === 'sell' ? 'VENTE' : 'LOCATION' }));
+    setPage(0);
+  };
+
+  const location = useLocation();
+
+  // Sync filters from query params (e.g., ?typeOperation=VENTE)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const typeOp = params.get('typeOperation');
+    if (typeOp === 'VENTE') {
+      setFilters(prev => ({ ...prev, typeOperation: 'VENTE' }));
+      setCurrentExplore('sell');
+      setPage(0);
+    } else if (typeOp === 'LOCATION') {
+      setFilters(prev => ({ ...prev, typeOperation: 'LOCATION' }));
+      setCurrentExplore('rent');
+      setPage(0);
+    }
+  }, [location.search]);
+
+  const fetchProperties = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await propertyService.getProperties(filters, page, 16);
+      setProperties(response.data);
+      setTotalElements(response.total);
+    } catch (err) {
+      console.error('Error fetching properties:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, page]);
+
+  useEffect(() => {
+    fetchProperties();
+  }, [fetchProperties]);
+
+  const handleFilterChange = (name: keyof SearchFilters, value: any) => {
+    setFilters(prev => ({ ...prev, [name]: value }));
+    setPage(0); // Reset to first page on filter change
+  };
+
+  const clearFilters = () => {
+    setFilters({ typeOperation: mode === 'vendre' ? 'VENTE' : 'LOCATION' });
+    setPage(0);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
+      <Header currentExplore={currentExplore} onNavigate={handleHeaderNavigate} />
       {/* En-tête de page */}
       <div className="bg-white border-b border-cyan-100 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,7 +83,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title, mode }) => {
             {title}
           </h1>
           <p className="text-slate-600 text-lg">
-            Découvrez les meilleures offres {mode === 'vendre' ? 'à vendre' : 'à louer'} en Afrique centrale
+            Découvrez les meilleures offres {mode === 'vendre' ? 'à vendre' : 'à louer'} sur ImmoNet
           </p>
         </div>
       </div>
@@ -25,133 +92,161 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title, mode }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* Colonne Filtres */}
-          <div className="lg:col-span-6 xl:col-span-5 space-y-8">
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-cyan-100">
-              <h2 className="font-semibold text-xl text-slate-900 mb-8">Filtrer votre recherche</h2>
+          <div className="lg:col-span-4 space-y-8">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-cyan-100 sticky top-8">
+              <h2 className="font-semibold text-xl text-slate-900 mb-6">Filtrer votre recherche</h2>
 
               {/* Pays */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Dans quel pays recherchez-vous ?
-                </label>
-                <select className="w-full px-5 py-3.5 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none text-slate-700">
-                  <option value="">Sélectionner un pays</option>
-                  <option value="cm">Cameroun</option>
-                  <option value="ci">Côte d'Ivoire</option>
-                  <option value="sn">Sénégal</option>
-                  <option value="tg">Togo</option>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Pays</label>
+                <select 
+                  value={filters.pays || ''}
+                  onChange={(e) => handleFilterChange('pays', e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                >
+                  <option value="">Tous les pays</option>
+                  <option value="Bénin">Bénin</option>
+                  <option value="Cameroun">Cameroun</option>
+                  <option value="Sénégal">Sénégal</option>
                 </select>
               </div>
 
               {/* Type de bien */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Type de bien recherché
-                </label>
-                <select className="w-full px-5 py-3.5 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none text-slate-700">
-                  <option value="">Sélectionner un type</option>
-                  <option value="appartement">Appartement</option>
-                  <option value="maison">Maison</option>
-                  <option value="villa">Villa</option>
-                  <option value="terrain">Terrain</option>
-                  <option value="bureau">Bureau</option>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Type de bien</label>
+                <select 
+                  value={filters.typeBien || ''}
+                  onChange={(e) => handleFilterChange('typeBien', e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                >
+                  <option value="">Tous les types</option>
+                  <option value="APPARTEMENT">Appartement</option>
+                  <option value="MAISON">Maison</option>
+                  <option value="VILLA">Villa</option>
+                  <option value="TERRAIN">Terrain</option>
                 </select>
               </div>
 
               {/* Ville */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Saisissez la ville où vous recherchez
-                </label>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Ville</label>
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Ex: Douala, Yaoundé, Bafoussam..."
-                    className="w-full pl-12 pr-5 py-3.5 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none text-slate-700"
+                    placeholder="Ex: Cotonou, Douala..."
+                    value={filters.ville || ''}
+                    onChange={(e) => handleFilterChange('ville', e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
                   />
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-500 w-5 h-5" />
+                  <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-500 w-4 h-4" />
                 </div>
               </div>
 
-              {/* Prix */}
-              <div className="mb-8">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Filtrer par prix
-                </label>
-                <div className="relative">
+              {/* Prix Min/Max */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div>
+                  <label className="block text-sm text-slate-600 mb-1">Prix Min</label>
                   <input
-                    type="text"
-                    placeholder="Ex: 50 000 000 FCFA"
-                    className="w-full px-5 py-3.5 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none text-slate-700"
+                    type="number"
+                    placeholder="Min"
+                    value={filters.prixMin || ''}
+                    onChange={(e) => handleFilterChange('prixMin', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-600 mb-1">Prix Max</label>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={filters.prixMax || ''}
+                    onChange={(e) => handleFilterChange('prixMax', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
                   />
                 </div>
               </div>
 
-              {/* Boutons d'action */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button className="flex-1 flex items-center justify-center gap-2 bg-linear-to-r from-cyan-600 to-cyan-400 hover:from-cyan-500 hover:to-cyan-300 text-white font-medium py-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-cyan-500/30">
-                  <Search className="w-5 h-5" />
-                  Activer ma recherche
+              <div className="flex gap-3">
+                <button 
+                  onClick={fetchProperties}
+                  className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2"
+                >
+                  <Search className="w-4 h-4" />
+                  Rechercher
                 </button>
-
-                <button className="flex-1 flex gap-2 justify-center items-center py-4 border border-cyan-200 hover:bg-cyan-50 text-slate-700 font-medium rounded-2xl transition-all">
-                  <Menu className="w-5 h-5" />
-                  Afficher tout
-                </button>
-              </div>
-
-              <div className="flex gap-3 mt-4">
-                <button className="flex-1 py-3 text-cyan-600 hover:bg-cyan-50 border border-cyan-200 rounded-2xl text-sm font-medium flex items-center justify-center gap-2">
-                  <Filter className="w-4 h-4" />
-                  Plus de filtres
-                </button>
-                <button className="flex-1 py-3 text-slate-500 hover:bg-slate-100 border border-slate-200 rounded-2xl text-sm font-medium flex items-center justify-center gap-2">
-                  <X className="w-4 h-4" />
-                  Effacer
+                <button 
+                  onClick={clearFilters}
+                  className="p-3.5 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-2xl transition-all"
+                >
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Colonne Carte */}
-          <div className="lg:col-span-5 xl:col-span-7">
-            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-cyan-100 h-160 relative">
-              {/* Placeholder carte (à remplacer par React-Leaflet plus tard) */}
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1585208798174-6cedd78e0198')] bg-cover bg-center">
-                <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/40" />
-              </div>
-              
-              {/* Overlay infos carte */}
-              <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow flex items-center gap-3 text-sm">
-                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
-                1 782 biens trouvés
-              </div>
-
-              {/* Contrôles carte (zoom, etc.) */}
-              <div className="absolute bottom-6 right-6 flex flex-col gap-2">
-                <button className="w-10 h-10 bg-white rounded-2xl shadow flex items-center justify-center hover:bg-cyan-50">
-                  +
-                </button>
-                <button className="w-10 h-10 bg-white rounded-2xl shadow flex items-center justify-center hover:bg-cyan-50">
-                  −
-                </button>
+          {/* Colonne Résultats */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Infos Résultats */}
+            <div className="flex justify-between items-center">
+              <p className="text-slate-600">
+                <span className="font-bold text-slate-900">{totalElements}</span> biens trouvés
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-slate-500">Trier par :</span>
+                <select className="bg-transparent font-medium text-slate-900 outline-none cursor-pointer">
+                  <option>Plus récents</option>
+                  <option>Prix croissant</option>
+                  <option>Prix décroissant</option>
+                </select>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Résultats en bas */}
-        <div className="mt-10 flex flex-col sm:flex-row justify-between items-center text-sm">
-          <p className="text-slate-600">
-            Montrer <span className="font-medium text-slate-900">1 – 16</span> des <span className="font-medium text-slate-900">1 782</span> résultats
-          </p>
-          <div className="flex items-center gap-2 mt-4 sm:mt-0">
-            <span className="text-slate-500">Trié par :</span>
-            <select className="bg-white border border-cyan-100 rounded-2xl px-4 py-2 text-slate-700 focus:outline-none focus:border-cyan-400">
-              <option>Priorité et plus récent</option>
-              <option>Prix croissant</option>
-              <option>Prix décroissant</option>
-            </select>
+            {/* Grille de Résultats */}
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="w-10 h-10 text-cyan-500 animate-spin mb-4" />
+                <p className="text-slate-500">Chargement des annonces...</p>
+              </div>
+            ) : properties.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {properties.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-12 text-center border border-dashed border-slate-200">
+                <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Aucun résultat trouvé</h3>
+                <p className="text-slate-500">Essayez de modifier vos critères de recherche pour trouver plus de biens.</p>
+                <button 
+                  onClick={clearFilters}
+                  className="mt-6 text-cyan-600 font-bold hover:underline"
+                >
+                  Réinitialiser tous les filtres
+                </button>
+              </div>
+            )}
+
+            {/* Pagination simple */}
+            {totalElements > 16 && (
+              <div className="flex justify-center gap-2 pt-8">
+                <button 
+                  disabled={page === 0}
+                  onClick={() => setPage(p => p - 1)}
+                  className="px-6 py-2 border border-slate-200 rounded-xl disabled:opacity-30"
+                >
+                  Précédent
+                </button>
+                <button 
+                  disabled={(page + 1) * 16 >= totalElements}
+                  onClick={() => setPage(p => p + 1)}
+                  className="px-6 py-2 bg-slate-900 text-white rounded-xl disabled:opacity-30"
+                >
+                  Suivant
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

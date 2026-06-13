@@ -2,7 +2,7 @@ import type { PropertySummary } from '@/lib/types/property.types';
 
 export const MOCK_PROPERTIES: PropertySummary[] = [
   {
-    id: 'prop-001',
+    id: 1,
     titre: 'Villa moderne avec piscine – Bastos',
     typeOperation: 'VENTE',
     typeBien: 'VILLA',
@@ -27,6 +27,7 @@ export const MOCK_PROPERTIES: PropertySummary[] = [
     },
     createdAt: '2025-01-10T08:00:00Z',
   },
+  
   {
     id: 'prop-002',
     titre: 'Appartement standing – Bonapriso, vue mer',

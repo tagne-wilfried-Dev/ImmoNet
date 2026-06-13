@@ -23,7 +23,7 @@ export type PropertyStatus =
 export interface PropertyLocation {
   pays: string;
   ville: string;
-  quartier: string;
+  quartier?: string;
   adresse?: string;
   latitude?: number;
   longitude?: number;
@@ -32,43 +32,78 @@ export interface PropertyLocation {
 // ─── Propriétaire (vue publique) ──────────────────────────────────────────────
 
 export interface PropertyOwner {
-  id: string;
+  id: number | string;
   nom: string;
+  prenom?: string;
   avatarUrl?: string;
   telephone?: string;
+  estPro?: boolean;
   badgePro: boolean;
 }
 
 // ─── Bien immobilier (vue liste/carte) ────────────────────────────────────────
 
 export interface PropertySummary {
-  id: string;
-  titre: string;
-  typeOperation: OperationType;
-  typeBien: PropertyType;
-  statut: PropertyStatus;
-  prix: number;
-  surface: number;         // m²
+  id: number | string;
+  titre?: string;
+  typeOperation?: OperationType;
+  typeBien?: PropertyType;
+  statut?: PropertyStatus;
+  prix?: number;
   nbPieces?: number;
-  nbChambres?: number;
   nbSallesDeBain?: number;
-  photos: string[];        // URLs Cloudinary — photos[0] = photo principale
-  localisation: PropertyLocation;
-  proprietaire: PropertyOwner;
-  isFavoris?: boolean;
-  createdAt: string;       // ISO 8601
+  ville?: string;
+  quartier?: string;
+  surface?: number;
+  nbChambres?: number;
+  urlPhotoPrincipale?: string;
+  nbVues?: number;
+  photos?: string[];
+  localisation?: PropertyLocation;
+  proprietaire?: PropertyOwner;
+  createdAt?: string;
 }
 
 // ─── Bien immobilier (vue détail) ─────────────────────────────────────────────
 
-export interface PropertyDetail extends PropertySummary {
+export interface PropertyDetail {
+  id: number | string;
+  titre: string;
+  typeBien: PropertyType;
+  typeOperation: OperationType;
+  statut: PropertyStatus;
+  
   description: string;
+  adresse: string;
+  ville: string;
+  quartier: string;
+  pays: string;
+  latitude?: number;
+  longitude?: number;
+  
+  prix: number;
+  caution: number;
+  chargesIncluses: boolean;
+  prixNegoceable: boolean;
+  periodeLocation?: string;
+  
+  surface: number;
+  nbPieces?: number;
+  nbChambres?: number;
+  nbSdb?: number;
+  etage?: number;
+  estMeuble: boolean;
+  
+  urlsPhotos: string[];
   equipements: string[];
-  politique_annulation?: 'FLEXIBLE' | 'MODEREE' | 'STRICTE';
-  disponibleDe?: string;   // ISO 8601
-  disponibleA?: string;
-  notesMoyenne?: number;   // 1–5
-  nbAvis?: number;
+  proprietaire: PropertyOwner;
+  
+  nbVues: number;
+  nbFavoris: number;
+  estBoost: boolean;
+  
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ─── Filtres de recherche ─────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MapPin, Maximize2, BedDouble, Heart, BadgeCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { PropertySummary } from '@/lib/types/property.types';
 import { PROPERTY_TYPE_LABELS } from '@/lib/types/property.types';
@@ -23,7 +24,7 @@ interface PropertyCardProps {
   property: PropertySummary;
   /** Compact = version liste. Default = version grille (plus grande). */
   variant?: 'grid' | 'list';
-  onFavorisToggle?: (id: string) => void;
+  onFavorisToggle?: (id: number) => void;
   className?: string;
 }
 
@@ -45,14 +46,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     prix,
     surface,
     nbChambres,
-    photos,
-    localisation,
-    proprietaire,
-    isFavoris = false,
+    urlPhotoPrincipale,
+    ville,
+    quartier,
+    statut
   } = property;
 
-  const photoUrl = !imgError && photos.length > 0
-    ? photos[0]
+  const photoUrl = !imgError && urlPhotoPrincipale
+    ? urlPhotoPrincipale
     : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80';
 
   const isVente = typeOperation === 'VENTE';
@@ -68,7 +69,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         )}
       >
         {/* Image */}
-        <div className="relative w-48 shrink-0 overflow-hidden">
+        <Link to={`/biens/${id}`} className="relative w-48 shrink-0 overflow-hidden">
           <img
             src={photoUrl}
             alt={titre}
@@ -86,25 +87,27 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           >
             {isVente ? 'Vente' : 'Location'}
           </span>
-        </div>
+        </Link>
 
         {/* Content */}
         <div className="flex flex-col justify-between py-4 pr-4 flex-1 min-w-0">
           <div>
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-display font-semibold text-slate-900 text-[15px] leading-snug line-clamp-2">
-                {titre}
-              </h3>
+              <Link to={`/biens/${id}`}>
+                <h3 className="font-display font-semibold text-slate-900 text-[15px] leading-snug line-clamp-2 hover:text-cyan-600 transition-colors">
+                  {titre}
+                </h3>
+              </Link>
               {onFavorisToggle && (
                 <button
                   onClick={() => onFavorisToggle(id)}
-                  aria-label={isFavoris ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                  aria-label="Toggle favoris"
                   className="shrink-0 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                 >
                   <Heart
                     className={cn(
                       'w-4 h-4 transition-colors',
-                      isFavoris ? 'fill-cyan-500 text-cyan-500' : 'text-slate-400',
+                      'text-slate-400'
                     )}
                   />
                 </button>
@@ -113,7 +116,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
             <p className="flex items-center gap-1 mt-1.5 text-[13px] text-slate-500">
               <MapPin className="w-3.5 h-3.5 text-cyan-500 shrink-0" aria-hidden="true" />
-              {localisation.quartier}, {localisation.ville}
+              {quartier}, {ville}
             </p>
           </div>
 
@@ -151,7 +154,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       )}
     >
       {/* Image */}
-      <div className="relative h-52 overflow-hidden">
+      <Link to={`/biens/${id}`} className="relative h-52 overflow-hidden">
         <img
           src={photoUrl}
           alt={titre}
@@ -181,29 +184,31 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         {onFavorisToggle && (
           <button
             onClick={() => onFavorisToggle(id)}
-            aria-label={isFavoris ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+            aria-label="Toggle favoris"
             className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 hover:bg-white shadow-sm transition-colors"
           >
             <Heart
               className={cn(
                 'w-4 h-4 transition-colors',
-                isFavoris ? 'fill-cyan-500 text-cyan-500' : 'text-slate-400',
+                'text-slate-400'
               )}
             />
           </button>
         )}
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="flex flex-col gap-3 p-4 flex-1">
         {/* Titre + localisation */}
         <div>
-          <h3 className="font-display font-semibold text-slate-900 text-[15px] leading-snug line-clamp-2">
-            {titre}
-          </h3>
+          <Link to={`/biens/${id}`}>
+            <h3 className="font-display font-semibold text-slate-900 text-[15px] leading-snug line-clamp-2 hover:text-cyan-600 transition-colors">
+              {titre}
+            </h3>
+          </Link>
           <p className="flex items-center gap-1 mt-1.5 text-[13px] text-slate-500">
             <MapPin className="w-3.5 h-3.5 text-cyan-500 shrink-0" aria-hidden="true" />
-            {localisation.quartier}, {localisation.ville}
+            {quartier}, {ville}
           </p>
         </div>
 
@@ -221,17 +226,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           )}
         </div>
 
-        {/* Prix + propriétaire */}
+        {/* Prix */}
         <div className="flex items-center justify-between mt-auto">
           <p className="font-mono text-[16px] font-bold text-cyan-700">
             {formatPrix(prix, typeOperation)}
           </p>
-          {proprietaire.badgePro && (
-            <span className="flex items-center gap-1 text-[11px] font-medium text-cyan-700 bg-cyan-50 px-2 py-1 rounded-full">
-              <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" />
-              Pro vérifié
-            </span>
-          )}
         </div>
       </div>
     </article>

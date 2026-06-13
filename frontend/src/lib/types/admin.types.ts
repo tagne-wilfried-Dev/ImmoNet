@@ -1,4 +1,4 @@
-// src/types/admin.types.ts
+// src/lib/types/admin.types.ts
 // Types partagés entre AdminDashboard, ModerationPage, UtilisateursPage, etc.
 
 export type ModerationStatus = 'pending' | 'flagged';
