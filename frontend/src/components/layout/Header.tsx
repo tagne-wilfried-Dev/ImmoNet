@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, Plus, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 // import { defineConfig } from 'vite';
@@ -12,6 +12,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Verrouillage du scroll quand le menu mobile est ouvert
   useEffect(() => {
@@ -29,6 +30,18 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) 
     onNavigate(type);
     setIsMobileMenuOpen(false);
   };
+
+  const handleExplore = (type: 'rent' | 'sell') => {
+    // inform parent (keeps header toggle in sync) and navigate to advanced search
+    onNavigate(type);
+    setIsMobileMenuOpen(false);
+    if (type === 'sell') navigate('/explore/vente?typeOperation=VENTE');
+    else navigate('/explore/louer?typeOperation=LOCATION');
+  };
+
+  const isHomeActive = location.pathname === '/home' || location.pathname === '/';
+  const isSellActive = isHomeActive ? false : (currentExplore === 'sell' || location.pathname.startsWith('/explore/vente'));
+  const isRentActive = isHomeActive ? false : (currentExplore === 'rent' || location.pathname.startsWith('/explore/louer'));
 
   const handleLogin = () => {
     setIsMobileMenuOpen(false);
@@ -71,22 +84,32 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) 
           {/* Navigation Desktop */}
           <nav className="hidden md:flex items-center gap-1 text-sm font-medium" aria-label="Navigation principale">
             <button
-              onClick={() => onNavigate('sell')}
-              className={`relative px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer ${currentExplore === 'sell'
+              onClick={() => { navigate('/'); setIsMobileMenuOpen(false); }}
+              className={`relative px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer ${isHomeActive
                   ? 'text-cyan-700 font-semibold bg-cyan-50'
                   : 'text-slate-600 hover:text-cyan-700 hover:bg-slate-50'
                 }`}
-              aria-current={currentExplore === 'sell' ? 'page' : undefined}
+              aria-current={isHomeActive ? 'page' : undefined}
+            >
+              Accueil
+            </button>
+            <button
+              onClick={() => handleExplore('sell')}
+              className={`relative px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer ${isSellActive
+                  ? 'text-cyan-700 font-semibold bg-cyan-50'
+                  : 'text-slate-600 hover:text-cyan-700 hover:bg-slate-50'
+                }`}
+              aria-current={isSellActive ? 'page' : undefined}
             >
               À Vendre
             </button>
             <button
-              onClick={() => onNavigate('rent')}
-              className={`relative px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer ${currentExplore === 'rent'
+              onClick={() => handleExplore('rent')}
+              className={`relative px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer ${isRentActive
                   ? 'text-cyan-700 font-semibold bg-cyan-50'
                   : 'text-slate-600 hover:text-cyan-700 hover:bg-slate-50'
                 }`}
-              aria-current={currentExplore === 'rent' ? 'page' : undefined}
+              aria-current={isRentActive ? 'page' : undefined}
             >
               À Louer
             </button>
@@ -162,8 +185,17 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) 
               <div className="px-4 sm:px-6 py-5 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
                 {/* Navigation */}
                 <button
-                  onClick={() => handleNavigateAndClose('sell')}
-                  className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${currentExplore === 'sell'
+                  onClick={() => { setIsMobileMenuOpen(false); navigate('/'); }}
+                  className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${isHomeActive
+                      ? 'text-cyan-700 bg-cyan-50'
+                      : 'text-slate-700 hover:text-cyan-700 hover:bg-slate-50'
+                    }`}
+                >
+                  Accueil
+                </button>
+                <button
+                  onClick={() => { handleNavigateAndClose('sell'); navigate('/explore/vente?typeOperation=VENTE'); }}
+                  className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${isSellActive
                       ? 'text-cyan-700 bg-cyan-50'
                       : 'text-slate-700 hover:text-cyan-700 hover:bg-slate-50'
                     }`}
@@ -171,8 +203,8 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) 
                   À Vendre
                 </button>
                 <button
-                  onClick={() => handleNavigateAndClose('rent')}
-                  className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${currentExplore === 'rent'
+                  onClick={() => { handleNavigateAndClose('rent'); navigate('/explore/louer?typeOperation=LOCATION'); }}
+                  className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${isRentActive
                       ? 'text-cyan-700 bg-cyan-50'
                       : 'text-slate-700 hover:text-cyan-700 hover:bg-slate-50'
                     }`}
@@ -180,19 +212,12 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) 
                   À Louer
                 </button>
                 <button
-                  className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${currentExplore === 'rent'
-                      ? 'text-cyan-700 bg-cyan-50'
-                      : 'text-slate-700 hover:text-cyan-700 hover:bg-slate-50'
-                    }`}
+                  className="flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors text-slate-700 hover:text-cyan-700 hover:bg-slate-50"
                 >
                   A propos
                 </button>
                 <button
-                  
-                  className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${currentExplore === 'rent'
-                      ? 'text-cyan-700 bg-cyan-50'
-                      : 'text-slate-700 hover:text-cyan-700 hover:bg-slate-50'
-                    }`}
+                  className="flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors text-slate-700 hover:text-cyan-700 hover:bg-slate-50"
                 >
                   Nous Contacter
                 </button>

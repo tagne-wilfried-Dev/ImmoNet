@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Megaphone,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -70,14 +71,20 @@ const MENU_ITEMS: MenuItem[] = [
   },
   {
     icon: Building2,
+    label: 'Mes biens',
+    path: '/dashboard/biens',
+    roles: ['PRO', 'ADMIN'],
+  },
+  {
+    icon: Megaphone,
     label: 'Mes annonces',
     path: '/dashboard/annonces',
     roles: ['PRO', 'ADMIN'],
   },
   {
     icon: Grid3X3,
-    label: 'Catalogue',
-    path: '/dashboard/catalogue',
+    label: 'Équipements',
+    path: '/dashboard/equipements',
     roles: ['PRO', 'ADMIN'],
   },
   {

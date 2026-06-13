@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Routes, Route, useLocation, Link } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import DashboardPage from './pages/proprietaire/DashboardPage';
-import AnnoncesPage from './pages/proprietaire/AnnoncesPage';
+import MesBiensPage from './pages/proprietaire/AnnoncesPage';
+import MesAnnoncesPage from './pages/proprietaire/MesAnnoncesPage';
 import ReservationsPage from './pages/proprietaire/ReservationsPage';
 import MessagesPage from './pages/proprietaire/MessagesPage';
-import TransactionsPage from './pages/proprietaire/TransactionsPage';
 import ValidationsPage from './pages/proprietaire/ValidationsPage';
-import CataloguePage from './pages/proprietaire/CataloguesPage';
+import EquipementsPage from './pages/proprietaire/CataloguesPage';
 import CreateAnnoncePage from './pages/proprietaire/CreateAnnoncePage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -15,6 +15,7 @@ import Appp from '@/draft';
 import { ProfilePage } from '@/pages/ProfilePage';
 import ExploreRenting from '@/pages/explorePages/ExploreRenting';
 import ExploreSellings from '@/pages/explorePages/ExploreSellings';
+import PropertyDetailPage from '@/pages/explorePages/PropertyDetailPage';
 import NotificationsPage from './pages/proprietaire/NotificationsPage';
 import type { SimpleUser } from './types/user.types';
 import { toast } from 'sonner';
@@ -23,7 +24,7 @@ import ClientDashboardPage from './pages/client/ClientDashboardPage';
 import AdminDashboardPage from './pages/admin/AdminDashboard';
 import ModerationPage from './pages/admin/ModerationPage';
 import { ChangePasswordForm } from './pages/auth/ChangePasswordForm';
-import Home from './Home';
+import Home from './pages/basePages/Home';
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -46,12 +47,12 @@ const ListRoutes: React.FC = () => {
     { path: '/dashboard', label: 'Dashboard' },
     { path: '/dashboard/favoris', label: 'Favoris' },
     { path: '/dashboard/locations', label: 'Locations' },
-    { path: '/dashboard/annonces', label: 'Annonces' },
+    { path: '/dashboard/biens', label: 'Mes biens' },
     { path: '/dashboard/reservations', label: 'Reservations' },
     { path: '/dashboard/messages', label: 'Messages' },
     { path: '/dashboard/transactions', label: 'Transactions' },
     { path: '/dashboard/validations', label: 'Validations' },
-    { path: '/dashboard/catalogue', label: 'Catalogue' },
+    { path: '/dashboard/equipements', label: 'Équipements' },
     { path: '/dashboard/notifications', label: 'Notifications' },
     { path: '/publier', label: 'Publier (Create Annonce)' },
     { path: '/profile', label: 'Profile' },
@@ -93,7 +94,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<SimpleUser>(
     {
-      nom: 'bo1244525633',
+      nom: 'bo124452563',
       role: 'PRO',
     }
   );
@@ -126,7 +127,7 @@ const App: React.FC = () => {
         <div className="flex flex-col items-center gap-3">
           <div className="size-10 rounded-full border-2 border-slate-200 border-t-cyan-500 animate-spin" />
           <p className="text-[13px] text-slate-500 font-body">
-            Chargement du tableau de bord…
+            Chargement…...
           </p>
         </div>
       </div>
@@ -136,17 +137,18 @@ const App: React.FC = () => {
   return (
     <>
       <Routes>
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/routes" element={<ListRoutes />} />
         <Route path="/demo" element={<Appp />} />
 
-      //routes d'authentification
+        {/* routes d'authentification */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/reset-password" element={<ChangePasswordForm />} />
 
-// routes client/pro
-        <Route  path='/home' element={<Home />} />
-        <Route  path='/dashclient' element={<ClientDashboardPage />} />
+        {/* routes client/pro */}
+        <Route path="/home" element={<Home />} />
+        <Route path="/dashclient" element={<ClientDashboardPage />} />
         <Route
           path="/dashboard"
           element={
@@ -184,9 +186,9 @@ const App: React.FC = () => {
             />
           }
         />
-      //-----------------------------------------------------------------------------
+      {/* ----------------------------------------------------------------------------- */}
 
-        // routes admin
+        {/* routes admin */}
         <Route
           path="/admin"
           element={
@@ -196,7 +198,7 @@ const App: React.FC = () => {
             />
           }
         />
-      // prochaine etape: créer les pages admin et les lier à ces routes
+        {/* prochaine etape: créer les pages admin et les lier à ces routes */}
         <Route
           path="/admin/moderation"
           element={
@@ -211,16 +213,17 @@ const App: React.FC = () => {
         <Route path="/admin/configuration" element={<PlaceholderPage title="Configuration" />} />
 
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/biens/:id" element={<PropertyDetailPage />} />
         <Route path="/dashboard/notifications" element={<NotificationsPage />} />
         <Route path="/explore/louer" element={<ExploreRenting />} />
         <Route path="/explore/vente" element={<ExploreSellings />} />
         <Route path="/recherche" element={<SearchResults />} />
-        <Route path="/dashboard/annonces" element={<AnnoncesPage />} />
+        <Route path="/dashboard/biens" element={<MesBiensPage />} />
+        <Route path="/dashboard/annonces" element={<MesAnnoncesPage />} />
         <Route path="/dashboard/reservations" element={<ReservationsPage />} />
         <Route path="/dashboard/messages" element={<MessagesPage />} />
-        <Route path="/dashboard/transactions" element={<TransactionsPage />} />
         <Route path="/dashboard/validations" element={<ValidationsPage />} />
-        <Route path="/dashboard/catalogue" element={<CataloguePage />} />
+        <Route path="/dashboard/equipements" element={<EquipementsPage />} />
         <Route path="/publier" element={<CreateAnnoncePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

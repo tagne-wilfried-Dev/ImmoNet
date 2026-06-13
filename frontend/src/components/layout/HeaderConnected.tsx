@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { userService } from '@/services/UserService'
 import {
   Bell,
@@ -30,6 +30,7 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Fermer le dropdown au clic extérieur
   useEffect(() => {
@@ -85,14 +86,24 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
           </button>
 
           <nav className="hidden md:flex items-center gap-1 ml-4" aria-label="Navigation principale">
-            {['À Vendre', 'À Louer'].map((item) => (
-              <button
-                key={item}
-                className="px-3 py-2 text-sm font-medium text-slate-600 hover:text-cyan-700 hover:bg-cyan-50 rounded-full transition-colors"
-              >
-                {item}
-              </button>
-            ))}
+            <button
+              onClick={() => navigate('/')}
+              className={`px-3 py-2 text-sm font-medium rounded-full transition-colors ${location.pathname === '/' ? 'text-cyan-700 bg-cyan-50 font-semibold' : 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50'}`}
+            >
+              Accueil
+            </button>
+            <button
+              onClick={() => navigate('/explore/vente?typeOperation=VENTE')}
+              className={`px-3 py-2 text-sm font-medium rounded-full transition-colors ${location.pathname.startsWith('/explore/vente') ? 'text-cyan-700 bg-cyan-50 font-semibold' : 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50'}`}
+            >
+              À Vendre
+            </button>
+            <button
+              onClick={() => navigate('/explore/louer?typeOperation=LOCATION')}
+              className={`px-3 py-2 text-sm font-medium rounded-full transition-colors ${location.pathname.startsWith('/explore/louer') ? 'text-cyan-700 bg-cyan-50 font-semibold' : 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50'}`}
+            >
+              À Louer
+            </button>
             <button className="px-3 py-2 text-sm font-medium text-slate-600 hover:text-cyan-700 hover:bg-cyan-50 rounded-full transition-colors">
               Notaires
             </button>
@@ -159,7 +170,7 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
                   </div>
                   <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                     <User size={16} />
-                    <a href='/mon profile'>Mon profil</a>
+                    <a href='/profile'>Mon profil</a>
                   </button>
                   <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                     <Settings size={16} />

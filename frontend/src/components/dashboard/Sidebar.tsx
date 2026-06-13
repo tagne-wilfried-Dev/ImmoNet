@@ -24,13 +24,13 @@ interface SidebarProps {
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard' },
-  { icon: Building2, label: 'Mes annonces', path: '/dashboard/annonces' },
+  { icon: Building2, label: 'Mes biens', path: '/dashboard/biens' },
   { icon: CalendarDays, label: 'Réservations', path: '/dashboard/reservations' },
   { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
   { icon: Wallet, label: 'Transactions', path: '/dashboard/transactions' },
   { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
   { icon: CheckCircle, label: 'Validations', path: '/dashboard/validations' },
-  { icon: Grid3X3, label: 'Catalogue', path: '/dashboard/catalogue' },
+  { icon: Grid3X3, label: 'Équipements', path: '/dashboard/equipements' },
   { icon: Tag, label: 'Promotions', path: '/dashboard/promotions' },
   { icon: Lock, label: 'Sécurité', path: '/dashboard/securite' },
 ];
