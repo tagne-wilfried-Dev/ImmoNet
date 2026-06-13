@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "photos_biens")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
