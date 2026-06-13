@@ -567,7 +567,7 @@ INSERT INTO utilisateurs (
 ('550e8400-e29b-41d4-a716-446655440000', 'ADMIN', 'Super', 'admin@immonet.cm', 
  '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.XEQOwEhK5VqG0C', 
  '+237600000000', 'ACTIVE', 'ADMIN', TRUE, NOW()),
-('660e8400-e29b-41d4-a716-446655440001', 'DUPONT', 'Jean', 'jean@immonet.cm', 
+('660e8400-e29b-41d4-a716-446655440001', 'Makougang', 'pauline', 'pauline@immonet.cm', 
  '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.XEQOwEhK5VqG0C', 
  '+237699999999', 'ACTIVE', 'CLIENT', TRUE, NOW()),
 ('770e8400-e29b-41d4-a716-446655440002', 'MARTIN', 'Paul', 'paul@immonet.cm', 

@@ -6,6 +6,7 @@ import com.immoteam.immoteamdev.dto.BienSummaryResponse;
 import com.immoteam.immoteamdev.dto.BienUpdateRequest;
 import com.immoteam.immoteamdev.dto.ProprietaireSummaryDTO;
 import com.immoteam.immoteamdev.entity.Bien;
+import com.immoteam.immoteamdev.entity.EquipementBien;
 import com.immoteam.immoteamdev.entity.PhotoBien;
 import com.immoteam.immoteamdev.entity.Utilisateur;
 import com.immoteam.immoteamdev.entity.enums.RoleUtilisateur;
@@ -50,6 +51,7 @@ public interface BienMapper {
 
     @Mapping(source = "proprietaire", target = "proprietaire")
     @Mapping(source = "photos", target = "urlsPhotos", qualifiedByName = "mapPhotosToUrls")
+    @Mapping(source = "equipements", target = "equipements", qualifiedByName = "mapEquipementsToNames")
     BienDetailResponse toDetailResponse(Bien bien);
 
     @Named("mapPhotosToUrls")
@@ -58,8 +60,17 @@ public interface BienMapper {
             return List.of();
         }
         return photos.stream()
-                .filter(PhotoBien::isEstPrincipale) // Ou trier par ordre si besoin
                 .map(PhotoBien::getUrlCloudinary)
+                .collect(Collectors.toList());
+    }
+
+    @Named("mapEquipementsToNames")
+    default List<String> mapEquipementsToNames(List<EquipementBien> equipements) {
+        if (equipements == null) {
+            return List.of();
+        }
+        return equipements.stream()
+                .map(EquipementBien::getNom)
                 .collect(Collectors.toList());
     }
 

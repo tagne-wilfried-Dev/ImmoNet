@@ -66,4 +66,7 @@ public class BienCreateRequest {
     private Integer nbChambres;
     private Integer nbSdb;
     private Integer etage;
+
+    @Builder.Default
+    private boolean estMeuble = false;
 }

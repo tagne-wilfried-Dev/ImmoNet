@@ -20,12 +20,15 @@ public class BienSummaryResponse {
     private String titre;
     private BigDecimal prix;
     private String ville;
+    private String quartier;
     private TypeBien typeBien;
     private TypeOperation typeOperation;
     
     // Champ calculé par le Mapper à partir de la liste des photos
     private String urlPhotoPrincipale;
     
+    private BigDecimal surface;
+    private Integer nbChambres;
     private Integer nbVues;
     private StatutAnnonce statut;
 }

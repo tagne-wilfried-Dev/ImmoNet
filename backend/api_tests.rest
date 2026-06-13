@@ -1,0 +1,70 @@
+### Variables Globales
+@baseUrl = http://localhost:8080/api
+@token = {{login.response.body.accessToken}}
+
+### 1. Authentification (Nécessaire pour POST/PUT/DELETE)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@immoteam.com",
+    "password": "Password123!"
+}
+
+###
+
+### 2. Recherche de biens (Public)
+GET {{baseUrl}}/biens?ville=Cotonou&page=0&size=10
+Content-Type: application/json
+
+###
+
+### 3. Obtenir les détails d'un bien (Public si PUBLIE)
+# Remplacez {id} par un ID existant après avoir lancé le projet
+GET {{baseUrl}}/biens/1
+Content-Type: application/json
+
+###
+
+### 4. Créer une nouvelle annonce (PRO/ADMIN)
+POST {{baseUrl}}/biens
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "titre": "Magnifique Villa Aqua Tech",
+    "description": "Une villa moderne avec vue sur mer, entièrement connectée.",
+    "typeOperation": "VENTE",
+    "typeBien": "VILLA",
+    "adresse": "123 Rue de la Plage",
+    "ville": "Cotonou",
+    "pays": "Bénin",
+    "prix": 250000000,
+    "surface": 350.5,
+    "nbPieces": 6,
+    "nbChambres": 4,
+    "nbSdb": 3,
+    "etage": 0,
+    "estMeuble": true
+}
+
+###
+
+### 5. Modifier une annonce (Propriétaire/ADMIN)
+PUT {{baseUrl}}/biens/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "titre": "Villa Aqua Tech - Prix mis à jour",
+    "prix": 245000000,
+    "description": "Description mise à jour pour refléter les nouveaux équipements."
+}
+
+###
+
+### 6. Archiver une annonce (Soft Delete)
+DELETE {{baseUrl}}/biens/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
