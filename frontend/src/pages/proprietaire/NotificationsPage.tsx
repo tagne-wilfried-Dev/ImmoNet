@@ -15,7 +15,7 @@ const NotificationsPage: React.FC = () => {
   const deleteNotif = (id: number) => setNotifs(prev => prev.filter(n => n.id !== id));
 
   return (
-    <DashboardLayout userName="Wiliam Smith" userRole="PRO" notificationCount={3}>
+    <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

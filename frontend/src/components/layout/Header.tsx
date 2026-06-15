@@ -35,8 +35,8 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) 
     // inform parent (keeps header toggle in sync) and navigate to advanced search
     onNavigate(type);
     setIsMobileMenuOpen(false);
-    if (type === 'sell') navigate('/explore/vente?typeOperation=VENTE');
-    else navigate('/explore/louer?typeOperation=LOCATION');
+    if (type === 'sell') navigate('/explore/vente');
+    else navigate('/explore/louer');
   };
 
   const isHomeActive = location.pathname === '/home' || location.pathname === '/';
@@ -194,7 +194,7 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) 
                   Accueil
                 </button>
                 <button
-                  onClick={() => { handleNavigateAndClose('sell'); navigate('/explore/vente?typeOperation=VENTE'); }}
+                  onClick={() => { handleNavigateAndClose('sell'); navigate('/explore/vente'); }}
                   className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${isSellActive
                       ? 'text-cyan-700 bg-cyan-50'
                       : 'text-slate-700 hover:text-cyan-700 hover:bg-slate-50'
@@ -203,7 +203,7 @@ const Header: React.FC<HeaderProps> = ({ currentExplore, onNavigate=() => {} }) 
                   À Vendre
                 </button>
                 <button
-                  onClick={() => { handleNavigateAndClose('rent'); navigate('/explore/louer?typeOperation=LOCATION'); }}
+                  onClick={() => { handleNavigateAndClose('rent'); navigate('/explore/louer'); }}
                   className={`flex items-center w-full text-left px-4 py-3.5 text-base font-medium rounded-xl transition-colors ${isRentActive
                       ? 'text-cyan-700 bg-cyan-50'
                       : 'text-slate-700 hover:text-cyan-700 hover:bg-slate-50'

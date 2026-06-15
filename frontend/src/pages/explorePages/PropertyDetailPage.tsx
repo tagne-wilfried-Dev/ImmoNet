@@ -8,6 +8,7 @@ import {
 import { propertyService } from '@/services/PropertyService';
 import { type PropertyDetail, PROPERTY_TYPE_LABELS } from '@/lib/types/property.types';
 import { cn } from '@/lib/utils';
+import VisitRequestModal from '@/components/explore/VisitRequestModal';
 
 const PropertyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +16,7 @@ const PropertyDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activePhoto, setActivePhoto] = useState(0);
+  const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -245,7 +247,14 @@ const PropertyDetailPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <button className="w-full flex items-center justify-center gap-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 active:scale-95">
+                  <button 
+                    onClick={() => {
+                      if (property) {
+                        navigate('/dashboard/messages', { state: { initialBienId: property.id, initialTitre: property.titre } });
+                      }
+                    }}
+                    className="w-full flex items-center justify-center gap-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 active:scale-95"
+                  >
                     <MessageSquare className="w-5 h-5" />
                     Contacter l'annonceur
                   </button>
@@ -283,7 +292,10 @@ const PropertyDetailPage: React.FC = () => {
                       <span className="text-white font-bold lowercase">{property.periodeLocation || 'mensuelle'}</span>
                     </li>
                   </ul>
-                  <button className="w-full mt-6 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-600/20">
+                  <button 
+                    onClick={() => setIsVisitModalOpen(true)}
+                    className="w-full mt-6 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
+                  >
                     Demander une visite
                   </button>
                 </div>
@@ -299,6 +311,14 @@ const PropertyDetailPage: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Modal de Demande de Visite */}
+      <VisitRequestModal 
+        isOpen={isVisitModalOpen}
+        onClose={() => setIsVisitModalOpen(false)}
+        propertyId={Number(property.id)}
+        propertyTitle={property.titre}
+      />
     </div>
   );
 };

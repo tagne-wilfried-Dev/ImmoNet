@@ -13,7 +13,7 @@ const equipements = [
 
 const EquipementsPage: React.FC = () => {
   return (
-    <DashboardLayout userName="Wiliam Smith" userRole="PRO" notificationCount={3}>
+    <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="font-display text-2xl font-bold text-slate-900">Vos équipements</h1>

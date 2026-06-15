@@ -1,5 +1,11 @@
 import axios from 'axios';
-import type { PropertyDetail, PropertySummary, SearchFilters, PaginatedProperties } from '@/lib/types/property.types';
+import type { 
+  PropertyDetail, 
+  PropertySummary, 
+  SearchFilters, 
+  PaginatedProperties,
+  PropertyCreateRequest 
+} from '@/lib/types/property.types';
 
 const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
@@ -22,14 +28,13 @@ api.interceptors.request.use((config) => {
 
 export const propertyService = {
   /**
-   * Recherche paginée de biens immobiliers
+   * Recherche paginée de biens immobiliers (Public)
    */
   getProperties: async (filters: SearchFilters, page = 0, size = 20): Promise<PaginatedProperties> => {
     const response = await api.get('/biens', {
       params: { ...filters, page, size }
     });
     
-    // Adaptation de la structure Spring Data Page vers PaginatedProperties
     return {
       data: response.data.content,
       total: response.data.totalElements,
@@ -50,7 +55,7 @@ export const propertyService = {
   /**
    * Création d'une annonce (données textuelles)
    */
-  createProperty: async (data: any): Promise<PropertySummary> => {
+  createProperty: async (data: PropertyCreateRequest): Promise<PropertySummary> => {
     const response = await api.post<PropertySummary>('/biens', data);
     return response.data;
   },
@@ -71,10 +76,10 @@ export const propertyService = {
   },
 
   /**
-   * Récupère TOUS les biens du patrimoine (Brouillon, Loué, Publié)
+   * Récupère TOUS les biens du patrimoine (Brouillon, Loué, Publié) du propriétaire connecté
    */
-  getMyProperties: async (page = 0, size = 20): Promise<PaginatedProperties> => {
-    const response = await api.get('/biens/mine', {
+  getMyProperties: async (page = 0, size = 50): Promise<PaginatedProperties> => {
+    const response = await api.get('/biens/me', {
       params: { page, size }
     });
     return {
@@ -87,10 +92,10 @@ export const propertyService = {
   },
 
   /**
-   * Récupère uniquement les biens en ligne (PUBLIE)
+   * Récupère uniquement les annonces actuellement PUBLIÉES du propriétaire connecté
    */
-  getMyListings: async (page = 0, size = 20): Promise<PaginatedProperties> => {
-    const response = await api.get('/biens/mine/annonces', {
+  getMyListings: async (page = 0, size = 50): Promise<PaginatedProperties> => {
+    const response = await api.get('/biens/annonces/me', {
       params: { page, size }
     });
     return {
@@ -103,15 +108,15 @@ export const propertyService = {
   },
 
   /**
-   * Récupère les biens disponibles pour une nouvelle publication
+   * Récupère les biens publiables (Brouillon, Suspendu, Loué) pour la modal de mise en ligne
    */
   getAvailableProperties: async (): Promise<PropertySummary[]> => {
-    const response = await api.get<PropertySummary[]>('/biens/mine/available');
+    const response = await api.get<PropertySummary[]>('/biens/disponibles/me');
     return response.data;
   },
 
   /**
-   * Change le statut d'un bien (PUBLIE, EN_LOCATION, VENDU, BROUILLON)
+   * Met à jour le statut d'un bien (Publication, Suspension, Archivage)
    */
   updatePropertyStatus: async (id: number | string, status: string): Promise<PropertyDetail> => {
     const response = await api.patch<PropertyDetail>(`/biens/${id}/statut`, null, {

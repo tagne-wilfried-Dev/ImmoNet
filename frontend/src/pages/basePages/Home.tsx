@@ -324,7 +324,7 @@ const Home: React.FC = () => {
                   Publiez vos biens et touchez des milliers d'acheteurs
                 </h2>
                 <p className="text-cyan-100 text-[15px] leading-relaxed">
-                  Rejoignez 3 800 propriétaires vérifiés. Gérez vos annonces, réservations et locataires depuis un seul tableau de bord.
+                  Rejoignez 3 800 propriétaires vérifiés. Gérez vos annonces, réservations et locataires dans une seule plateforme.
                 </p>
               </div>
 
@@ -335,11 +335,11 @@ const Home: React.FC = () => {
                   onClick={() => navigate('/register')}
                   className="bg-white text-cyan-700 hover:bg-cyan-50 shadow-lg whitespace-nowrap"
                 >
-                  Devenir Pro
+                  Nous Rejoindre
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </Button>
                 <p className="text-center text-[12px] text-black/70">
-                  Dès 9 900 FCFA / mois · Sans engagement
+                  Demarrer votre aventure dans l'immobilier
                 </p>
               </div>
             </div>

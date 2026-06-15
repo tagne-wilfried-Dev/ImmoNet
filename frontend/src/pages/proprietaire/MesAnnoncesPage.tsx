@@ -74,7 +74,7 @@ const MesAnnoncesPage: React.FC = () => {
   }, []);
 
   return (
-    <DashboardLayout userName="Propriétaire Pro" userRole="PRO" notificationCount={3}>
+    <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

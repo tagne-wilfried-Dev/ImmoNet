@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import DashboardPage from './pages/proprietaire/DashboardPage';
 import MesBiensPage from './pages/proprietaire/AnnoncesPage';
@@ -17,14 +17,13 @@ import ExploreRenting from '@/pages/explorePages/ExploreRenting';
 import ExploreSellings from '@/pages/explorePages/ExploreSellings';
 import PropertyDetailPage from '@/pages/explorePages/PropertyDetailPage';
 import NotificationsPage from './pages/proprietaire/NotificationsPage';
-import type { SimpleUser } from './types/user.types';
-import { toast } from 'sonner';
-import { userService } from './services/UserService';
 import ClientDashboardPage from './pages/client/ClientDashboardPage';
 import AdminDashboardPage from './pages/admin/AdminDashboard';
 import ModerationPage from './pages/admin/ModerationPage';
 import { ChangePasswordForm } from './pages/auth/ChangePasswordForm';
 import Home from './pages/basePages/Home';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { fetchCurrentUser } from './store/slices/authSlice';
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -90,36 +89,12 @@ const SearchResults: React.FC = () => {
 };
 
 const App: React.FC = () => {
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<SimpleUser>(
-    {
-      nom: 'bo124452563',
-      role: 'PRO',
-    }
-  );
-
-  const loadUserProfile = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const data = await userService.getCurrentUser();
-      setUser({
-        nom: data.nom,
-        role: data.role,
-      });
-    } catch {
-      toast.error('Erreur lors du chargement du profil');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const dispatch = useAppDispatch();
+  const { user, isLoading } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    const init = async () => {
-      await loadUserProfile();
-    };
-    init();
-  }, [loadUserProfile]);
+    dispatch(fetchCurrentUser());
+  }, [dispatch]);
 
   if (isLoading) {
     return (
@@ -133,6 +108,10 @@ const App: React.FC = () => {
       </div>
     );
   }
+
+  // Fallback user information if not authenticated
+  const userName = user?.nom || 'Invité';
+  const userRole = user?.role || 'CLIENT';
 
   return (
     <>
@@ -152,61 +131,31 @@ const App: React.FC = () => {
         <Route
           path="/dashboard"
           element={
-            user.role === 'CLIENT' ? (
-              <ClientDashboardPage
-                userName={user.nom}
-                userRole="CLIENT"
-                notificationCount={0}
-              />
+            userRole === 'CLIENT' ? (
+              <ClientDashboardPage />
             ) : (
-              <DashboardPage
-                userName={user.nom}
-                userRole={user.role === 'CLIENT' ? 'CLIENT' : 'PRO'}
-              />
+              <DashboardPage />
             )
           }
         />
         <Route
           path="/dashboard/favoris"
-          element={
-            <ClientDashboardPage
-              userName={user.nom}
-              userRole="CLIENT"
-              notificationCount={0}
-            />
-          }
+          element={<ClientDashboardPage />}
         />
         <Route
           path="/dashboard/locations"
-          element={
-            <ClientDashboardPage
-              userName={user.nom}
-              userRole="CLIENT"
-              notificationCount={0}
-            />
-          }
+          element={<ClientDashboardPage />}
         />
       {/* ----------------------------------------------------------------------------- */}
 
         {/* routes admin */}
         <Route
           path="/admin"
-          element={
-            <AdminDashboardPage
-              userName={user.nom}
-              notificationCount={0}
-            />
-          }
+          element={<AdminDashboardPage />}
         />
-        {/* prochaine etape: créer les pages admin et les lier à ces routes */}
         <Route
           path="/admin/moderation"
-          element={
-            <ModerationPage
-              userName={user.nom}
-              notificationCount={0}
-            />
-          }
+          element={<ModerationPage />}
         />
         <Route path="/admin/utilisateurs" element={<PlaceholderPage title="Gestion des utilisateurs" />} />
         <Route path="/admin/statistiques" element={<PlaceholderPage title="Statistiques" />} />

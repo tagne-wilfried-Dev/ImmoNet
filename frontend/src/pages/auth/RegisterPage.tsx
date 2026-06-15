@@ -44,13 +44,14 @@ const RegisterPage: React.FC = () => {
       };
 
       try {
-         console.log(payload);
-         const response = await axios.post('api/auth/register', payload);
-         // if (response.status === 200 || response.status === 201) {
-         //    // navigate('/login', { state: { message: 'Compte créé avec succès !' } });
-            
-         // }
-         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         console.log('Sending payload:', payload);
+         const response = await axios.post('/auth/register', payload);
+         
+         if (response.status === 200 || response.status === 201) {
+            navigate('/login', { 
+               state: { message: 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.' } 
+            });
+         }
       } catch (err: any) {
          setError(err.response?.data?.message || 'Une erreur est survenue lors de l\'inscription.');
       }

@@ -1,11 +1,24 @@
 
+export interface AbonnementSummary {
+  typeAbonnement: 'GRATUIT' | 'STARTER' | 'BUSINESS' | 'PREMIUM';
+  dateDebut: string;
+  dateFin?: string;
+  actif: boolean;
+}
+
 export interface UserDto {
+  id: number;
   nom: string;
   prenom: string;
   email: string;
   telephone: string;
-  role:string;
-  dateInscription: string; // ISO date string
+  role: 'CLIENT' | 'PRO' | 'ADMIN';
+  statut: 'ACTIVE' | 'PENDING' | 'SUSPENDED';
+  emailVerifie: boolean;
+  avatarUrl?: string;
+  dateInscription: string;
+  dernierLogin?: string;
+  abonnement?: AbonnementSummary;
 }
 
 export interface SimpleUser {

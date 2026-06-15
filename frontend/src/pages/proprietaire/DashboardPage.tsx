@@ -6,14 +6,10 @@ import MessageAlert from '@/components/ui/MessageAlert';
 import dashboardMockData from '@/lib/data/mockData.json';
 
 interface DashboardPageProps {
-  userName?: string;
-  userRole?: 'CLIENT' | 'PRO' | 'ADMIN';
   notificationCount?: number;
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = ({
-  userName = 'bo1244525633',
-  userRole = 'PRO',
   notificationCount = 3,
 }) => {
   const location = useLocation();
@@ -22,19 +18,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  if(userName === 'bo1244525633')
-    navigate('/login')
   useEffect(() => {
     // Simulation d'un appel API
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // TODO: Remplacer par un vrai appel API
-        // const response = await fetch('/api/dashboard/stats');
-        // const data = await response.json();
-        
-        // Simuler un délai réseau
-        // await new Promise(resolve => setTimeout(resolve, 500));
+        // TODO: Remplacer par un vrai appel API (GET /api/biens/stats/me)
         setData(dashboardMockData);
       } catch (error) {
         console.error('Erreur chargement dashboard:', error);
@@ -48,11 +37,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
 
   if (isLoading) {
     return (
-      <DashboardLayout
-        userName={userName}
-        userRole={userRole}
-        notificationCount={notificationCount}
-      >
+      <DashboardLayout notificationCount={notificationCount}>
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto mb-4"></div>
@@ -64,11 +49,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
   }
 
   return (
-    <DashboardLayout
-      userName={userName}
-      userRole={userRole}
-      notificationCount={notificationCount}
-    >
+    <DashboardLayout notificationCount={notificationCount}>
       {locationState?.message && (
         <div className="mb-6">
           <MessageAlert type="success" message={locationState.message} />

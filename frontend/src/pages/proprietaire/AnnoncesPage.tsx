@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { propertyService } from '@/services/PropertyService';
 import { type PropertySummary, PROPERTY_TYPE_LABELS } from '@/lib/types/property.types';
 import { toast } from 'sonner';
+import { useAppSelector } from '@/store/hooks';
 
 const statusLabels: Record<string, string> = {
   'PUBLIE': 'Mis en ligne',
@@ -30,14 +31,13 @@ const statusColors: Record<string, string> = {
 
 const MesBiensPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
   const [properties, setProperties] = useState<PropertySummary[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<PropertySummary[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // États des filtres
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('ALL');
   const [filterType, setFilterType] = useState('ALL');
+  const [filterStatus, setFilterStatus] = useState('ALL');
 
   const fetchMyProperties = async () => {
     try {
@@ -79,18 +79,17 @@ const MesBiensPage: React.FC = () => {
     setFilteredProperties(result);
   }, [searchQuery, filterStatus, filterType, properties]);
 
-  const handleStatusChange = async (id: number, newStatus: string) => {
+  const handleStatusChange = async (id: number | string, newStatus: string) => {
     try {
       await propertyService.updatePropertyStatus(id, newStatus);
-      toast.success(`Statut mis à jour : ${statusLabels[newStatus]}`);
+      toast.success(`Statut mis à jour : ${statusLabels[newStatus] || newStatus}`);
       fetchMyProperties();
     } catch (err) {
       toast.error('Erreur lors du changement de statut.');
     }
   };
-
   return (
-    <DashboardLayout userName="Propriétaire Pro" userRole="PRO" notificationCount={3}>
+    <DashboardLayout>
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>

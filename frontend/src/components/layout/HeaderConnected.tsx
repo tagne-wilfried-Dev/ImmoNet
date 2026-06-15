@@ -93,13 +93,13 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
               Accueil
             </button>
             <button
-              onClick={() => navigate('/explore/vente?typeOperation=VENTE')}
+              onClick={() => navigate('/explore/vente')}
               className={`px-3 py-2 text-sm font-medium rounded-full transition-colors ${location.pathname.startsWith('/explore/vente') ? 'text-cyan-700 bg-cyan-50 font-semibold' : 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50'}`}
             >
               À Vendre
             </button>
             <button
-              onClick={() => navigate('/explore/louer?typeOperation=LOCATION')}
+              onClick={() => navigate('/explore/louer')}
               className={`px-3 py-2 text-sm font-medium rounded-full transition-colors ${location.pathname.startsWith('/explore/louer') ? 'text-cyan-700 bg-cyan-50 font-semibold' : 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50'}`}
             >
               À Louer

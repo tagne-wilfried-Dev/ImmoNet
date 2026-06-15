@@ -27,7 +27,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 const DEFAULT_USER: UserDto = {
   nom: "Mon Nom",
   prenom: "Mon Prenom",
-  email: "email.com",
+  email: "email@mail.com",
   telephone: "698462357",
   role: "USER",
   dateInscription: "2008-01-05",
@@ -67,6 +67,7 @@ export function ProfilePage() {
     try {
       setIsLoading(true);
       const data = await userService.getCurrentUser();
+      console.log(data);
       setUser(data);
       syncForm(data);
     } catch {
@@ -150,7 +151,7 @@ export function ProfilePage() {
 
           <ReadOnlyField
             icon={<Mail size={16} />}
-            label="Adresse email"
+            label="Role dans la plateforme"
             value={user.role ? user.role:'Proprietaire'}
           />
 

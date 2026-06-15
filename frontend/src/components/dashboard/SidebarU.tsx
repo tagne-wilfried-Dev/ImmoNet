@@ -20,7 +20,11 @@ import {
   ChevronRight,
   X,
   Megaphone,
+  ChevronDown,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import RoleBadge from '../ui/RoleBadge';
+import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,6 +45,14 @@ interface SidebarProps {
   onClose?: () => void;
   isMobileOpen?: boolean;
 }
+
+// Items à grouper pour l'ADMIN
+const PRO_GROUP_PATHS = [
+  '/dashboard/biens',
+  '/dashboard/annonces',
+  '/dashboard/equipements',
+  '/dashboard/validations'
+];
 
 // ─── Items de navigation — filtrés par rôle au rendu ─────────────────────────
 
@@ -144,16 +156,17 @@ const MENU_ITEMS: MenuItem[] = [
   },
 ];
 
-// ─── NavItem partagé — évite la duplication desktop/mobile ───────────────────
+// ─── NavItem partagé ────────────────────────────────────────────────────────
 
 interface NavItemProps {
   item: MenuItem;
   isActive: boolean;
   isCollapsed: boolean;
   onClick: () => void;
+  isSubItem?: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ item, isActive, isCollapsed, onClick }) => (
+const NavItem: React.FC<NavItemProps> = ({ item, isActive, isCollapsed, onClick, isSubItem = false }) => (
   <button
     onClick={onClick}
     className={`
@@ -163,23 +176,35 @@ const NavItem: React.FC<NavItemProps> = ({ item, isActive, isCollapsed, onClick 
         ? 'bg-cyan-50 text-cyan-700'
         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
       }
+      ${isSubItem ? 'pl-11 py-2' : ''}
     `}
     aria-current={isActive ? 'page' : undefined}
   >
-    {isActive && (
-      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.75h-5 bg-cyan-500 rounded-r-full" />
+    {isActive && !isSubItem && (
+      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.75 h-5 bg-cyan-500 rounded-r-full" />
+    )}
+    
+    {isActive && isSubItem && (
+      <span className="absolute left-6 top-1/2 -translate-y-1/2 w-1 h-1 bg-cyan-500 rounded-full" />
     )}
 
-    <item.icon
-      size={19}
-      className={`shrink-0 transition-colors ${
-        isActive ? 'text-cyan-600' : 'text-slate-400 group-hover:text-slate-600'
-      }`}
-      aria-hidden="true"
-    />
+    {!isSubItem && (
+      <item.icon
+        size={19}
+        className={`shrink-0 transition-colors ${
+          isActive ? 'text-cyan-600' : 'text-slate-400 group-hover:text-slate-600'
+        }`}
+        aria-hidden="true"
+      />
+    )}
 
     {!isCollapsed && (
-      <span className="text-sm font-medium flex-1 truncate">{item.label}</span>
+      <span className={cn(
+        "text-sm font-medium flex-1 truncate",
+        isSubItem ? "text-[13px]" : ""
+      )}>
+        {item.label}
+      </span>
     )}
 
     {!isCollapsed && item.badge != null && item.badge > 0 && (
@@ -205,26 +230,6 @@ const NavItem: React.FC<NavItemProps> = ({ item, isActive, isCollapsed, onClick 
   </button>
 );
 
-// ─── Badge rôle ───────────────────────────────────────────────────────────────
-
-const RoleBadge: React.FC<{ userRole: UserRole }> = ({ userRole }) => {
-  const label =
-    userRole === 'PRO'
-      ? 'Propriétaire Pro'
-      : userRole === 'CLIENT'
-      ? 'Client'
-      : 'Administrateur';
-
-  return (
-    <div className="p-3 border-t border-slate-100">
-      <div className="bg-linear-to-br from-cyan-50 to-cyan-100/60 rounded-xl p-3 border border-cyan-100">
-        <p className="text-xs font-semibold text-cyan-800">Compte {label}</p>
-        <p className="text-[10px] text-cyan-500 mt-0.5">ImmoNet · Afrique Centrale</p>
-      </div>
-    </div>
-  );
-};
-
 // ─── Composant principal ──────────────────────────────────────────────────────
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -237,6 +242,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [isProGroupOpen, setIsProGroupOpen] = React.useState(() => 
+    PRO_GROUP_PATHS.some(path => location.pathname.startsWith(path))
+  );
+
   const visibleItems = MENU_ITEMS.filter((item) => item.roles.includes(userRole));
 
   const isItemActive = (path: string) =>
@@ -248,6 +257,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     navigate(path);
     onClose?.();
   };
+
+  const isAnyProItemActive = PRO_GROUP_PATHS.some(path => location.pathname.startsWith(path));
 
   return (
     <>
@@ -279,15 +290,86 @@ const Sidebar: React.FC<SidebarProps> = ({
           className="flex flex-col gap-0.5 p-3 pt-5 h-full overflow-y-auto pb-36"
           aria-label="Navigation dashboard"
         >
-          {visibleItems.map((item) => (
-            <NavItem
-              key={item.path}
-              item={item}
-              isActive={isItemActive(item.path)}
-              isCollapsed={isCollapsed}
-              onClick={() => handleNavigate(item.path)}
-            />
-          ))}
+          {visibleItems.map((item, _index) => {
+            const isProItem = PRO_GROUP_PATHS.includes(item.path);
+            const isAdmin = userRole === 'ADMIN';
+
+            // Si c'est un item Pro et qu'on est ADMIN, on gère le groupement
+            if (isAdmin && isProItem) {
+              // On n'affiche le header du groupe qu'au premier item rencontré
+              const isFirstProItem = item.path === PRO_GROUP_PATHS[0];
+              if (!isFirstProItem) return null;
+
+              return (
+                <div key="pro-group" className="space-y-0.5">
+                  <button
+                    onClick={() => !isCollapsed && setIsProGroupOpen(!isProGroupOpen)}
+                    className={`
+                      relative flex items-center gap-3 px-3 py-2.5 rounded-xl w-full text-left
+                      transition-all duration-150 group
+                      ${isAnyProItemActive && !isProGroupOpen 
+                        ? 'bg-cyan-50/50 text-cyan-700' 
+                        : 'text-slate-600 hover:bg-slate-50'
+                      }
+                    `}
+                  >
+                    <Building2
+                      size={19}
+                      className={`shrink-0 transition-colors ${
+                        isAnyProItemActive ? 'text-cyan-600' : 'text-slate-400 group-hover:text-slate-600'
+                      }`}
+                    />
+                    {!isCollapsed && (
+                      <>
+                        <span className="text-sm font-semibold flex-1 truncate">Espace Propriétaire</span>
+                        <ChevronDown 
+                          size={14} 
+                          className={`transition-transform duration-200 ${isProGroupOpen ? 'rotate-180' : ''}`}
+                        />
+                      </>
+                    )}
+                    {isCollapsed && (
+                      <span className="absolute left-full ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
+                        Espace Propriétaire
+                      </span>
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {isProGroupOpen && !isCollapsed && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden flex flex-col gap-0.5"
+                      >
+                        {visibleItems.filter(i => PRO_GROUP_PATHS.includes(i.path)).map(subItem => (
+                          <NavItem
+                            key={subItem.path}
+                            item={subItem}
+                            isActive={isItemActive(subItem.path)}
+                            isCollapsed={isCollapsed}
+                            onClick={() => handleNavigate(subItem.path)}
+                            isSubItem
+                          />
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }
+
+            return (
+              <NavItem
+                key={item.path}
+                item={item}
+                isActive={isItemActive(item.path)}
+                isCollapsed={isCollapsed}
+                onClick={() => handleNavigate(item.path)}
+              />
+            );
+          })}
         </nav>
 
         {!isCollapsed && <RoleBadge userRole={userRole} />}

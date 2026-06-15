@@ -3,12 +3,15 @@ export type OperationType = 'VENTE' | 'LOCATION';
 
 export type PropertyType =
   | 'APPARTEMENT'
-  | 'MAISON'
   | 'VILLA'
+  | 'STUDIO'
   | 'TERRAIN'
   | 'BUREAU'
-  | 'COMMERCE'
-  | 'STUDIO';
+  | 'LOCAL_COMMERCIAL'
+  | 'APPARTEMENT_MEUBLEE'
+  | 'MAISON';
+
+export type PeriodeLocation = 'NUIT' | 'SEMAINE' | 'MOIS' | 'ANNEE';
 
 export type PropertyStatus =
   | 'BROUILLON'
@@ -16,7 +19,8 @@ export type PropertyStatus =
   | 'PUBLIE'
   | 'EN_LOCATION'
   | 'VENDU'
-  | 'ARCHIVE';
+  | 'ARCHIVE'
+  | 'SUSPENDU';
 
 // ─── Localisation ─────────────────────────────────────────────────────────────
 
@@ -41,27 +45,50 @@ export interface PropertyOwner {
   badgePro: boolean;
 }
 
+// ─── Requête de création (DTO Backend BienCreateRequest) ──────────────────────
+
+export interface PropertyCreateRequest {
+  titre: string;
+  description?: string;
+  typeOperation: OperationType;
+  typeBien: PropertyType;
+  adresse: string;
+  ville: string;
+  quartier?: string;
+  pays: string;
+  latitude?: number;
+  longitude?: number;
+  periodeLocation?: PeriodeLocation;
+  prix: number;
+  caution?: number;
+  chargesIncluses?: boolean;
+  prixNegoceable?: boolean;
+  surface: number;
+  nbPieces?: number;
+  nbChambres?: number;
+  nbSdb?: number;
+  etage?: number;
+  estMeuble?: boolean;
+}
+
 // ─── Bien immobilier (vue liste/carte) ────────────────────────────────────────
 
 export interface PropertySummary {
   id: number | string;
-  titre?: string;
-  typeOperation?: OperationType;
-  typeBien?: PropertyType;
-  statut?: PropertyStatus;
-  prix?: number;
-  nbPieces?: number;
-  nbSallesDeBain?: number;
-  ville?: string;
+  titre: string;
+  typeOperation: OperationType;
+  typeBien: PropertyType;
+  statut: PropertyStatus;
+  prix: number;
+  ville: string;
   quartier?: string;
-  surface?: number;
+  surface: number;
   nbChambres?: number;
+  nbPieces?: number;
+  nbSdb?: number;
   urlPhotoPrincipale?: string;
-  nbVues?: number;
-  photos?: string[];
-  localisation?: PropertyLocation;
-  proprietaire?: PropertyOwner;
-  createdAt?: string;
+  nbVues: number;
+  createdAt: string;
 }
 
 // ─── Bien immobilier (vue détail) ─────────────────────────────────────────────
@@ -85,7 +112,7 @@ export interface PropertyDetail {
   caution: number;
   chargesIncluses: boolean;
   prixNegoceable: boolean;
-  periodeLocation?: string;
+  periodeLocation?: PeriodeLocation;
   
   surface: number;
   nbPieces?: number;
@@ -137,12 +164,13 @@ export interface PaginatedProperties {
 
 export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   APPARTEMENT: 'Appartement',
-  MAISON: 'Maison',
   VILLA: 'Villa',
+  STUDIO: 'Studio',
   TERRAIN: 'Terrain',
   BUREAU: 'Bureau',
-  COMMERCE: 'Commerce',
-  STUDIO: 'Studio',
+  LOCAL_COMMERCIAL: 'Local Commercial',
+  APPARTEMENT_MEUBLEE: 'Appartement Meublé',
+  MAISON: 'Maison',
 };
 
 export const OPERATION_TYPE_LABELS: Record<OperationType, string> = {
@@ -151,12 +179,12 @@ export const OPERATION_TYPE_LABELS: Record<OperationType, string> = {
 };
 
 export const PAYS_OPTIONS = [
-  { value: 'CM', label: 'Cameroun' },
-  { value: 'CI', label: "Côte d'Ivoire" },
-  { value: 'SN', label: 'Sénégal' },
-  { value: 'TG', label: 'Togo' },
-  { value: 'GA', label: 'Gabon' },
-  { value: 'CG', label: 'Congo' },
+  { value: 'Bénin', label: 'Bénin' },
+  { value: 'Sénégal', label: 'Sénégal' },
+  { value: 'Côte d\'Ivoire', label: "Côte d'Ivoire" },
+  { value: 'Cameroun', label: 'Cameroun' },
+  { value: 'Togo', label: 'Togo' },
+  { value: 'Gabon', label: 'Gabon' },
 ] as const;
 
 export const EQUIPEMENTS_OPTIONS = [
