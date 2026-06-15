@@ -1,13 +1,15 @@
 package com.immoteam.immoteamdev.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.immoteam.immoteamdev.dto.UpdateProfileRequest;
 import com.immoteam.immoteamdev.dto.UserDto;
 import com.immoteam.immoteamdev.entity.Utilisateur;
 import com.immoteam.immoteamdev.exception.ResourceNotFoundException;
 import com.immoteam.immoteamdev.repository.UtilisateurRepository;
+
 import jakarta.transaction.Transactional;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -64,14 +66,27 @@ public class UserService {
 
     private UserDto mapToDto(Utilisateur utilisateur) {
         UserDto dto = new UserDto();
-        // dto.setId(utilisateur.getId());
+        dto.setId(utilisateur.getId());
         dto.setNom(utilisateur.getNom());
         dto.setPrenom(utilisateur.getPrenom());
         dto.setEmail(utilisateur.getEmail());
         dto.setTelephone(utilisateur.getTelephone());
-        // dto.setRole(utilisateur.getRole());
-        // dto.setStatut(utilisateur.getStatut());
+        dto.setRole(utilisateur.getRole());
+        dto.setStatut(utilisateur.getStatut());
         dto.setDateInscription(utilisateur.getDateInscription());
+        dto.setEmailVerifie(utilisateur.isEmailVerifie());
+        dto.setAvatarUrl(utilisateur.getAvatarUrl());
+        dto.setDernierLogin(utilisateur.getDernierLogin());
+
+        if (utilisateur.getAbonnementPro() != null) {
+            dto.setAbonnement(com.immoteam.immoteamdev.dto.AbonnementSummaryDto.builder()
+                    .typeAbonnement(utilisateur.getAbonnementPro().getTypeAbonnement())
+                    .dateDebut(utilisateur.getAbonnementPro().getDateDebut())
+                    .dateFin(utilisateur.getAbonnementPro().getDateFin())
+                    .actif(utilisateur.getAbonnementPro().isActif())
+                    .build());
+        }
+
         return dto;
     }
 }

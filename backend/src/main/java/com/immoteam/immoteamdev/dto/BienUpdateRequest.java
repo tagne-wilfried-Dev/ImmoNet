@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,11 +34,11 @@ public class BienUpdateRequest {
 
     @NotNull(message = "Le prix est obligatoire")
     @DecimalMin(value = "0.0", inclusive = false, message = "Le prix doit être supérieur à 0")
-    private Double prix;
+    private BigDecimal prix;
 
     @NotNull(message = "La surface est obligatoire")
     @DecimalMin(value = "0.0", inclusive = false, message = "La surface doit être supérieure à 0")
-    private Double surface;
+    private BigDecimal surface;
 
     @Min(value = 0, message = "Le nombre de chambres ne peut pas être négatif")
     private Integer nbChambres;

@@ -24,7 +24,7 @@ public class PhotoBien {
     private Bien bien;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column
     private String urlCloudinary;
 
     @NotBlank

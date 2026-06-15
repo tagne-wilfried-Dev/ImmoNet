@@ -31,4 +31,6 @@ public class BienSummaryResponse {
     private Integer nbChambres;
     private Integer nbVues;
     private StatutAnnonce statut;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
 }

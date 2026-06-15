@@ -43,6 +43,7 @@ public class BienService {
     private final PhotoBienRepository photoBienRepository;
     private final BienMapper bienMapper;
     private final StorageService storageService;
+    private final AbonnementService abonnementService;
 
     /**
      * Recherche multicritère avec pagination (CDC §3.3)
@@ -75,8 +76,8 @@ public class BienService {
         Utilisateur proprietaire = utilisateurRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Utilisateur non trouvé avec l'email : " + userEmail));
 
-        // 2. Vérification du rôle (optionnel ici si géré par @PreAuthorize au niveau contrôleur, mais double sécurité)
-        // if (!proprietaire.getRole().equals(Role.PRO)) { throw new IllegalStateException("Seuls les pros peuvent créer des annonces"); }
+        // 2. Initialisation auto d'un abonnement GRATUIT si inexistant
+        abonnementService.getOrCreateDefaultAbonnement(proprietaire);
 
         // 3. Mapping et application des règles métier
         Bien nouveauBien = bienMapper.toEntity(request);
@@ -234,6 +235,11 @@ public class BienService {
         // Vérification propriétaire
         if (!bien.getProprietaire().getEmail().equals(userEmail)) {
             throw new AccessDeniedException("Vous n'êtes pas autorisé à modifier ce bien.");
+        }
+
+        // Vérification Quota si passage au statut PUBLIE
+        if (nouveauStatut == StatutAnnonce.PUBLIE && !abonnementService.peutPublier(bien.getProprietaire())) {
+            throw new IllegalStateException("Quota d'annonces publié atteint pour votre abonnement actuel.");
         }
 
         // RÈGLE MÉTIER : VENTE -> VENDU -> ARCHIVE (Fin de vie)
