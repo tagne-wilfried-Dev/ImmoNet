@@ -1,7 +1,8 @@
 package com.immoteam.immoteamdev.entity.enums;
 
 public enum FormatAbonnement {
-    STARTER,    // 9 900 FCFA/mois, 3 annonces max
-    BUSINESS,   // 24 900 FCFA/mois, 15 annonces max, mise en avant
-    PREMIUM     // 49 900 FCFA/mois, illimité, boost, support prioritaire
+    GRATUIT,    // 0 FCFA, 3 annonces max
+    STARTER,    // 2 500 FCFA, 10 annonces max
+    BUSINESS,   // 12 000 FCFA, 20 annonces max
+    PREMIUM     // 24 000 FCFA, 40 annonces max
 }

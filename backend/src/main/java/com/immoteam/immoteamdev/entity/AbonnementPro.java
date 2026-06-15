@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "abonnements_pro")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,7 +24,7 @@ public class AbonnementPro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "utilisateur_id", nullable = false)
     private Utilisateur utilisateur;
 
@@ -38,16 +37,13 @@ public class AbonnementPro {
     @Column(nullable = false)
     private LocalDateTime dateDebut;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column
     private LocalDateTime dateFin;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column
     private String stripeSubscriptionId;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column
     private String stripePaymentId;
 
     @Column(nullable = false)
@@ -55,7 +51,7 @@ public class AbonnementPro {
     private boolean actif = false;
 
     @NotNull
-    @DecimalMin("0.01")
+    @DecimalMin("0.00")
     @Column(nullable = false)
     private BigDecimal montantPaye;
 
