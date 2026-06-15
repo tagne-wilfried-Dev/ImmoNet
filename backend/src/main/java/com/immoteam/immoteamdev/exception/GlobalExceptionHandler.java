@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -80,24 +82,117 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gère les erreurs d'authentification (identifiants invalides, session expirée, etc.)
+     * Retourne un 401 Unauthorized.
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            AuthenticationException ex, HttpServletRequest request) {
+        
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error("Authentification Échouée")
+                .message("Identifiants invalides ou session expirée")
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Gère les ressources non trouvées (ex: utilisateur introuvable, propriété introuvable)
+     * Retourne un 404 Not Found.
+     */
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ErrorResponse> handleNoSuchElementException(
+            NoSuchElementException ex, HttpServletRequest request) {
+        
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Ressource Non Trouvée")
+                .message(ex.getMessage() != null ? ex.getMessage() : "La ressource demandée n'existe pas")
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Gère les conflits (ex: ressource déjà existante, quota dépassé, état invalide)
+     * Retourne un 409 Conflict.
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(
+            IllegalStateException ex, HttpServletRequest request) {
+        
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflit")
+                .message(ex.getMessage() != null ? ex.getMessage() : "Une opération conflictuelle a été détectée")
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
      * Catch-all pour toute exception non gérée explicitement.
      * Retourne un 500 Internal Server Error avec un message générique pour éviter la fuite d'informations sensibles.
+     * Les détails de l'exception doivent être loggés côté serveur pour le débogage.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, HttpServletRequest request) {
         
-        // Note: En production, il est recommandé de logger 'ex' ici (ex: avec SLF4J) 
+        // En production, il est recommandé de logger 'ex' ici (ex: avec SLF4J ou Logback)
         // pour le débogage, sans l'exposer au client.
+        // Exemple:
+        // logger.error("Erreur non gérée pour la requête {} {}", 
+        //            request.getMethod(), request.getRequestURI(), ex);
+        
+        // Déterminer le code HTTP approprié basé sur le type d'exception
+        HttpStatus status = determineHttpStatus(ex);
         
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error("Erreur Serveur Interne")
-                .message("Une erreur inattendue s'est produite. Veuillez réessayer plus tard.")
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(getErrorMessage(ex, status))
                 .path(request.getRequestURI())
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    /**
+     * Détermine le code HTTP approprié basé sur le type d'exception.
+     */
+    private HttpStatus determineHttpStatus(Exception ex) {
+        if (ex instanceof NoSuchElementException) {
+            return HttpStatus.NOT_FOUND;
+        } else if (ex instanceof IllegalArgumentException || ex instanceof IllegalStateException) {
+            return HttpStatus.BAD_REQUEST;
+        } else if (ex instanceof AccessDeniedException) {
+            return HttpStatus.FORBIDDEN;
+        } else if (ex instanceof AuthenticationException) {
+            return HttpStatus.UNAUTHORIZED;
+        } else if (ex instanceof UnsupportedOperationException) {
+            return HttpStatus.NOT_IMPLEMENTED;
+        }
+        // Par défaut, 500 pour les erreurs vraiment inattendues
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    /**
+     * Génère un message d'erreur approprié selon le type d'exception et le code HTTP.
+     */
+    private String getErrorMessage(Exception ex, HttpStatus status) {
+        if (status == HttpStatus.INTERNAL_SERVER_ERROR) {
+            return "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.";
+        }
+        return ex.getMessage() != null ? ex.getMessage() : status.getReasonPhrase();
     }
 }

@@ -44,7 +44,8 @@ public class SecurityConfig {
                     "/api/biens/search/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
-                    "/swagger-ui.html"
+                    "/swagger-ui.html",
+                    "/uploads/**"
                 ).permitAll()
                 // Routes ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -62,7 +63,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:*")); // À adapter en prod
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
