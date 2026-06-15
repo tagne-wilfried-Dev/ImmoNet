@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "demandes_visite")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,15 +23,15 @@ public class DemandeVisite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bien_id", nullable = false)
     private Bien bien;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Utilisateur client;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proprietaire_id", nullable = false)
     private Utilisateur proprietaire;
 
