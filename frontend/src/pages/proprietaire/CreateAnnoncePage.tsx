@@ -163,8 +163,13 @@ export default function CreateAnnoncePage() {
       // 2. Upload des photos si présentes
       if (formData.photos.length > 0) {
         toast.loading('Envoi des photos...', { id: 'upload-photos' });
-        await propertyService.uploadPhotos(createdProperty.id, formData.photos);
-        toast.success('Photos envoyées !', { id: 'upload-photos' });
+        try {
+          await propertyService.uploadPhotos(createdProperty.id, formData.photos);
+          toast.success('Photos envoyées !', { id: 'upload-photos' });
+        } catch (uploadErr) {
+          console.error('Erreur upload photos:', uploadErr);
+          toast.error('Le bien a été créé mais les photos n\'ont pas pu être envoyées.', { id: 'upload-photos' });
+        }
       }
 
       // 3. Passage au statut PUBLIE (Vérification Quota au backend)
@@ -174,8 +179,20 @@ export default function CreateAnnoncePage() {
       navigate('/dashboard/annonces');
     } catch (err: any) {
       console.error('Erreur lors de la publication:', err);
-      const errorMsg = err.response?.data?.message || 'Erreur lors de la publication de l\'annonce.';
-      toast.error(errorMsg);
+      
+      let errorMsg = 'Erreur lors de la publication de l\'annonce.';
+      
+      if (err.response?.data) {
+        const serverData = err.response.data;
+        // Si le backend renvoie des détails de validation (GlobalExceptionHandler)
+        if (serverData.details && Array.isArray(serverData.details)) {
+          errorMsg = `Erreur : ${serverData.details.join(', ')}`;
+        } else if (serverData.message) {
+          errorMsg = serverData.message;
+        }
+      }
+      
+      toast.error(errorMsg, { duration: 5000 });
     } finally {
       setIsSubmitting(false);
     }
@@ -299,6 +316,7 @@ export default function CreateAnnoncePage() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
+                { id: 'free', name: 'free plan', price: '00 CFA', features: ['3 annonces', 'Valide 1 mois', 'Support faible'] },
                 { id: 'starter', name: 'Starter', price: '2 500 CFA', features: ['10 annonces', 'Valide 2 mois', 'Support standard'] },
                 { id: 'business', name: 'Business', price: '12 000 CFA', features: ['20 annonces', 'Valide 4 mois', 'Mise en avant'] },
                 { id: 'premium', name: 'Premium', price: '24 000 CFA', features: ['40 annonces', 'Valide 6 mois', 'Support prioritaire'] },
@@ -327,7 +345,6 @@ export default function CreateAnnoncePage() {
                 </button>
               ))}
             </div>
-            <p className="text-xs text-slate-500 text-center">Le plan GRATUIT (3 annonces) est activé par défaut si aucune formule n'est choisie.</p>
           </div>
         );
 
@@ -631,7 +648,7 @@ export default function CreateAnnoncePage() {
 
   // ── RENDER ────────────────────────────────────────────────────────────────────
   return (
-    <DashboardLayout userName="Utilisateur Pro" userRole="PRO" notificationCount={0}>
+    <DashboardLayout>
       <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] bg-slate-50">
         <StepSidebar />
         <div className="flex-1 flex flex-col h-[calc(100vh-80px)]">

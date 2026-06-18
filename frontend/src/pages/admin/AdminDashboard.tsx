@@ -272,7 +272,7 @@ interface AdminDashboardPageProps {
 }
 
 const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
-  userName = 'Administrateur',
+  userName,
   notificationCount = 0,
 }) => {
   const navigate = useNavigate();

@@ -24,6 +24,7 @@ import { ChangePasswordForm } from './pages/auth/ChangePasswordForm';
 import Home from './pages/basePages/Home';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { fetchCurrentUser } from './store/slices/authSlice';
+import ClientReservationsPage from './pages/client/ClientReservationsPage';
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -111,6 +112,7 @@ const App: React.FC = () => {
 
   // Fallback user information if not authenticated
   const userName = user?.nom || 'Invité';
+  console.log(userName);
   const userRole = user?.role || 'CLIENT';
 
   return (
@@ -169,7 +171,16 @@ const App: React.FC = () => {
         <Route path="/recherche" element={<SearchResults />} />
         <Route path="/dashboard/biens" element={<MesBiensPage />} />
         <Route path="/dashboard/annonces" element={<MesAnnoncesPage />} />
-        <Route path="/dashboard/reservations" element={<ReservationsPage />} />
+        <Route
+          path="/dashboard/reservations"
+          element={
+            userRole === 'CLIENT' ? (
+              <ClientReservationsPage />
+            ) : (
+              <ReservationsPage />
+            )
+          }
+        />
         <Route path="/dashboard/messages" element={<MessagesPage />} />
         <Route path="/dashboard/validations" element={<ValidationsPage />} />
         <Route path="/dashboard/equipements" element={<EquipementsPage />} />

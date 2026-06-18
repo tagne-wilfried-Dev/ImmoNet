@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import Dashboard from './Dashboard';
 import MessageAlert from '@/components/ui/MessageAlert';
+import { propertyService } from '@/services/PropertyService';
+import { useAppSelector } from '@/store/hooks';
+import type { PropertySummary } from '@/lib/types/property.types';
+import { computeQuota, totalVues } from '@/lib/stats/proprietaireStats';
 import dashboardMockData from '@/lib/data/mockData.json';
 
 interface DashboardPageProps {
@@ -14,17 +18,17 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
 }) => {
   const location = useLocation();
   const locationState = location.state as { message?: string } | null;
-  const [data, setData] = useState(dashboardMockData);
+  const plan = useAppSelector((state) => state.auth.user?.abonnement?.typeAbonnement);
+
+  const [biens, setBiens] = useState<PropertySummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulation d'un appel API
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // TODO: Remplacer par un vrai appel API (GET /api/biens/stats/me)
-        setData(dashboardMockData);
+        const response = await propertyService.getMyProperties(0, 50);
+        setBiens(response.data);
       } catch (error) {
         console.error('Erreur chargement dashboard:', error);
       } finally {
@@ -48,6 +52,36 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
     );
   }
 
+  const quota = computeQuota(biens, plan);
+  const vues = totalVues(biens);
+
+  // KPIs dérivés des vraies données du patrimoine
+  const kpis = [
+    {
+      id: 'biens',
+      title: 'Biens au patrimoine',
+      value: String(biens.length),
+      icon: 'Home',
+    },
+    {
+      id: 'annonces',
+      title: 'Annonces en ligne',
+      value: `${quota.publies} / ${quota.quota}`,
+      icon: 'MapPin',
+    },
+    {
+      id: 'vues',
+      title: 'Vues cumulées',
+      value: String(vues),
+      icon: 'Eye',
+    },
+  ];
+
+  const data = {
+    kpis,
+    quickActions: dashboardMockData.quickActions,
+  };
+
   return (
     <DashboardLayout notificationCount={notificationCount}>
       {locationState?.message && (
@@ -55,7 +89,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
           <MessageAlert type="success" message={locationState.message} />
         </div>
       )}
-      <Dashboard data={data} />
+      <Dashboard data={data} biens={biens} plan={plan} />
     </DashboardLayout>
   );
 };

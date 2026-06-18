@@ -2,7 +2,6 @@
 export interface AbonnementSummary {
   typeAbonnement: 'GRATUIT' | 'STARTER' | 'BUSINESS' | 'PREMIUM';
   dateDebut: string;
-  dateFin?: string;
   actif: boolean;
 }
 

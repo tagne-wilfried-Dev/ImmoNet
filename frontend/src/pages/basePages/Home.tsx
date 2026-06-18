@@ -3,22 +3,21 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Search,
   MapPin,
-  Building2,
   TrendingUp,
-  ShieldCheck,
   ArrowRight,
-  Home as HomeIcon,
   ChevronDown,
+  Loader2,
 } from 'lucide-react';
-import Header from '@/components/layout/Header';
+import DynamicHeader from '@/components/layout/DynamicHeader';
 import Footer from '@/components/layout/Footer';
 import PropertyCard from '@/components/ui/PropertyCard';
 import { Button } from '@/components/ui/Button';
 import { MOCK_PROPERTIES } from '@/lib/data/mockProperties';
-import type { OperationType, PropertyType } from '@/lib/types/property.types';
+import type { OperationType, PropertyType, PropertySummary } from '@/lib/types/property.types';
 import { PROPERTY_TYPE_LABELS, PAYS_OPTIONS } from '@/lib/types/property.types';
 import OperationToggle from '@/components/base/OperationToggle';
 import { STATS, VILLES_CM, type QuickSearchState } from '@/lib/types/globalTypes';
+import { propertyService } from '@/services/PropertyService';
 
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -28,12 +27,32 @@ const Home: React.FC = () => {
   const location = useLocation();
 
   const [currentExplore, setCurrentExplore] = useState<'rent' | 'sell'>('sell');
+  const [realProperties, setRealProperties] = useState<PropertySummary[]>([]);
+  const [isLoadingReal, setIsLoadingReal] = useState(true);
+  
   const [search, setSearch] = useState<QuickSearchState>({
     typeOperation: 'VENTE',
-    pays: 'CM',
+    pays: 'Cameroun',
     ville: '',
     typeBien: '',
   });
+
+  // Fetch real properties from API
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        setIsLoadingReal(true);
+        // On récupère les derniers biens publiés
+        const response = await propertyService.getProperties({ typeOperation: search.typeOperation }, 0, 8);
+        setRealProperties(response.data);
+      } catch (err) {
+        console.error('Failed to fetch real properties:', err);
+      } finally {
+        setIsLoadingReal(false);
+      }
+    };
+    fetchLatest();
+  }, [search.typeOperation]);
 
   // Reset currentExplore when on home page (/) to avoid showing À Vendre selected
   useEffect(() => {
@@ -69,12 +88,13 @@ const Home: React.FC = () => {
     if (e.key === 'Enter') handleSearch();
   };
 
-  // Biens en vedette : 4 premiers du mock (alternés vente/location)
-  const featuredProperties = MOCK_PROPERTIES.slice(0, 4);
+  // Fusion des données réelles et mockées (Réelles en premier)
+  // On limite à 4 pour la section vedette
+  const featuredProperties = [...realProperties, ...MOCK_PROPERTIES].slice(0, 4);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8fafc]">
-      <Header currentExplore={currentExplore} onNavigate={handleHeaderNavigate} />
+      <DynamicHeader currentExplore={currentExplore} onNavigate={handleHeaderNavigate} />
 
       <main className="flex-1">
         {/* ── HERO ────────────────────────────────────────────────────────── */}
@@ -271,15 +291,22 @@ const Home: React.FC = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {featuredProperties.map((property) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                variant="grid"
-              />
-            ))}
-          </div>
+          {isLoadingReal ? (
+            <div className="flex flex-col items-center justify-center py-12">
+               <Loader2 className="w-8 h-8 text-cyan-500 animate-spin mb-3" />
+               <p className="text-sm text-slate-500">Chargement des meilleures offres...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {featuredProperties.map((property) => (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  variant="grid"
+                />
+              ))}
+            </div>
+          )}
 
           {/* CTA mobile */}
           <div className="flex justify-center mt-8 sm:hidden">

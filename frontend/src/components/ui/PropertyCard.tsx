@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { MapPin, Maximize2, BedDouble, Heart, BadgeCheck } from 'lucide-react';
+import { MapPin, Maximize2, BedDouble, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn, getMediaUrl } from '@/lib/utils';
 import type { PropertySummary } from '@/lib/types/property.types';
 import { PROPERTY_TYPE_LABELS } from '@/lib/types/property.types';
 
@@ -24,7 +24,7 @@ interface PropertyCardProps {
   property: PropertySummary;
   /** Compact = version liste. Default = version grille (plus grande). */
   variant?: 'grid' | 'list';
-  onFavorisToggle?: (id: number) => void;
+  onFavorisToggle?: (id: number | string) => void;
   className?: string;
 }
 
@@ -49,11 +49,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     urlPhotoPrincipale,
     ville,
     quartier,
-    statut
   } = property;
 
   const photoUrl = !imgError && urlPhotoPrincipale
-    ? urlPhotoPrincipale
+    ? getMediaUrl(urlPhotoPrincipale)
     : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80';
 
   const isVente = typeOperation === 'VENTE';
@@ -79,7 +78,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           />
           <span
             className={cn(
-              'absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1 rounded-full',
+              'absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm',
               isVente
                 ? 'bg-cyan-600 text-white'
                 : 'bg-emerald-600 text-white',
@@ -116,7 +115,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
             <p className="flex items-center gap-1 mt-1.5 text-[13px] text-slate-500">
               <MapPin className="w-3.5 h-3.5 text-cyan-500 shrink-0" aria-hidden="true" />
-              {quartier}, {ville}
+              {quartier ? `${quartier}, ` : ''}{ville}
             </p>
           </div>
 
@@ -167,7 +166,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <div className="absolute top-3 left-3 flex gap-2">
           <span
             className={cn(
-              'text-[11px] font-semibold px-2.5 py-1 rounded-full',
+              'text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm',
               isVente
                 ? 'bg-cyan-600 text-white'
                 : 'bg-emerald-600 text-white',
@@ -175,7 +174,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           >
             {isVente ? 'Vente' : 'Location'}
           </span>
-          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/90 text-slate-700">
+          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/90 text-slate-700 backdrop-blur-xs shadow-sm">
             {PROPERTY_TYPE_LABELS[typeBien]}
           </span>
         </div>
@@ -185,7 +184,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <button
             onClick={() => onFavorisToggle(id)}
             aria-label="Toggle favoris"
-            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 hover:bg-white shadow-sm transition-colors"
+            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 hover:bg-white shadow-sm transition-colors backdrop-blur-xs"
           >
             <Heart
               className={cn(
@@ -208,7 +207,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           </Link>
           <p className="flex items-center gap-1 mt-1.5 text-[13px] text-slate-500">
             <MapPin className="w-3.5 h-3.5 text-cyan-500 shrink-0" aria-hidden="true" />
-            {quartier}, {ville}
+            {quartier ? `${quartier}, ` : ''}{ville}
           </p>
         </div>
 
@@ -218,12 +217,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
             {surface} m²
           </span>
-          {nbChambres && (
+          {nbChambres ? (
             <span className="flex items-center gap-1">
               <BedDouble className="w-3.5 h-3.5" aria-hidden="true" />
               {nbChambres} ch.
             </span>
-          )}
+          ) : null}
         </div>
 
         {/* Prix */}

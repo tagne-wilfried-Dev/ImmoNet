@@ -17,7 +17,7 @@ const AuthLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Auth Card Container */}
       <div className="relative w-full max-w-md z-10">
         {/* Logo ImmoNet - Version Light */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-1">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
               <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white" stroke="currentColor" strokeWidth={2.5}>

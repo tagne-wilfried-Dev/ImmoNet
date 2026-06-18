@@ -36,7 +36,7 @@ export interface PropertyLocation {
 // ─── Propriétaire (vue publique) ──────────────────────────────────────────────
 
 export interface PropertyOwner {
-  id: number | string;
+  id: number;
   nom: string;
   prenom?: string;
   avatarUrl?: string;
@@ -74,7 +74,7 @@ export interface PropertyCreateRequest {
 // ─── Bien immobilier (vue liste/carte) ────────────────────────────────────────
 
 export interface PropertySummary {
-  id: number | string;
+  id: number;
   titre: string;
   typeOperation: OperationType;
   typeBien: PropertyType;
@@ -94,7 +94,7 @@ export interface PropertySummary {
 // ─── Bien immobilier (vue détail) ─────────────────────────────────────────────
 
 export interface PropertyDetail {
-  id: number | string;
+  id: number;
   titre: string;
   typeBien: PropertyType;
   typeOperation: OperationType;
@@ -136,6 +136,8 @@ export interface PropertyDetail {
 // ─── Filtres de recherche ─────────────────────────────────────────────────────
 
 export interface SearchFilters {
+  nbChambres?: string;
+  estMeuble?: undefined;
   typeOperation: OperationType;
   typeBien?: PropertyType;
   pays?: string;

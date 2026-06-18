@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import Header from '@/components/layout/Header';
+import DynamicHeader from '@/components/layout/DynamicHeader';
 import { MapPin, Search, X, Loader2, LayoutGrid, MapIcon } from 'lucide-react';
 import { propertyService } from '@/services/PropertyService';
 import type { PropertySummary, SearchFilters } from '@/lib/types/property.types';
@@ -22,7 +22,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
   const location = useLocation();
 
   // Déterminer le mode en fonction du pathname
-  const isSellingMode = location.pathname.includes('/vendre');
+  const isSellingMode = location.pathname.includes('/vente');
   const [filters, setFilters] = useState<SearchFilters>({
     typeOperation: isSellingMode ? 'VENTE' : 'LOCATION',
   });
@@ -53,8 +53,21 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
   }, [fetchProperties]);
 
   const handleFilterChange = (name: keyof SearchFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [name]: value }));
+    setFilters(prev => {
+      const next = { ...prev };
+      if (value === '' || value === undefined || value === null) {
+        delete next[name];
+      } else {
+        next[name] = value;
+      }
+      return next;
+    });
     setPage(0); // Reset to first page on filter change
+  };
+
+  // Convertit une saisie texte en nombre (ou undefined si vide)
+  const handleNumberChange = (name: keyof SearchFilters, raw: string) => {
+    handleFilterChange(name, raw === '' ? undefined : Number(raw));
   };
 
   const clearFilters = () => {
@@ -64,7 +77,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header currentExplore={currentExplore} onNavigate={handleHeaderNavigate} />
+      <DynamicHeader currentExplore={currentExplore} onNavigate={handleHeaderNavigate} />
       {/* En-tête de page */}
       <div className="bg-white border-b border-cyan-100 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -85,21 +98,6 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
             <div className="bg-white rounded-3xl p-6 shadow-sm border border-cyan-100 sticky top-8">
               <h2 className="font-semibold text-xl text-slate-900 mb-6">Filtrer votre recherche</h2>
 
-              {/* Pays */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Pays</label>
-                <select
-                  value={filters.pays || ''}
-                  onChange={(e) => handleFilterChange('pays', e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
-                >
-                  <option value="">Tous les pays</option>
-                  <option value="Bénin">Bénin</option>
-                  <option value="Cameroun">Cameroun</option>
-                  <option value="Sénégal">Sénégal</option>
-                </select>
-              </div>
-
               {/* Type de bien */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Type de bien</label>
@@ -110,9 +108,13 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                 >
                   <option value="">Tous les types</option>
                   <option value="APPARTEMENT">Appartement</option>
+                  <option value="APPARTEMENT_MEUBLEE">Appartement meublé</option>
                   <option value="MAISON">Maison</option>
                   <option value="VILLA">Villa</option>
+                  <option value="STUDIO">Studio</option>
                   <option value="TERRAIN">Terrain</option>
+                  <option value="BUREAU">Bureau</option>
+                  <option value="LOCAL_COMMERCIAL">Local commercial</option>
                 </select>
               </div>
 
@@ -122,7 +124,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Ex: Cotonou, Douala..."
+                    placeholder="Ex: Yaoundé, Douala..."
                     value={filters.ville || ''}
                     onChange={(e) => handleFilterChange('ville', e.target.value)}
                     className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
@@ -131,15 +133,27 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                 </div>
               </div>
 
+              {/* Quartier */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Quartier</label>
+                <input
+                  type="text"
+                  placeholder="Ex: Bastos, Bonapriso..."
+                  value={filters.quartier || ''}
+                  onChange={(e) => handleFilterChange('quartier', e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                />
+              </div>
+
               {/* Prix Min/Max */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
                   <label className="block text-sm text-slate-600 mb-1">Prix Min</label>
                   <input
                     type="number"
                     placeholder="Min"
-                    value={filters.prixMin || ''}
-                    onChange={(e) => handleFilterChange('prixMin', e.target.value)}
+                    value={filters.prixMin ?? ''}
+                    onChange={(e) => handleNumberChange('prixMin', e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
                   />
                 </div>
@@ -148,11 +162,68 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                   <input
                     type="number"
                     placeholder="Max"
-                    value={filters.prixMax || ''}
-                    onChange={(e) => handleFilterChange('prixMax', e.target.value)}
+                    value={filters.prixMax ?? ''}
+                    onChange={(e) => handleNumberChange('prixMax', e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
                   />
                 </div>
+              </div>
+
+              {/* Surface Min/Max */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                  <label className="block text-sm text-slate-600 mb-1">Surface min (m²)</label>
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={filters.surfaceMin ?? ''}
+                    onChange={(e) => handleNumberChange('surfaceMin', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-600 mb-1">Surface max (m²)</label>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={filters.surfaceMax ?? ''}
+                    onChange={(e) => handleNumberChange('surfaceMax', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Nombre de chambres minimum */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Chambres (minimum)</label>
+                <select
+                  value={filters.nbChambres ?? ''}
+                  onChange={(e) => handleNumberChange('nbChambres', e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                >
+                  <option value="">Indifférent</option>
+                  <option value="1">1+</option>
+                  <option value="2">2+</option>
+                  <option value="3">3+</option>
+                  <option value="4">4+</option>
+                  <option value="5">5+</option>
+                </select>
+              </div>
+
+              {/* Meublé */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Ameublement</label>
+                <select
+                  value={filters.estMeuble === undefined ? '' : String(filters.estMeuble)}
+                  onChange={(e) =>
+                    handleFilterChange('estMeuble', e.target.value === '' ? undefined : e.target.value === 'true')
+                  }
+                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                >
+                  <option value="">Peu importe</option>
+                  <option value="true">Meublé</option>
+                  <option value="false">Non meublé</option>
+                </select>
               </div>
 
               <div className="flex gap-3">
@@ -203,15 +274,6 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                   >
                     <MapIcon className="w-5 h-5" />
                   </button>
-                </div>
-
-                <div className="hidden sm:flex items-center gap-2">
-                  <span className="text-sm text-slate-500">Trier par :</span>
-                  <select className="bg-transparent font-medium text-slate-900 outline-none cursor-pointer">
-                    <option>Plus récents</option>
-                    <option>Prix croissant</option>
-                    <option>Prix décroissant</option>
-                  </select>
                 </div>
               </div>
             </div>

@@ -4,3 +4,24 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+/**
+ * Retourne l'URL complète d'un média (photo, avatar).
+ * Si l'URL commence par /uploads, on ajoute le préfixe du backend.
+ * Si l'URL est déjà complète (http...), on la retourne telle quelle.
+ */
+export function getMediaUrl(url: string | undefined | null): string {
+  if (!url) return '';
+  
+  if (url.startsWith('http')) {
+    return url;
+  }
+  
+  if (url.startsWith('/uploads')) {
+    const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const baseUrl = rawApiUrl.replace('/api', '');
+    return `${baseUrl}${url}`;
+  }
+  
+  return url;
+}

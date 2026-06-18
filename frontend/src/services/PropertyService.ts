@@ -79,7 +79,7 @@ export const propertyService = {
    * Récupère TOUS les biens du patrimoine (Brouillon, Loué, Publié) du propriétaire connecté
    */
   getMyProperties: async (page = 0, size = 50): Promise<PaginatedProperties> => {
-    const response = await api.get('/biens/me', {
+    const response = await api.get('/biens/mine', {
       params: { page, size }
     });
     return {
@@ -95,7 +95,7 @@ export const propertyService = {
    * Récupère uniquement les annonces actuellement PUBLIÉES du propriétaire connecté
    */
   getMyListings: async (page = 0, size = 50): Promise<PaginatedProperties> => {
-    const response = await api.get('/biens/annonces/me', {
+    const response = await api.get('/biens/mine/annonces', {
       params: { page, size }
     });
     return {
@@ -111,7 +111,7 @@ export const propertyService = {
    * Récupère les biens publiables (Brouillon, Suspendu, Loué) pour la modal de mise en ligne
    */
   getAvailableProperties: async (): Promise<PropertySummary[]> => {
-    const response = await api.get<PropertySummary[]>('/biens/disponibles/me');
+    const response = await api.get<PropertySummary[]>('/biens/mine/available');
     return response.data;
   },
 

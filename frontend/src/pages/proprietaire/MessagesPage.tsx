@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { Search, MessageSquare, Clock, Send, Loader2, User } from 'lucide-react';
+import {
+  Search, MessageSquare,
+  //  Clock,
+  Send, Loader2, User
+} from 'lucide-react';
 import { messageService } from '@/services/MessageService';
 import type { ConversationResponse, MessageResponse } from '@/lib/types/message.types';
 import { format } from 'date-fns';
@@ -12,7 +16,7 @@ import { useLocation } from 'react-router-dom';
 const MessagesPage: React.FC = () => {
   const location = useLocation();
   const { user: currentUser } = useAppSelector((state) => state.auth);
-  
+
   const [conversations, setConversations] = useState<ConversationResponse[]>([]);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
   const [selectedConv, setSelectedConv] = useState<ConversationResponse | null>(null);
@@ -59,8 +63,8 @@ const MessagesPage: React.FC = () => {
           setLoadingMessages(true);
           const data = await messageService.getMessages(selectedConv.id);
           setMessages(data);
-          
-          setConversations(prev => prev.map(c => 
+
+          setConversations(prev => prev.map(c =>
             c.id === selectedConv.id ? { ...c, messagesNonLus: 0 } : c
           ));
         } catch (err) {
@@ -89,10 +93,10 @@ const MessagesPage: React.FC = () => {
           contenu: newMessage
         });
         setMessages(prev => [...prev, sentMsg]);
-        
-        setConversations(prev => prev.map(c => 
-          c.id === selectedConv.id 
-            ? { ...c, dernierMessageContenu: sentMsg.contenu, dernierMessageAt: sentMsg.dateEnvoi } 
+
+        setConversations(prev => prev.map(c =>
+          c.id === selectedConv.id
+            ? { ...c, dernierMessageContenu: sentMsg.contenu, dernierMessageAt: sentMsg.dateEnvoi }
             : c
         ).sort((a, b) => new Date(b.dernierMessageAt).getTime() - new Date(a.dernierMessageAt).getTime()));
       } else if (initialConvData) {
@@ -101,7 +105,7 @@ const MessagesPage: React.FC = () => {
           bienId: initialConvData.bienId,
           contenu: newMessage
         });
-        
+
         // Rafraîchir les conversations pour récupérer la nouvelle
         const convs = await messageService.getConversations();
         setConversations(convs);
@@ -109,7 +113,7 @@ const MessagesPage: React.FC = () => {
         if (newConv) setSelectedConv(newConv);
         setInitialConvData(null);
       }
-      
+
       setNewMessage('');
     } catch (err) {
       console.error('Error sending message:', err);
@@ -117,7 +121,7 @@ const MessagesPage: React.FC = () => {
   };
 
   return (
-    <DashboardLayout userName={currentUser?.nom} userRole="PRO" notificationCount={0}>
+    <DashboardLayout userName={currentUser?.nom} notificationCount={0}>
       <div className="space-y-6">
         <div>
           <h1 className="font-display text-2xl font-bold text-slate-900">Messagerie</h1>
@@ -137,7 +141,7 @@ const MessagesPage: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               {loading ? (
                 <div className="flex justify-center py-10">
@@ -156,7 +160,7 @@ const MessagesPage: React.FC = () => {
                     {selectedConv?.id === conv.id && (
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 rounded-r-full" />
                     )}
-                    
+
                     <div className="flex gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 shrink-0 border border-slate-200 group-hover:border-cyan-200 transition-colors">
                         <User size={20} />
@@ -199,19 +203,33 @@ const MessagesPage: React.FC = () => {
 
           {/* Zone de chat */}
           <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl shadow-sm flex flex-col overflow-hidden">
-            {selectedConv ? (
+            {selectedConv || initialConvData ? (
               <>
                 <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold border border-cyan-200 shadow-sm">
-                      {selectedConv.interlocuteurPrenom[0]}{selectedConv.interlocuteurNom[0]}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900">
-                        {selectedConv.interlocuteurPrenom} {selectedConv.interlocuteurNom}
-                      </h3>
-                      <p className="text-xs text-cyan-600 font-medium">{selectedConv.bienTitre}</p>
-                    </div>
+                    {selectedConv ? (
+                      <>
+                        <div className="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold border border-cyan-200 shadow-sm">
+                          {selectedConv.interlocuteurPrenom[0]}{selectedConv.interlocuteurNom[0]}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-slate-900">
+                            {selectedConv.interlocuteurPrenom} {selectedConv.interlocuteurNom}
+                          </h3>
+                          <p className="text-xs text-cyan-600 font-medium">{selectedConv.bienTitre}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shadow-sm">
+                          <User size={20} />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-slate-900">Nouveau message</h3>
+                          <p className="text-xs text-cyan-600 font-medium">{initialConvData?.titre}</p>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -220,6 +238,11 @@ const MessagesPage: React.FC = () => {
                     <div className="flex justify-center items-center h-full">
                       <Loader2 className="animate-spin text-cyan-500" />
                     </div>
+                  ) : !selectedConv ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center text-slate-400">
+                      <MessageSquare className="w-10 h-10 text-slate-200 mb-3" />
+                      <p className="text-sm">Démarrez la conversation avec le propriétaire.</p>
+                    </div>
                   ) : (
                     messages.map((msg, idx) => {
                       const isMe = msg.expediteurEmail === currentUser?.email;
@@ -227,8 +250,8 @@ const MessagesPage: React.FC = () => {
                         <div key={msg.id || idx} className={cn("flex", isMe ? "justify-end" : "justify-start")}>
                           <div className={cn(
                             "max-w-[70%] px-5 py-3 rounded-2xl text-sm shadow-sm",
-                            isMe 
-                              ? "bg-cyan-600 text-white rounded-tr-sm" 
+                            isMe
+                              ? "bg-cyan-600 text-white rounded-tr-sm"
                               : "bg-white border border-slate-200 text-slate-700 rounded-tl-sm"
                           )}>
                             <p className="leading-relaxed">{msg.contenu}</p>
@@ -256,7 +279,7 @@ const MessagesPage: React.FC = () => {
                       placeholder="Votre message..."
                       className="flex-1 px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all outline-none"
                     />
-                    <button 
+                    <button
                       type="submit"
                       disabled={!newMessage.trim()}
                       className="w-14 h-14 bg-cyan-600 text-white rounded-2xl flex items-center justify-center hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-600/20 active:scale-95 disabled:opacity-50 disabled:scale-100"

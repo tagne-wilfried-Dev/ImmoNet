@@ -2,6 +2,14 @@ import type { PropertySummary } from './property.types';
 
 export type StatutVisite = 'EN_ATTENTE' | 'CONFIRMEE' | 'REFUSEE' | 'ANNULEE' | 'REALISEE';
 
+export enum StatutReservation {
+    EN_ATTENTE,
+    CONFIRMEE,
+    ANNULEE,
+    REFUSEE,
+    TERMINEE,
+    PAYEE
+}
 export interface VisitRequest {
   bienId: number;
   dateSouhaitee: string; // Format YYYY-MM-DD
@@ -32,3 +40,5 @@ export interface VisitResponse {
   motifRefus?: string;
   createdAt: string;
 }
+
+

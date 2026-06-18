@@ -1,28 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { 
-  Building2, Eye, Trash2, Plus, 
-  Search, Filter, X, Loader2,
+import {
+  // Building2, Eye, Trash2,
+   Plus,
+  // Search, Filter,
+   X, Loader2,
   Megaphone, ExternalLink
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { propertyService } from '@/services/PropertyService';
 import { type PropertySummary, PROPERTY_TYPE_LABELS } from '@/lib/types/property.types';
 import { toast } from 'sonner';
+import { getMediaUrl } from '@/lib/utils';
 
-const statusLabels: Record<string, string> = {
-  'PUBLIE': 'En ligne',
-  'EN_LOCATION': 'Loué / Occupé',
-  'BROUILLON': 'Brouillon',
-  'SUSPENDU': 'Suspendu',
-};
+// const statusLabels: Record<string, string> = {
+//   'PUBLIE': 'En ligne',
+//   'EN_LOCATION': 'Loué / Occupé',
+//   'BROUILLON': 'Brouillon',
+//   'SUSPENDU': 'Suspendu',
+// };
 
-const statusColors: Record<string, string> = {
-  'PUBLIE': 'bg-emerald-500 text-white',
-  'EN_LOCATION': 'bg-cyan-500 text-white',
-  'BROUILLON': 'bg-slate-200 text-slate-600',
-  'SUSPENDU': 'bg-amber-500 text-white',
-};
+// const statusColors: Record<string, string> = {
+//   'PUBLIE': 'bg-emerald-500 text-white',
+//   'EN_LOCATION': 'bg-cyan-500 text-white',
+//   'BROUILLON': 'bg-slate-200 text-slate-600',
+//   'SUSPENDU': 'bg-amber-500 text-white',
+// };
 
 const MesAnnoncesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -35,7 +38,7 @@ const MesAnnoncesPage: React.FC = () => {
   const fetchListings = async () => {
     try {
       setLoading(true);
-      const response = await propertyService.getMyListings();
+      const response = await propertyService.getMyListings(0, 100);
       setListings(response.data);
     } catch (err) {
       console.error('Erreur chargement annonces:', err);
@@ -116,8 +119,8 @@ const MesAnnoncesPage: React.FC = () => {
             listings.map((annonce) => (
               <div key={annonce.id} className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-cyan-200 hover:shadow-xl transition-all duration-300">
                 <div className="relative h-48">
-                  <img 
-                    src={annonce.urlPhotoPrincipale || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80'} 
+                  <img
+                    src={annonce.urlPhotoPrincipale || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80'}
                     alt={annonce.titre}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -137,12 +140,12 @@ const MesAnnoncesPage: React.FC = () => {
                       {new Intl.NumberFormat('fr-FR').format(annonce.prix)} CFA
                     </p>
                     <div className="flex gap-2">
-                      <button 
+                      <button
                         onClick={() => navigate(`/biens/${annonce.id}`)}
                         className="p-2 bg-slate-50 text-slate-600 rounded-xl hover:bg-cyan-50 hover:text-cyan-600 transition-colors" title="Voir sur le site">
                         <ExternalLink size={16} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => propertyService.updatePropertyStatus(annonce.id, 'SUSPENDU').then(fetchListings)}
                         className="p-2 bg-slate-50 text-slate-600 rounded-xl hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Suspendre">
                         <X size={16} />
@@ -171,10 +174,10 @@ const MesAnnoncesPage: React.FC = () => {
                   <X size={20} className="text-slate-400" />
                 </button>
               </div>
-              
+
               <div className="p-8 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button 
+                  <button
                     onClick={() => navigate('/publier')}
                     className="flex flex-col items-center gap-4 p-8 border-2 border-dashed border-slate-200 rounded-3xl hover:border-cyan-500 hover:bg-cyan-50/30 transition-all group">
                     <div className="w-16 h-16 bg-cyan-100 text-cyan-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -185,19 +188,19 @@ const MesAnnoncesPage: React.FC = () => {
                       <p className="text-xs text-slate-500 mt-1">Créer de A à Z</p>
                     </div>
                   </button>
-                  
+
                   <div className="flex flex-col gap-3 max-h-60 overflow-y-auto pr-2 scrollbar-thin">
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Choisir un existant</p>
                     {loadingAvailable ? (
                       <Loader2 className="w-6 h-6 animate-spin text-cyan-500 mx-auto" />
                     ) : availableBiens.length > 0 ? (
                       availableBiens.map(bien => (
-                        <button 
+                        <button
                           key={bien.id}
                           onClick={() => handlePublierExistant(bien.id)}
                           className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-transparent hover:border-cyan-400 hover:bg-white transition-all text-left group">
                           <div className="w-12 h-12 bg-white rounded-xl border border-slate-100 overflow-hidden shrink-0">
-                            {bien.urlPhotoPrincipale && <img src={bien.urlPhotoPrincipale} className="w-full h-full object-cover" />}
+                            {bien.urlPhotoPrincipale && <img src={getMediaUrl(bien.urlPhotoPrincipale)} className="w-full h-full object-cover" />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-bold text-slate-900 truncate">{bien.titre}</p>

@@ -50,10 +50,15 @@ const LoginPage: React.FC = () => {
       if (response.status === 200 || response.status === 201) {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
-        navigate('/dashboard', {
+        
+        // Redirection intelligente : vers 'from' si présent, sinon vers /dashboard
+        const from = (location.state as any)?.from || '/dashboard';
+        
+        navigate(from, {
           state: {
             message: `Nous sommes ravis de vous revoir, ${response.data.nom || 'bienvenue'}.`,
           },
+          replace: true
         });
       }
     } catch (err: unknown) {
@@ -88,7 +93,7 @@ const LoginPage: React.FC = () => {
           Bon retour !
         </h1>
         <p className="text-slate-500 text-[15px] mt-2 font-medium">
-          Connectez-vous pour gérer vos biens
+          Connectez-vous a votre espace immobilier
         </p>
       </div>
 

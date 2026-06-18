@@ -28,7 +28,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
 
   // Détermination dynamique des infos utilisateur
-  const userName = propsUserName || user?.nom || 'Utilisateur';
+  const userDisplayName = user ? `${user.prenom || ''} ${user.nom || ''}`.trim() : null;
+  const userName = propsUserName || userDisplayName || 'Utilisateur';
   
   // Si on est dans une route /admin, on force l'affichage ADMIN de la sidebar
   // même si l'utilisateur a d'autres droits, pour éviter le basculement visuel

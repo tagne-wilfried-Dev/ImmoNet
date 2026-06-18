@@ -24,6 +24,7 @@ import ActionCard from '@/components/dashboard/ActionCard';
 import MessageAlert from '@/components/ui/MessageAlert';
 import clientMockData from '@/lib/data/mockDataClient.json';
 import type { LucideIcon } from 'lucide-react';
+import { useAppSelector } from '@/store/hooks';
 
 // ─── Types locaux alignés sur mockDataClient.json ─────────────────────────────
 
@@ -198,7 +199,8 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
     void load();
   }, []);
 
-  const firstName = userName.split(' ')[0];
+  const { user } = useAppSelector((state) => state.auth);
+  const displayFirstName = (userName || user?.prenom || 'Utilisateur').split(' ')[0];
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
@@ -242,7 +244,7 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
               className="text-2xl font-bold text-slate-900"
               style={{ fontFamily: "'Syne', sans-serif" }}
             >
-              {greeting}, {firstName} 👋
+              {greeting}, {displayFirstName} 👋
             </h1>
             <p className="text-sm text-slate-500 mt-1">
               Voici un aperçu de votre activité sur ImmoNet.

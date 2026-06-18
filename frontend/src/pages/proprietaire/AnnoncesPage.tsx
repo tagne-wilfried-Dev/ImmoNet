@@ -10,6 +10,7 @@ import { propertyService } from '@/services/PropertyService';
 import { type PropertySummary, PROPERTY_TYPE_LABELS } from '@/lib/types/property.types';
 import { toast } from 'sonner';
 import { useAppSelector } from '@/store/hooks';
+import { getMediaUrl } from '@/lib/utils';
 
 const statusLabels: Record<string, string> = {
   'PUBLIE': 'Mis en ligne',
@@ -32,6 +33,7 @@ const statusColors: Record<string, string> = {
 const MesBiensPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
+  console.log(user)
   const [properties, setProperties] = useState<PropertySummary[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<PropertySummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -164,7 +166,7 @@ const MesBiensPage: React.FC = () => {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0">
                           {bien.urlPhotoPrincipale ? (
-                            <img src={bien.urlPhotoPrincipale} alt="" className="w-full h-full object-cover" />
+                            <img src={getMediaUrl(bien.urlPhotoPrincipale)} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <Building2 size={24} className="text-slate-400 m-auto mt-2.5" />
                           )}

@@ -1,22 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   MapPin, Maximize2, BedDouble, Bath, Stars, 
   CheckCircle2, Phone, MessageSquare, Heart, 
-  Share2, ArrowLeft, Calendar, ShieldCheck
+  Share2, ArrowLeft, Calendar, ShieldCheck,
+  Info, Loader2
 } from 'lucide-react';
 import { propertyService } from '@/services/PropertyService';
+import { reservationService } from '@/services/ReservationService';
 import { type PropertyDetail, PROPERTY_TYPE_LABELS } from '@/lib/types/property.types';
-import { cn } from '@/lib/utils';
+import { cn, getMediaUrl } from '@/lib/utils';
 import VisitRequestModal from '@/components/explore/VisitRequestModal';
+import DynamicHeader from '@/components/layout/DynamicHeader';
+import Footer from '@/components/layout/Footer';
+import { useAppSelector } from '@/store/hooks';
+import { toast } from 'sonner';
 
 const PropertyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  
   const [property, setProperty] = useState<PropertyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activePhoto, setActivePhoto] = useState(0);
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
+
+  // État pour la réservation rapide
+  const [reservationDates, setReservationDates] = useState({
+    start: '',
+    end: ''
+  });
+  const [isReserving, setIsReserving] = useState(false);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -57,11 +73,76 @@ const PropertyDetailPage: React.FC = () => {
 
   const isVente = property.typeOperation === 'VENTE';
 
+  const handleContactOwner = () => {
+    if (!isAuthenticated) {
+      navigate('/login', { 
+        state: { 
+          from: `/biens/${id}`,
+          message: 'Veuillez vous connecter pour contacter l\'annonceur.' 
+        } 
+      });
+      return;
+    }
+    
+    navigate('/dashboard/messages', { 
+      state: { 
+        initialBienId: property.id, 
+        initialTitre: property.titre 
+      } 
+    });
+  };
+
+  const handleRequestReservation = async () => {
+    if (!isAuthenticated) {
+      navigate('/login', { 
+        state: { 
+          from: `/biens/${id}`,
+          message: 'Veuillez vous connecter pour effectuer une réservation.' 
+        } 
+      });
+      return;
+    }
+
+    if (!reservationDates.start || !reservationDates.end) {
+      toast.error('Veuillez choisir les dates de votre séjour.');
+      return;
+    }
+
+    try {
+      setIsReserving(true);
+      await reservationService.createReservation({
+        bienId: Number(property.id),
+        dateDebut: new Date(reservationDates.start).toISOString(),
+        dateFin: new Date(reservationDates.end).toISOString(),
+        messageClient: "Je souhaite réserver ce bien."
+      });
+      
+      toast.success('Demande de réservation envoyée !');
+      navigate('/dashboard/reservations');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erreur lors de la réservation.');
+    } finally {
+      setIsReserving(false);
+    }
+  };
+
+  // Calcul du montant estimé
+  const calculateEstimatedTotal = () => {
+    if (!reservationDates.start || !reservationDates.end) return 0;
+    const start = new Date(reservationDates.start);
+    const end = new Date(reservationDates.end);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return (diffDays || 1) * property.prix;
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
+      <DynamicHeader />
+      
       {/* Barre de navigation simplifiée / Fil d'ariane */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <Link to={isVente ? '/explore-sellings' : '/explore-renting'} className="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors group">
+        <Link to={isVente ? '/explore/vente' : '/explore/louer'} className="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Retour aux résultats
         </Link>
@@ -77,7 +158,7 @@ const PropertyDetailPage: React.FC = () => {
             <section className="space-y-4">
               <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 bg-white/5 shadow-2xl">
                 <img 
-                  src={property.urlsPhotos[activePhoto] || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80'} 
+                  src={getMediaUrl(property.urlsPhotos[activePhoto]) || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80'} 
                   alt={property.titre}
                   className="w-full h-full object-cover transition-opacity duration-500"
                 />
@@ -120,7 +201,7 @@ const PropertyDetailPage: React.FC = () => {
                         activePhoto === index ? "border-cyan-500 scale-105 shadow-lg shadow-cyan-500/20" : "border-transparent opacity-60 hover:opacity-100"
                       )}
                     >
-                      <img src={url} alt={`Vue ${index + 1}`} className="w-full h-full object-cover" />
+                      <img src={getMediaUrl(url)} alt={`Vue ${index + 1}`} className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
@@ -225,11 +306,72 @@ const PropertyDetailPage: React.FC = () => {
             </section>
           </div>
 
-          {/* Section Droite : Contact & Actions */}
+          {/* Section Droite : Contact & Réservation */}
           <div className="lg:col-span-4 space-y-6">
             
-            {/* Carte Propriétaire */}
             <div className="sticky top-8 space-y-6">
+              
+              {/* Widget de Réservation Rapide (Aqua Tech) */}
+              {!isVente && (
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl overflow-hidden relative group">
+                  <div className="absolute inset-0 bg-linear-to-br from-cyan-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  
+                  <h4 className="font-display text-xl font-bold text-white mb-6">Réserver un séjour</h4>
+                  
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Début du séjour</label>
+                        <div className="relative">
+                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-500" />
+                          <input 
+                            type="date" 
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition-all"
+                            value={reservationDates.start}
+                            onChange={(e) => setReservationDates(prev => ({ ...prev, start: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Fin du séjour</label>
+                        <div className="relative">
+                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-500" />
+                          <input 
+                            type="date" 
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition-all"
+                            value={reservationDates.end}
+                            onChange={(e) => setReservationDates(prev => ({ ...prev, end: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
+                       <div className="flex justify-between text-sm">
+                          <span className="text-slate-400">Prix par nuit</span>
+                          <span className="text-white font-mono font-bold">{new Intl.NumberFormat('fr-FR').format(property.prix)} FCFA</span>
+                       </div>
+                       <div className="flex justify-between items-center text-lg font-bold">
+                          <span className="text-white">Total estimé</span>
+                          <span className="text-cyan-400 font-mono">{new Intl.NumberFormat('fr-FR').format(calculateEstimatedTotal())} FCFA</span>
+                       </div>
+                    </div>
+
+                    <button 
+                      onClick={handleRequestReservation}
+                      disabled={isReserving}
+                      className="w-full mt-6 py-4 bg-linear-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white font-bold rounded-2xl transition-all shadow-lg shadow-cyan-600/20 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:scale-100"
+                    >
+                      {isReserving ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShieldCheck className="w-5 h-5" />}
+                      {isReserving ? 'Envoi en cours...' : 'Confirmer la demande'}
+                    </button>
+                    
+                    <p className="text-[10px] text-center text-slate-500 italic">Aucun paiement ne vous sera demandé à cette étape.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Carte Propriétaire */}
               <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 shadow-xl">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="w-16 h-16 rounded-2xl bg-cyan-500/20 flex items-center justify-center text-2xl font-bold text-cyan-400 border border-cyan-500/30">
@@ -248,63 +390,24 @@ const PropertyDetailPage: React.FC = () => {
 
                 <div className="space-y-3">
                   <button 
-                    onClick={() => {
-                      if (property) {
-                        navigate('/dashboard/messages', { state: { initialBienId: property.id, initialTitre: property.titre } });
-                      }
-                    }}
-                    className="w-full flex items-center justify-center gap-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 active:scale-95"
+                    onClick={handleContactOwner}
+                    className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-2xl transition-all border border-white/10 active:scale-95"
                   >
                     <MessageSquare className="w-5 h-5" />
                     Contacter l'annonceur
                   </button>
-                  <button className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-2xl transition-all active:scale-95 border border-white/10">
+                  <button className="w-full flex items-center justify-center gap-3 bg-white/5 text-slate-400 font-bold py-4 rounded-2xl transition-all cursor-not-allowed opacity-50">
                     <Phone className="w-5 h-5" />
-                    {property.proprietaire.telephone || 'Voir le numéro'}
+                    {property.proprietaire.telephone || 'Non disponible'}
                   </button>
-                </div>
-
-                <div className="mt-8 pt-8 border-t border-white/10">
-                  <div className="flex items-center gap-3 text-sm text-slate-400">
-                    <Calendar className="w-4 h-4" />
-                    Membre depuis Janvier 2024
-                  </div>
                 </div>
               </div>
 
-              {/* Résumé de l'offre (Widget) */}
-              {!isVente && (
-                <div className="bg-linear-to-br from-cyan-600/20 to-slate-900 border border-cyan-500/20 rounded-3xl p-8">
-                  <h4 className="font-bold text-white mb-4">Informations de location</h4>
-                  <ul className="space-y-4">
-                    <li className="flex justify-between text-sm">
-                      <span className="text-slate-400">Caution :</span>
-                      <span className="text-white font-mono">{new Intl.NumberFormat('fr-FR').format(property.caution)} FCFA</span>
-                    </li>
-                    <li className="flex justify-between text-sm">
-                      <span className="text-slate-400">Charges incluses :</span>
-                      <span className={cn("font-bold", property.chargesIncluses ? "text-emerald-400" : "text-slate-400")}>
-                        {property.chargesIncluses ? 'OUI' : 'NON'}
-                      </span>
-                    </li>
-                    <li className="flex justify-between text-sm">
-                      <span className="text-slate-400">Période :</span>
-                      <span className="text-white font-bold lowercase">{property.periodeLocation || 'mensuelle'}</span>
-                    </li>
-                  </ul>
-                  <button 
-                    onClick={() => setIsVisitModalOpen(true)}
-                    className="w-full mt-6 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
-                  >
-                    Demander une visite
-                  </button>
-                </div>
-              )}
-
               {/* Petit Rappel Sécurité */}
-              <div className="text-center px-4">
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Ne versez jamais d'argent avant d'avoir visité le bien et signé un contrat. ImmoNet ne gère pas les paiements directs aux propriétaires.
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex gap-3">
+                <Info size={18} className="text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-amber-200/70 leading-relaxed">
+                  Ne versez jamais d'argent avant d'avoir visité le bien. ImmoNet protège vos transactions via notre système de réservation.
                 </p>
               </div>
             </div>
@@ -312,13 +415,7 @@ const PropertyDetailPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Modal de Demande de Visite */}
-      <VisitRequestModal 
-        isOpen={isVisitModalOpen}
-        onClose={() => setIsVisitModalOpen(false)}
-        propertyId={Number(property.id)}
-        propertyTitle={property.titre}
-      />
+      <Footer />
     </div>
   );
 };

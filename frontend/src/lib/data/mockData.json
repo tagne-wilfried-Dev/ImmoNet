@@ -11,7 +11,7 @@
     },
     {
       "id": "sales",
-      "title": "Mes ventes aujourd'hui",
+      "title": "Mes gains /30j",
       "value": "125 000 CFA",
       "previousValue": "80 000 CFA",
       "trend": "+56%",
