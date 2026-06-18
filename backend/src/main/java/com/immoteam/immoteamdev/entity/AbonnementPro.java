@@ -2,9 +2,6 @@ package com.immoteam.immoteamdev.entity;
 
 import com.immoteam.immoteamdev.entity.enums.FormatAbonnement;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.DecimalMin;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import lombok.*;
@@ -25,20 +22,15 @@ public class AbonnementPro {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "utilisateur_id", nullable = false)
+    @JoinColumn(name = "utilisateur_id") // Rendu nullable
     private Utilisateur utilisateur;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
-    @Column(nullable = false)
+    @Column // Rendu nullable
     private FormatAbonnement typeAbonnement;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column // Rendu nullable
     private LocalDateTime dateDebut;
-
-    @Column
-    private LocalDateTime dateFin;
 
     @Column
     private String stripeSubscriptionId;
@@ -46,24 +38,20 @@ public class AbonnementPro {
     @Column
     private String stripePaymentId;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean actif = false;
+    @Column
+    private Boolean actif; // Changé de boolean à Boolean pour accepter null
 
-    @NotNull
-    @DecimalMin("0.00")
-    @Column(nullable = false)
+    @Column
     private BigDecimal montantPaye;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column
     private String devise;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
+    @Column
     private LocalDateTime updatedAt;
 }

@@ -14,10 +14,10 @@ import java.util.List;
 @Repository
 public interface BienRepository extends JpaRepository<Bien, Long>, JpaSpecificationExecutor<Bien> {
 
-    // 🔍 CDC §3.4 : Vérification du quota d'annonces actives par propriétaire Pro
+    // Vérification du quota d'annonces actives par propriétaire
     long countByProprietaireIdAndStatut(Long proprietaireId, StatutAnnonce statut);
 
-    // 🔍 CDC §3.3 & §3.8 : Validation rapide avant affichage fiche détaillée
+    // Validation rapide avant affichage fiche détaillée
     boolean existsByIdAndStatut(Long id, StatutAnnonce statut);
 
     Page<Bien> findByProprietaireIdAndStatutNot(Long proprietaireId, StatutAnnonce statut, Pageable pageable);

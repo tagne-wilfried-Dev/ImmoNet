@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Builder
 public class BienFilterRequest {
 
-    // Filtres textuels (CDC §3.3 : Recherche par lieu)
+    // Filtres textuels ( Recherche par lieu)
     private String ville;
     private String quartier;
 

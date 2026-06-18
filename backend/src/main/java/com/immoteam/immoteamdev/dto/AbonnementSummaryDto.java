@@ -13,6 +13,5 @@ import java.time.LocalDateTime;
 public class AbonnementSummaryDto {
     private FormatAbonnement typeAbonnement;
     private LocalDateTime dateDebut;
-    private LocalDateTime dateFin;
     private boolean actif;
 }
