@@ -55,7 +55,7 @@ public class BienController {
             @Parameter(description = "Numéro de page (commence à 0)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Taille de la page (max 50)") @RequestParam(defaultValue = "20") int size) {
         
-        // Sécurité : limiter la taille de page pour éviter les attaques DOS (CDC §8.2)
+        // Sécurité : limiter la taille de page pour éviter les attaques DOS 
         int safeSize = Math.min(size, 50);
         
         Page<BienSummaryResponse> resultats = bienService.rechercherBiens(filter, page, safeSize);
@@ -63,7 +63,7 @@ public class BienController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('PRO', 'ADMIN')") // CDC §3.1 : Seuls les Pros et Admins peuvent créer
+    @PreAuthorize("hasAnyRole('PRO', 'ADMIN')") // Seuls les Pros et Admins peuvent créer
     @Operation(summary = "Créer une annonce", description = "Crée une nouvelle annonce au statut BROUILLON. Nécessite un rôle PRO ou ADMIN.")
     @ApiResponse(responseCode = "201", description = "Annonce créée avec succès")
     @ApiResponse(responseCode = "400", description = "Données invalides")

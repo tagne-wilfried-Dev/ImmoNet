@@ -87,6 +87,6 @@ public class SecurityConfig {
     
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12); // Cost 12 comme spécifié CDC §8.2
+        return new BCryptPasswordEncoder(12); 
     }
 }

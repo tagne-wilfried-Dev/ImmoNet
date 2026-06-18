@@ -19,7 +19,7 @@ public class BienSpecifications {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // 1. Filtre de sécurité implicite (CDC §3.4) :
+            // 1. Filtre de sécurité implicite  :
             // Ne retourner que les annonces PUBLIEES par défaut dans la recherche publique.
             // (Le service layer pourra surcharger ce statut si l'utilisateur est le
             // propriétaire ou un admin)

@@ -46,14 +46,14 @@ public class BienService {
     private final AbonnementService abonnementService;
 
     /**
-     * Recherche multicritère avec pagination (CDC §3.3)
+     * Recherche multicritère avec pagination 
      * @param filter Les critères de recherche (peut être nul ou partiel)
      * @param page Numéro de page (0-indexed)
      * @param size Taille de la page (défaut 20)
      * @return Page de BienSummaryResponse
      */
     public Page<BienSummaryResponse> rechercherBiens(BienFilterRequest filter, int page, int size) {
-        // CDC §3.3 : Tri par date de création décroissante par défaut
+        // Tri par date de création décroissante par défaut
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         
         // Si le filtre est nul, on crée un filtre vide pour que la specification retourne tout (sauf la contrainte de statut)
@@ -65,7 +65,7 @@ public class BienService {
     }
 
     /**
-     * Création d'une nouvelle annonce par un propriétaire (CDC §3.4)
+     * Création d'une nouvelle annonce par un propriétaire 
      * @param request Les données de l'annonce
      * @param userEmail L'email de l'utilisateur authentifié (extrait du SecurityContext)
      * @return Le DTO de résumé de l'annonce créée
@@ -83,7 +83,7 @@ public class BienService {
         Bien nouveauBien = bienMapper.toEntity(request);
         nouveauBien.setProprietaire(proprietaire);
         
-        // CDC §3.4 : Une annonce est créée avec le statut BROUILLON en attendant la validation
+        //  Une annonce est créée avec le statut BROUILLON en attendant la validation
         nouveauBien.setStatut(StatutAnnonce.BROUILLON);
         
         // Initialisation des compteurs (déjà géré par @Builder.Default, mais explicite pour la clarté)

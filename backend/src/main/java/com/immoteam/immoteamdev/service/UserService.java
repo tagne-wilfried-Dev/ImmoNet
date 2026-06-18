@@ -82,8 +82,7 @@ public class UserService {
             dto.setAbonnement(com.immoteam.immoteamdev.dto.AbonnementSummaryDto.builder()
                     .typeAbonnement(utilisateur.getAbonnementPro().getTypeAbonnement())
                     .dateDebut(utilisateur.getAbonnementPro().getDateDebut())
-                    .dateFin(utilisateur.getAbonnementPro().getDateFin())
-                    .actif(utilisateur.getAbonnementPro().isActif())
+                    .actif(Boolean.TRUE.equals(utilisateur.getAbonnementPro().getActif()))
                     .build());
         }
 

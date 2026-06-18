@@ -111,11 +111,7 @@ public class MessageService {
             }
 
             // Vérifier si une conversation existe déjà entre ces deux participants pour ce bien
-            conv = conversationRepository.findAll().stream()
-                    .filter(c -> c.getBien().getId().equals(bien.getId()) &&
-                            ((c.getParticipant1().getId().equals(expediteur.getId()) && c.getParticipant2().getId().equals(destinataire.getId())) ||
-                             (c.getParticipant1().getId().equals(destinataire.getId()) && c.getParticipant2().getId().equals(expediteur.getId()))))
-                    .findFirst()
+            conv = conversationRepository.findConversationForBienBetween(bien.getId(), expediteur.getId(), destinataire.getId())
                     .orElseGet(() -> {
                         Conversation newConv = Conversation.builder()
                                 .bien(bien)

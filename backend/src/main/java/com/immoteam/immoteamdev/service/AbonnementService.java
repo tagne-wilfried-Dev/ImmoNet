@@ -34,7 +34,7 @@ public class AbonnementService {
     public boolean peutPublier(Utilisateur utilisateur) {
         AbonnementPro abonnement = getOrCreateDefaultAbonnement(utilisateur);
         
-        if (!abonnement.isActif() && abonnement.getTypeAbonnement() != FormatAbonnement.GRATUIT) {
+        if (!Boolean.TRUE.equals(abonnement.getActif()) && abonnement.getTypeAbonnement() != FormatAbonnement.GRATUIT) {
             return false;
         }
 
@@ -55,7 +55,7 @@ public class AbonnementService {
                             .dateDebut(LocalDateTime.now())
                             .actif(true)
                             .montantPaye(BigDecimal.ZERO)
-                            .devise("XOF")
+                            .devise("XAF")
                             .build();
                     return abonnementProRepository.save(defaultAbo);
                 });
