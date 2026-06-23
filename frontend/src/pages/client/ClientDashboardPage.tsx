@@ -17,6 +17,7 @@ import {
   MapPin,
   ChevronRight,
   Sparkles,
+  Building2,
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import KpiCard from '@/components/dashboard/KpiCard';
@@ -25,6 +26,7 @@ import MessageAlert from '@/components/ui/MessageAlert';
 import clientMockData from '@/lib/data/mockDataClient.json';
 import type { LucideIcon } from 'lucide-react';
 import { useAppSelector } from '@/store/hooks';
+import { dashboardService, type ClientDashboardKpis } from '@/services/DashboardService';
 
 // ─── Types locaux alignés sur mockDataClient.json ─────────────────────────────
 
@@ -85,6 +87,36 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 const resolveIcon = (name: string): LucideIcon => ICON_MAP[name] ?? Bell;
+
+// ─── Transformation agrégats API → view-model de la page ──────────────────────
+
+const buildKpiCards = (k: ClientDashboardKpis): KpiData[] => [
+  { id: 'favorites', title: 'Biens en favoris', value: String(k.favoris), trend: '', positive: true, icon: 'Heart' },
+  { id: 'visits', title: 'Visites planifiées', value: String(k.visitesPlanifiees), trend: '', positive: true, icon: 'CalendarCheck' },
+  { id: 'reservations', title: 'Réservations actives', value: String(k.reservationsActives), trend: '', positive: true, icon: 'KeyRound' },
+  { id: 'messages', title: 'Messages non lus', value: String(k.messagesNonLus), trend: '', positive: false, icon: 'MessageSquare' },
+];
+
+const buildQuickActions = (k: ClientDashboardKpis): QuickAction[] => [
+  { id: 'search', title: 'Explorer les biens', description: 'Recherchez des biens à louer ou acheter près de chez vous', icon: 'Search', path: '/explorer' },
+  { id: 'reservations', title: 'Mes réservations', description: 'Suivez vos réservations et demandes de visite en cours', icon: 'CalendarDays', path: '/dashboard/reservations', count: k.reservationsActives },
+  { id: 'messages', title: 'Mes messages', description: 'Retrouvez vos conversations avec les propriétaires', icon: 'MessageSquare', path: '/dashboard/messages', count: k.messagesNonLus },
+  { id: 'favorites', title: 'Mes favoris', description: 'Consultez et comparez les biens que vous avez sauvegardés', icon: 'Heart', path: '/dashboard/favoris', count: k.favoris },
+];
+
+/** Formate une date ISO du backend en libellé relatif lisible (Aujourd'hui / Hier / JJ mois). */
+const formatActivityDate = (iso: string): string => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const heure = `${d.getHours()}h${String(d.getMinutes()).padStart(2, '0')}`;
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  if (d.toDateString() === today.toDateString()) return `Aujourd'hui, ${heure}`;
+  if (d.toDateString() === yesterday.toDateString()) return `Hier, ${heure}`;
+  return `${d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}, ${heure}`;
+};
 
 // ─── Sous-composants ──────────────────────────────────────────────────────────
 
@@ -186,11 +218,27 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: remplacer par appel API réel — GET /api/dashboard/client
     const load = async () => {
       setIsLoading(true);
       try {
-        await new Promise((r) => setTimeout(r, 300));
+        const dash = await dashboardService.getClientDashboard();
+        setData({
+          kpis: buildKpiCards(dash.kpis),
+          recentActivity: dash.recentActivity.map((a, i) => ({
+            id: i,
+            type: a.type,
+            label: a.label,
+            detail: a.detail,
+            date: formatActivityDate(a.date),
+            status: a.status,
+          })),
+          quickActions: buildQuickActions(dash.kpis),
+          // Module "recherches sauvegardées" non développé → état vide propre
+          savedSearches: [],
+        });
+      } catch (err) {
+        // Sécurité démo : si l'API échoue, on retombe sur le mock pour ne pas casser l'affichage
+        console.error('Erreur chargement dashboard client, fallback mock :', err);
         setData(clientMockData as ClientDashboardData);
       } finally {
         setIsLoading(false);
@@ -260,6 +308,28 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
           </button>
         </div>
 
+        {/* ── Bannière "Devenir propriétaire" (clients uniquement) ──────── */}
+        {user?.role === 'CLIENT' && (
+          <div className="flex items-center gap-4 flex-wrap bg-linear-to-r from-cyan-50 to-white border border-cyan-100 rounded-2xl p-5">
+            <div className="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-700 shrink-0">
+              <Building2 size={20} aria-hidden="true" />
+            </div>
+            <div className="flex-1 min-w-[180px]">
+              <h3 className="font-semibold text-slate-900">Vous avez un bien à louer ou à vendre ?</h3>
+              <p className="text-sm text-slate-600 mt-0.5">
+                Passez en compte propriétaire pour publier vos annonces — gratuit pour commencer.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/devenir-proprietaire')}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold rounded-full shadow-sm transition-all active:scale-95"
+            >
+              Devenir propriétaire
+              <ArrowRight size={15} aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
         {/* ── KPIs ──────────────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {data.kpis.map((kpi) => (
@@ -276,7 +346,7 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
           {/* Activité récente — 2/3 */}
-          <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-semibold text-slate-900 text-base">Activité récente</h2>
               <button
@@ -295,7 +365,7 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
           </div>
 
           {/* Recherches sauvegardées — 1/3 */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-semibold text-slate-900 text-base">Mes recherches</h2>
               <button
@@ -348,7 +418,7 @@ const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({
         </div>
 
         {/* ── Bannière upgrade PRO ──────────────────────────────────────── */}
-        <div className="relative overflow-hidden bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+        <div className="relative overflow-hidden bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           {/* Halos décoratifs */}
           <div className="absolute top-0 right-16 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-8 right-0 w-32 h-32 bg-cyan-400/5 rounded-full blur-2xl pointer-events-none" />
