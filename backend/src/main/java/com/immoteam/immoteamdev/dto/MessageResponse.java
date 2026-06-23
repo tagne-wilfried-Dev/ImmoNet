@@ -16,6 +16,7 @@ public class MessageResponse {
     private String contenu;
     private LocalDateTime dateEnvoi;
     private boolean lu;
+    private Long expediteurId;
     private String expediteurEmail;
     private String expediteurNom;
     private TypeMessage typeMessage;

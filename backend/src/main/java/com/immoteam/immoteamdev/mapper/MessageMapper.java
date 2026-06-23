@@ -12,6 +12,7 @@ import com.immoteam.immoteamdev.entity.Utilisateur;
 @Mapper(componentModel = "spring")
 public interface MessageMapper {
 
+    @Mapping(source = "expediteur.id", target = "expediteurId")
     @Mapping(source = "expediteur.email", target = "expediteurEmail")
     @Mapping(source = "expediteur.nom", target = "expediteurNom")
     @Mapping(source = "conversation.id", target = "conversationId")

@@ -130,14 +130,14 @@ const MessagesPage: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-250px)] min-h-[500px]">
           {/* Liste des conversations */}
-          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50">
               <div className="relative">
                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Rechercher..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all"
                 />
               </div>
             </div>
@@ -153,7 +153,7 @@ const MessagesPage: React.FC = () => {
                     key={conv.id}
                     onClick={() => setSelectedConv(conv)}
                     className={cn(
-                      "w-full text-left p-5 border-b border-slate-50 hover:bg-slate-50 transition-all relative group",
+                      "w-full text-left p-4 border-b border-slate-50 hover:bg-slate-50 transition-all relative group",
                       selectedConv?.id === conv.id ? 'bg-cyan-50/50' : ''
                     )}
                   >
@@ -161,9 +161,9 @@ const MessagesPage: React.FC = () => {
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 rounded-r-full" />
                     )}
 
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 shrink-0 border border-slate-200 group-hover:border-cyan-200 transition-colors">
-                        <User size={20} />
+                    <div className="flex gap-3">
+                      <div className="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 shrink-0 border border-slate-200 group-hover:border-cyan-200 transition-colors">
+                        <User size={18} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-1">
@@ -202,14 +202,14 @@ const MessagesPage: React.FC = () => {
           </div>
 
           {/* Zone de chat */}
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl shadow-sm flex flex-col overflow-hidden">
+          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col overflow-hidden">
             {selectedConv || initialConvData ? (
               <>
-                <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     {selectedConv ? (
                       <>
-                        <div className="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold border border-cyan-200 shadow-sm">
+                        <div className="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold border border-cyan-200 shadow-sm">
                           {selectedConv.interlocuteurPrenom[0]}{selectedConv.interlocuteurNom[0]}
                         </div>
                         <div>
@@ -221,8 +221,8 @@ const MessagesPage: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shadow-sm">
-                          <User size={20} />
+                        <div className="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shadow-sm">
+                          <User size={18} />
                         </div>
                         <div>
                           <h3 className="font-bold text-slate-900">Nouveau message</h3>
@@ -233,7 +233,7 @@ const MessagesPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 p-6 bg-slate-50/30 overflow-y-auto space-y-4 custom-scrollbar">
+                <div className="flex-1 p-5 bg-slate-50/30 overflow-y-auto space-y-3 custom-scrollbar">
                   {loadingMessages ? (
                     <div className="flex justify-center items-center h-full">
                       <Loader2 className="animate-spin text-cyan-500" />
@@ -245,11 +245,11 @@ const MessagesPage: React.FC = () => {
                     </div>
                   ) : (
                     messages.map((msg, idx) => {
-                      const isMe = msg.expediteurEmail === currentUser?.email;
+                      const isMe = currentUser != null && msg.expediteurId === currentUser.id;
                       return (
                         <div key={msg.id || idx} className={cn("flex", isMe ? "justify-end" : "justify-start")}>
                           <div className={cn(
-                            "max-w-[70%] px-5 py-3 rounded-2xl text-sm shadow-sm",
+                            "max-w-[75%] px-4 py-2.5 rounded-2xl text-sm shadow-sm",
                             isMe
                               ? "bg-cyan-600 text-white rounded-tr-sm"
                               : "bg-white border border-slate-200 text-slate-700 rounded-tl-sm"
@@ -270,21 +270,21 @@ const MessagesPage: React.FC = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                <div className="p-5 border-t border-slate-100 bg-white">
-                  <form onSubmit={handleSendMessage} className="flex gap-3">
+                <div className="p-4 border-t border-slate-100 bg-white">
+                  <form onSubmit={handleSendMessage} className="flex gap-2.5">
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Votre message..."
-                      className="flex-1 px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all outline-none"
+                      className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all outline-none"
                     />
                     <button
                       type="submit"
                       disabled={!newMessage.trim()}
-                      className="w-14 h-14 bg-cyan-600 text-white rounded-2xl flex items-center justify-center hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-600/20 active:scale-95 disabled:opacity-50 disabled:scale-100"
+                      className="w-11 h-11 shrink-0 bg-cyan-600 text-white rounded-xl flex items-center justify-center hover:bg-cyan-500 transition-all shadow-sm shadow-cyan-600/20 active:scale-95 disabled:opacity-50 disabled:scale-100"
                     >
-                      <Send className="w-5 h-5" />
+                      <Send className="w-[18px] h-[18px]" />
                     </button>
                   </form>
                 </div>

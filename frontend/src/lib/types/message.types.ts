@@ -10,6 +10,7 @@ export interface MessageResponse {
   contenu: string;
   dateEnvoi: string;
   lu: boolean;
+  expediteurId: number;
   expediteurEmail: string;
   expediteurNom: string;
   typeMessage: 'TEXTE' | 'IMAGE' | 'DOCUMENT';
