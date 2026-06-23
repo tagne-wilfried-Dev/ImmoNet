@@ -16,6 +16,12 @@ export const userService = {
     await api.post('/users/me/change-password', data);
   },
 
+  /** Fait évoluer le compte CLIENT vers PRO (propriétaire). */
+  becomePro: async (): Promise<UserDto> => {
+    const response = await api.post<UserDto>('/users/me/devenir-pro');
+    return response.data;
+  },
+
   logout: async (): Promise<void> => {
     try {
       await api.post('/auth/logout');

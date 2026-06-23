@@ -50,6 +50,12 @@ public class UserController {
         userService.changePassword(email, request.getAncienMotDePasse(), request.getNouveauMotDePasse());
         return ResponseEntity.ok().build();
     }
+// Devenir propriétaire (CLIENT -> PRO)
+    @PostMapping("/me/devenir-pro")
+    public ResponseEntity<UserDto> devenirProprietaire(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(userService.devenirProprietaire(email));
+    }
 // Changer le mot de passe en cas d'oublie
     @PostMapping("/me/forget-password")
     public ResponseEntity<String> changePassword(Authentication authentication,

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.immoteam.immoteamdev.dto.UpdateProfileRequest;
 import com.immoteam.immoteamdev.dto.UserDto;
 import com.immoteam.immoteamdev.entity.Utilisateur;
+import com.immoteam.immoteamdev.entity.enums.RoleUtilisateur;
 import com.immoteam.immoteamdev.exception.ResourceNotFoundException;
 import com.immoteam.immoteamdev.repository.UtilisateurRepository;
 
@@ -16,10 +17,14 @@ public class UserService {
 
     private final UtilisateurRepository utilisateurRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AbonnementService abonnementService;
 
-    public UserService(UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UtilisateurRepository utilisateurRepository,
+                       PasswordEncoder passwordEncoder,
+                       AbonnementService abonnementService) {
         this.utilisateurRepository = utilisateurRepository;
         this.passwordEncoder = passwordEncoder;
+        this.abonnementService = abonnementService;
     }
 
     @Transactional
@@ -53,6 +58,30 @@ public class UserService {
 
         utilisateur.setMotDePasseHash(passwordEncoder.encode(nouveauMotDePasse));
         utilisateurRepository.save(utilisateur);
+    }
+
+    /**
+     * Fait évoluer un CLIENT vers le rôle PRO (propriétaire/agent) afin qu'il
+     * puisse publier des biens. Garantit un abonnement GRATUIT par défaut.
+     */
+    @Transactional
+    public UserDto devenirProprietaire(String email) {
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable : " + email));
+
+        if (utilisateur.getRole() == RoleUtilisateur.ADMIN) {
+            throw new IllegalStateException("Un administrateur ne peut pas devenir propriétaire.");
+        }
+
+        if (utilisateur.getRole() != RoleUtilisateur.PRO) {
+            utilisateur.setRole(RoleUtilisateur.PRO);
+            utilisateur = utilisateurRepository.save(utilisateur);
+        }
+
+        // Un PRO doit disposer d'un abonnement pour publier : on crée le GRATUIT si absent.
+        utilisateur.setAbonnementPro(abonnementService.getOrCreateDefaultAbonnement(utilisateur));
+
+        return mapToDto(utilisateur);
     }
 
     public void forgotPassword(String email, String nouveauMotDePasse) {
