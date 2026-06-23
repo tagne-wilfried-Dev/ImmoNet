@@ -44,6 +44,9 @@ interface SidebarProps {
   userRole: UserRole;
   onClose?: () => void;
   isMobileOpen?: boolean;
+  /** Mode drawer uniquement (pages publiques) : pas de sidebar fixe desktop,
+   *  le panneau coulissant fonctionne à toutes les tailles d'écran. */
+  drawerOnly?: boolean;
 }
 
 // Items à grouper pour l'ADMIN
@@ -66,7 +69,7 @@ const MENU_ITEMS: MenuItem[] = [
   {
     icon: Search,
     label: 'Explorer',
-    path: '/explorer',
+    path: '/explore/louer',
     roles: ['CLIENT'],
   },
   {
@@ -238,6 +241,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   userRole,
   onClose,
   isMobileOpen = false,
+  drawerOnly = false,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -262,7 +266,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* ── Desktop : sidebar fixe, collapsible ──────────────────────────── */}
+      {/* ── Desktop : sidebar fixe, collapsible (masquée en mode drawer) ──── */}
+      {!drawerOnly && (
       <div
         className={`
           hidden lg:block fixed left-0 top-16 bottom-0 z-40
@@ -374,13 +379,14 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {!isCollapsed && <RoleBadge userRole={userRole} />}
       </div>
+      )}
 
-      {/* ── Mobile : overlay + drawer depuis la gauche ───────────────────── */}
+      {/* ── Drawer coulissant : mobile partout, + desktop en mode drawerOnly ── */}
 
       {/* Overlay */}
       <div
         className={`
-          lg:hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm
+          ${drawerOnly ? '' : 'lg:hidden'} fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm
           transition-opacity duration-300
           ${isMobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
         `}
@@ -391,7 +397,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Drawer */}
       <div
         className={`
-          lg:hidden fixed left-0 top-0 bottom-0 z-50 w-72
+          ${drawerOnly ? '' : 'lg:hidden'} fixed left-0 top-0 bottom-0 z-50 w-72
           bg-white border-r border-slate-200 flex flex-col
           transition-transform duration-300 ease-out shadow-xl
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}

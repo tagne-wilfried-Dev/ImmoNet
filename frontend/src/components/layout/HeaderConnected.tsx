@@ -17,7 +17,10 @@ interface HeaderConnectedProps {
   userRole: 'CLIENT' | 'PRO' | 'ADMIN';
   notificationCount: number;
   onToggleSidebar: () => void;
-  onOpenNotifications: () => void; 
+  onOpenNotifications: () => void;
+  /** Affiche le bouton menu (☰) à toutes les tailles d'écran
+   *  (pages publiques où la sidebar est un drawer, y compris sur desktop). */
+  alwaysShowMenu?: boolean;
 }
 
 const HeaderConnected: React.FC<HeaderConnectedProps> = ({
@@ -26,6 +29,7 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
   notificationCount,
   onToggleSidebar,
   onOpenNotifications,
+  alwaysShowMenu = false,
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -65,7 +69,7 @@ const HeaderConnected: React.FC<HeaderConnectedProps> = ({
         <div className="flex items-center gap-4">
           <button
             onClick={onToggleSidebar}
-            className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+            className={`${alwaysShowMenu ? '' : 'lg:hidden'} p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors`}
             aria-label="Menu"
           >
             <Menu size={20} />

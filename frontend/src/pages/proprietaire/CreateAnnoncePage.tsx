@@ -101,7 +101,7 @@ const steps = [
   { id: 8, label: 'Review & Publier', icon: Check },
 ];
 
-// ─── COMPOSANT PRINCIPAL ─────────────────────────────────────────────────────────
+// ─── COMPOSANT PRINCIPAL 
 export default function CreateAnnoncePage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
