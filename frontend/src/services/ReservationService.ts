@@ -28,11 +28,17 @@ export const reservationService = {
   },
 
   /**
-   * Mettre à jour le statut d'une réservation (Accepter, Refuser, Annuler)
+   * Faire évoluer le statut d'une réservation
+   * (Accepter, Refuser, Payer, Finaliser, Annuler).
+   * `motif` est optionnel et utilisé lors d'un refus.
    */
-  updateStatus: async (id: number, statut: StatutReservation): Promise<ReservationResponse> => {
+  updateStatus: async (
+    id: number,
+    statut: StatutReservation,
+    motif?: string
+  ): Promise<ReservationResponse> => {
     const response = await api.patch<ReservationResponse>(`/reservations/${id}/statut`, null, {
-      params: { statut }
+      params: motif ? { statut, motif } : { statut }
     });
     return response.data;
   }

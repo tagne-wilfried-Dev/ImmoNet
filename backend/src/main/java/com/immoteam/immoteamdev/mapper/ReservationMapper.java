@@ -39,6 +39,7 @@ public class ReservationMapper {
                 .statut(entity.getStatut())
                 .typeReservation(entity.getTypeReservation())
                 .messageClient(entity.getMessageClient())
+                .motifRefus(entity.getMotifRefus())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

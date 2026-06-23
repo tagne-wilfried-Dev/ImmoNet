@@ -43,11 +43,12 @@ public class ReservationController {
     }
 
     @PatchMapping("/{id}/statut")
-    @Operation(summary = "Mettre à jour le statut d'une réservation (Accepter/Refuser/Annuler)")
+    @Operation(summary = "Faire évoluer le statut d'une réservation (Accepter/Refuser/Payer/Finaliser/Annuler)")
     public ResponseEntity<ReservationResponse> updateStatut(
             @PathVariable Long id,
             @RequestParam StatutReservation statut,
+            @RequestParam(required = false) String motif,
             Authentication authentication) {
-        return ResponseEntity.ok(reservationService.updateStatut(id, statut, authentication.getName()));
+        return ResponseEntity.ok(reservationService.updateStatut(id, statut, motif, authentication.getName()));
     }
 }

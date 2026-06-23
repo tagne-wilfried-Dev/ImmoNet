@@ -39,13 +39,30 @@ const ReservationsPage: React.FC = () => {
     fetchReservations();
   }, []);
 
+  const SUCCESS_MESSAGES: Partial<Record<StatutReservation, string>> = {
+    [StatutReservation.CONFIRMEE]: 'Réservation acceptée !',
+    [StatutReservation.REFUSEE]: 'Réservation refusée.',
+    [StatutReservation.TERMINEE]: 'Séjour finalisé.',
+  };
+
   const handleAction = async (id: number, newStatus: StatutReservation) => {
+    let motif: string | undefined;
+    if (newStatus === StatutReservation.REFUSEE) {
+      const saisie = window.prompt('Motif du refus (optionnel) :', '');
+      if (saisie === null) return; // annulé par l'utilisateur
+      motif = saisie.trim() || undefined;
+    }
+    if (newStatus === StatutReservation.TERMINEE &&
+        !window.confirm('Confirmer la fin du séjour ? Cette action clôture la réservation.')) {
+      return;
+    }
+
     try {
-      await reservationService.updateStatus(id, newStatus);
-      toast.success(newStatus === StatutReservation.CONFIRMEE ? 'Réservation acceptée !' : 'Réservation refusée.');
+      await reservationService.updateStatus(id, newStatus, motif);
+      toast.success(SUCCESS_MESSAGES[newStatus] ?? 'Statut mis à jour.');
       fetchReservations();
-    } catch (err) {
-      toast.error('Erreur lors du changement de statut.');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erreur lors du changement de statut.');
     }
   };
 
@@ -63,16 +80,16 @@ const ReservationsPage: React.FC = () => {
           <StatCard label="Terminées" count={reservations.filter(r => r.statut === StatutReservation.TERMINEE).length} color="text-blue-600" />
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Bien</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Client</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Dates</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Revenu</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Statut</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase text-right">Actions</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Bien</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Client</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Dates</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Revenu</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Statut</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -89,7 +106,7 @@ const ReservationsPage: React.FC = () => {
                   const StatusIcon = config.icon;
                   return (
                     <tr key={res.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-4 min-w-[200px]">
+                      <td className="px-5 py-3.5 min-w-[200px]">
                         <div className="flex items-center gap-3">
                            <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-slate-200">
                              {res.bienImage ? (
@@ -101,32 +118,32 @@ const ReservationsPage: React.FC = () => {
                           <p className="text-sm font-medium text-slate-900 truncate max-w-[150px]">{res.bienTitre}</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
                           <User size={16} className="text-slate-400" /> {res.clientNomComplet}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
+                      <td className="px-5 py-3.5 text-sm text-slate-600">
                         {format(new Date(res.dateDebut), 'dd MMM', { locale: fr })} - {format(new Date(res.dateFin), 'dd MMM yyyy', { locale: fr })}
                       </td>
-                      <td className="px-6 py-4 text-sm font-mono text-slate-900">
+                      <td className="px-5 py-3.5 text-sm font-mono text-slate-900 tabular-nums">
                         {new Intl.NumberFormat('fr-FR').format(res.montantTotal)} {res.devise}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.color}`}>
                           <StatusIcon size={12} /> {config.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-5 py-3.5 text-right">
                         {res.statut === StatutReservation.EN_ATTENTE && (
                           <div className="flex justify-end gap-2">
-                            <button 
+                            <button
                               onClick={() => handleAction(res.id, StatutReservation.CONFIRMEE)}
                               className="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors flex items-center gap-1"
                             >
                               <Check size={14} /> Accepter
                             </button>
-                            <button 
+                            <button
                               onClick={() => handleAction(res.id, StatutReservation.REFUSEE)}
                               className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center gap-1"
                             >
@@ -134,7 +151,20 @@ const ReservationsPage: React.FC = () => {
                             </button>
                           </div>
                         )}
-                        {res.statut !== StatutReservation.EN_ATTENTE && <span className="text-xs text-slate-400">—</span>}
+                        {res.statut === StatutReservation.CONFIRMEE && (
+                          <span className="text-xs text-amber-600 italic">En attente de paiement</span>
+                        )}
+                        {res.statut === StatutReservation.PAYEE && (
+                          <button
+                            onClick={() => handleAction(res.id, StatutReservation.TERMINEE)}
+                            className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors inline-flex items-center gap-1"
+                          >
+                            <Check size={14} /> Terminer le séjour
+                          </button>
+                        )}
+                        {![StatutReservation.EN_ATTENTE, StatutReservation.CONFIRMEE, StatutReservation.PAYEE].includes(res.statut) && (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
                       </td>
                     </tr>
                   );
@@ -155,7 +185,7 @@ const ReservationsPage: React.FC = () => {
 };
 
 const StatCard = ({ label, count, color }: { label: string; count: number; color: string }) => (
-  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+  <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
     <p className="text-sm font-medium text-slate-600">{label}</p>
     <p className={`text-2xl font-display font-bold mt-1 ${color}`}>{count}</p>
   </div>

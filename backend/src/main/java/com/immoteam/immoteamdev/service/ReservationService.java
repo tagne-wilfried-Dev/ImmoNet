@@ -18,7 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +33,28 @@ public class ReservationService {
     private final BienRepository bienRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final ReservationMapper reservationMapper;
+
+    /**
+     * Transitions autorisées du cycle de vie d'une réservation.
+     * EN_ATTENTE → CONFIRMEE / REFUSEE / ANNULEE
+     * CONFIRMEE  → PAYEE / ANNULEE
+     * PAYEE      → TERMINEE / ANNULEE
+     * REFUSEE / ANNULEE / TERMINEE : états terminaux.
+     */
+    private static final Map<StatutReservation, EnumSet<StatutReservation>> TRANSITIONS_AUTORISEES =
+            new EnumMap<>(StatutReservation.class);
+
+    static {
+        TRANSITIONS_AUTORISEES.put(StatutReservation.EN_ATTENTE,
+                EnumSet.of(StatutReservation.CONFIRMEE, StatutReservation.REFUSEE, StatutReservation.ANNULEE));
+        TRANSITIONS_AUTORISEES.put(StatutReservation.CONFIRMEE,
+                EnumSet.of(StatutReservation.PAYEE, StatutReservation.ANNULEE));
+        TRANSITIONS_AUTORISEES.put(StatutReservation.PAYEE,
+                EnumSet.of(StatutReservation.TERMINEE, StatutReservation.ANNULEE));
+        TRANSITIONS_AUTORISEES.put(StatutReservation.REFUSEE, EnumSet.noneOf(StatutReservation.class));
+        TRANSITIONS_AUTORISEES.put(StatutReservation.ANNULEE, EnumSet.noneOf(StatutReservation.class));
+        TRANSITIONS_AUTORISEES.put(StatutReservation.TERMINEE, EnumSet.noneOf(StatutReservation.class));
+    }
 
     @Transactional
     public ReservationResponse creerDemande(ReservationRequest request, String userEmail) {
@@ -80,28 +105,56 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse updateStatut(Long id, StatutReservation nouveauStatut, String userEmail) {
+    public ReservationResponse updateStatut(Long id, StatutReservation nouveauStatut, String motif, String userEmail) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Réservation non trouvée"));
 
         Utilisateur demandeur = utilisateurRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Utilisateur non trouvé"));
 
-        // Sécurité : Seul le propriétaire peut accepter/refuser, seul le client peut annuler
         boolean isProprietaire = reservation.getBien().getProprietaire().getId().equals(demandeur.getId());
         boolean isClient = reservation.getClient().getId().equals(demandeur.getId());
-
-        if (nouveauStatut == StatutReservation.CONFIRMEE || nouveauStatut == StatutReservation.REFUSEE) {
-            if (!isProprietaire) throw new IllegalStateException("Seul le propriétaire peut valider cette demande");
-        } else if (nouveauStatut == StatutReservation.ANNULEE) {
-            if (!isClient && !isProprietaire) throw new IllegalStateException("Action non autorisée");
+        if (!isProprietaire && !isClient) {
+            throw new IllegalStateException("Action non autorisée sur cette réservation");
         }
 
+        // 1) La transition doit être autorisée par le cycle de vie
+        StatutReservation statutActuel = reservation.getStatut();
+        if (!TRANSITIONS_AUTORISEES.getOrDefault(statutActuel, EnumSet.noneOf(StatutReservation.class))
+                .contains(nouveauStatut)) {
+            throw new IllegalStateException(
+                    "Transition impossible : " + statutActuel + " → " + nouveauStatut);
+        }
+
+        // 2) Autorisation par rôle selon l'action demandée
+        switch (nouveauStatut) {
+            case CONFIRMEE, REFUSEE, TERMINEE -> {
+                if (!isProprietaire) {
+                    throw new IllegalStateException("Seul le propriétaire peut effectuer cette action");
+                }
+            }
+            case PAYEE -> {
+                if (!isClient) {
+                    throw new IllegalStateException("Seul le client peut payer la réservation");
+                }
+            }
+            case ANNULEE -> { /* client ou propriétaire : déjà validé ci-dessus */ }
+            default -> { /* aucun autre statut cible possible ici */ }
+        }
+
+        // 3) Application du nouveau statut + effets de bord (timestamps, paiement simulé…)
         reservation.setStatut(nouveauStatut);
-        if (nouveauStatut == StatutReservation.CONFIRMEE) {
-            reservation.setDateConfirmation(LocalDateTime.now());
-        } else if (nouveauStatut == StatutReservation.ANNULEE) {
-            reservation.setDateAnnulation(LocalDateTime.now());
+        switch (nouveauStatut) {
+            case CONFIRMEE -> reservation.setDateConfirmation(LocalDateTime.now());
+            case REFUSEE -> {
+                reservation.setMotifRefus(
+                        motif != null && !motif.isBlank() ? motif : "Demande refusée par le propriétaire");
+                reservation.setDateAnnulation(LocalDateTime.now());
+            }
+            case ANNULEE -> reservation.setDateAnnulation(LocalDateTime.now());
+            case PAYEE -> reservation.setStripePaymentStatus("SIMULATED"); // démo : pas de Stripe réel
+            case TERMINEE -> { /* fin du séjour, aucun effet supplémentaire */ }
+            default -> { }
         }
 
         return reservationMapper.toResponse(reservationRepository.save(reservation));

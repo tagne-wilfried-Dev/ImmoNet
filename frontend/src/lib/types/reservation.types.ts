@@ -24,5 +24,6 @@ export interface ReservationResponse {
   statut: StatutReservation;
   typeReservation: ReservationType;
   messageClient: string;
+  motifRefus?: string;
   createdAt: string;
 }

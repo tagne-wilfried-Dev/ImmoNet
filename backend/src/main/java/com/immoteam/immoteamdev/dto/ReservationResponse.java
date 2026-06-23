@@ -29,5 +29,6 @@ public class ReservationResponse {
     private StatutReservation statut;
     private TypeReservation typeReservation;
     private String messageClient;
+    private String motifRefus;
     private LocalDateTime createdAt;
 }

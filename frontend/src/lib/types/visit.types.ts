@@ -3,12 +3,12 @@ import type { PropertySummary } from './property.types';
 export type StatutVisite = 'EN_ATTENTE' | 'CONFIRMEE' | 'REFUSEE' | 'ANNULEE' | 'REALISEE';
 
 export enum StatutReservation {
-    EN_ATTENTE,
-    CONFIRMEE,
-    ANNULEE,
-    REFUSEE,
-    TERMINEE,
-    PAYEE
+    EN_ATTENTE = 'EN_ATTENTE',
+    CONFIRMEE = 'CONFIRMEE',
+    ANNULEE = 'ANNULEE',
+    REFUSEE = 'REFUSEE',
+    TERMINEE = 'TERMINEE',
+    PAYEE = 'PAYEE',
 }
 export interface VisitRequest {
   bienId: number;

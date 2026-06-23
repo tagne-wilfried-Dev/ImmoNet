@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { Building2, Check, X, Clock, Eye, MessageSquare, Loader2 } from 'lucide-react';
+import { Building2, Check, X, Clock, Eye, MessageSquare, Loader2, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { reservationService } from '@/services/ReservationService';
 import { type ReservationResponse } from '@/lib/types/reservation.types';
@@ -46,8 +46,19 @@ const ClientReservationsPage: React.FC = () => {
       await reservationService.updateStatus(id, StatutReservation.ANNULEE);
       toast.success('Réservation annulée.');
       fetchReservations();
-    } catch (err) {
-      toast.error('Erreur lors de l\'annulation.');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erreur lors de l\'annulation.');
+    }
+  };
+
+  const handlePay = async (id: number) => {
+    if (!window.confirm('Confirmer le paiement de cette réservation ? (simulation, aucun débit réel)')) return;
+    try {
+      await reservationService.updateStatus(id, StatutReservation.PAYEE);
+      toast.success('Paiement confirmé, votre séjour est réservé !');
+      fetchReservations();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erreur lors du paiement.');
     }
   };
 
@@ -59,15 +70,15 @@ const ClientReservationsPage: React.FC = () => {
           <p className="text-sm text-slate-600 mt-1">Gérez vos demandes de location et séjours</p>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Bien</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Dates</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Montant</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Statut</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase text-right">Actions</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Bien</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Dates</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Montant</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase">Statut</th>
+                <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -84,7 +95,7 @@ const ClientReservationsPage: React.FC = () => {
                   const StatusIcon = config.icon;
                   return (
                     <tr key={res.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 border border-slate-200 bg-slate-50">
                              {res.bienImage ? (
@@ -99,18 +110,18 @@ const ClientReservationsPage: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
+                      <td className="px-5 py-3.5 text-sm text-slate-600">
                         {format(new Date(res.dateDebut), 'dd MMM', { locale: fr })} - {format(new Date(res.dateFin), 'dd MMM yyyy', { locale: fr })}
                       </td>
-                      <td className="px-6 py-4 text-sm font-mono text-slate-900">
+                      <td className="px-5 py-3.5 text-sm font-mono text-slate-900 tabular-nums">
                         {new Intl.NumberFormat('fr-FR').format(res.montantTotal)} {res.devise}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.color}`}>
                           <StatusIcon size={12} /> {config.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-5 py-3.5 text-right">
                         <div className="flex justify-end gap-2">
                           <Link 
                             to={`/dashboard/messages`} 
@@ -127,8 +138,17 @@ const ClientReservationsPage: React.FC = () => {
                           >
                             <Eye size={16} />
                           </Link>
-                          {res.statut === StatutReservation.EN_ATTENTE && (
-                            <button 
+                          {res.statut === StatutReservation.CONFIRMEE && (
+                            <button
+                              onClick={() => handlePay(res.id)}
+                              className="px-3 py-2 text-xs font-medium text-white bg-cyan-600 hover:bg-cyan-500 rounded-lg transition-colors inline-flex items-center gap-1.5"
+                              title="Payer la réservation"
+                            >
+                              <CreditCard size={14} /> Payer
+                            </button>
+                          )}
+                          {(res.statut === StatutReservation.EN_ATTENTE || res.statut === StatutReservation.CONFIRMEE) && (
+                            <button
                               onClick={() => handleCancel(res.id)}
                               className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                               title="Annuler la réservation"
