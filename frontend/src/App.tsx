@@ -25,6 +25,8 @@ import Home from './pages/basePages/Home';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { fetchCurrentUser } from './store/slices/authSlice';
 import ClientReservationsPage from './pages/client/ClientReservationsPage';
+import DevenirProprietairePage from './pages/client/DevenirProprietairePage';
+import FavorisPage from './pages/client/FavorisPage';
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -142,7 +144,7 @@ const App: React.FC = () => {
         />
         <Route
           path="/dashboard/favoris"
-          element={<ClientDashboardPage />}
+          element={<FavorisPage />}
         />
         <Route
           path="/dashboard/locations"
@@ -163,6 +165,7 @@ const App: React.FC = () => {
         <Route path="/admin/statistiques" element={<PlaceholderPage title="Statistiques" />} />
         <Route path="/admin/configuration" element={<PlaceholderPage title="Configuration" />} />
 
+        <Route path="/devenir-pro" element={<DevenirProprietairePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/biens/:id" element={<PropertyDetailPage />} />
         <Route path="/dashboard/notifications" element={<NotificationsPage />} />

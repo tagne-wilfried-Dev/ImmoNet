@@ -3,10 +3,13 @@ import { useLocation } from 'react-router-dom';
 import DynamicHeader from '@/components/layout/DynamicHeader';
 import { MapPin, Search, X, Loader2, LayoutGrid, MapIcon } from 'lucide-react';
 import { propertyService } from '@/services/PropertyService';
+import { favoriService } from '@/services/FavoriService';
 import type { PropertySummary, SearchFilters } from '@/lib/types/property.types';
 import PropertyCard from '@/components/ui/PropertyCard';
 import { cn } from '@/lib/utils';
 import PropertyMap from './PropertyMap';
+import { useAppSelector } from '@/store/hooks';
+import { toast } from 'sonner';
 
 interface ExplorePageProps {
   title: string;
@@ -52,6 +55,51 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
     fetchProperties();
   }, [fetchProperties]);
 
+  // ── Favoris (utilisateur connecté uniquement) ───────────────────────────────
+  const { user } = useAppSelector((state) => state.auth);
+  const [favorisIds, setFavorisIds] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (!user) {
+      setFavorisIds(new Set());
+      return;
+    }
+    favoriService
+      .getFavorisIds()
+      .then((ids) => setFavorisIds(new Set(ids)))
+      .catch((err) => console.error('Erreur chargement favoris:', err));
+  }, [user]);
+
+  const handleFavorisToggle = async (id: number | string) => {
+    const bienId = Number(id);
+    const isFav = favorisIds.has(bienId);
+    // Mise à jour optimiste
+    setFavorisIds((prev) => {
+      const next = new Set(prev);
+      if (isFav) next.delete(bienId);
+      else next.add(bienId);
+      return next;
+    });
+    try {
+      if (isFav) {
+        await favoriService.removeFavori(bienId);
+      } else {
+        await favoriService.addFavori(bienId);
+        toast.success('Ajouté à vos favoris');
+      }
+    } catch (err) {
+      // Rollback en cas d'échec
+      console.error('Erreur favoris:', err);
+      setFavorisIds((prev) => {
+        const next = new Set(prev);
+        if (isFav) next.add(bienId);
+        else next.delete(bienId);
+        return next;
+      });
+      toast.error('Action impossible, réessayez.');
+    }
+  };
+
   const handleFilterChange = (name: keyof SearchFilters, value: any) => {
     setFilters(prev => {
       const next = { ...prev };
@@ -79,24 +127,24 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
     <div className="min-h-screen bg-slate-50">
       <DynamicHeader currentExplore={currentExplore} onNavigate={handleHeaderNavigate} />
       {/* En-tête de page */}
-      <div className="bg-white border-b border-cyan-100 py-8">
+      <div className="bg-white border-b border-cyan-100 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-slate-900 mb-2">
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-1">
             {title}
           </h1>
-          <p className="text-slate-600 text-lg">
+          <p className="text-slate-600 text-[15px]">
             Découvrez les meilleures offres {isSellingMode ? 'à vendre' : 'à louer'} sur ImmoNet
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
           {/* Colonne Filtres */}
-          <div className="lg:col-span-4 space-y-8">
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-cyan-100 sticky top-8">
-              <h2 className="font-semibold text-xl text-slate-900 mb-6">Filtrer votre recherche</h2>
+          <div className="lg:col-span-4 space-y-6">
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-cyan-100 sticky top-6">
+              <h2 className="font-semibold text-lg text-slate-900 mb-5">Filtrer votre recherche</h2>
 
               {/* Type de bien */}
               <div className="mb-4">
@@ -104,7 +152,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                 <select
                   value={filters.typeBien || ''}
                   onChange={(e) => handleFilterChange('typeBien', e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                  className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
                 >
                   <option value="">Tous les types</option>
                   <option value="APPARTEMENT">Appartement</option>
@@ -127,7 +175,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                     placeholder="Ex: Yaoundé, Douala..."
                     value={filters.ville || ''}
                     onChange={(e) => handleFilterChange('ville', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                    className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
                   />
                   <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-500 w-4 h-4" />
                 </div>
@@ -141,7 +189,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                   placeholder="Ex: Bastos, Bonapriso..."
                   value={filters.quartier || ''}
                   onChange={(e) => handleFilterChange('quartier', e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                  className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
                 />
               </div>
 
@@ -154,7 +202,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                     placeholder="Min"
                     value={filters.prixMin ?? ''}
                     onChange={(e) => handleNumberChange('prixMin', e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
+                    className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 outline-none"
                   />
                 </div>
                 <div>
@@ -164,7 +212,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                     placeholder="Max"
                     value={filters.prixMax ?? ''}
                     onChange={(e) => handleNumberChange('prixMax', e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
+                    className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 outline-none"
                   />
                 </div>
               </div>
@@ -178,7 +226,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                     placeholder="Min"
                     value={filters.surfaceMin ?? ''}
                     onChange={(e) => handleNumberChange('surfaceMin', e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
+                    className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 outline-none"
                   />
                 </div>
                 <div>
@@ -188,7 +236,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                     placeholder="Max"
                     value={filters.surfaceMax ?? ''}
                     onChange={(e) => handleNumberChange('surfaceMax', e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 outline-none"
+                    className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 outline-none"
                   />
                 </div>
               </div>
@@ -199,7 +247,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                 <select
                   value={filters.nbChambres ?? ''}
                   onChange={(e) => handleNumberChange('nbChambres', e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                  className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
                 >
                   <option value="">Indifférent</option>
                   <option value="1">1+</option>
@@ -218,7 +266,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                   onChange={(e) =>
                     handleFilterChange('estMeuble', e.target.value === '' ? undefined : e.target.value === 'true')
                   }
-                  className="w-full px-4 py-3 bg-slate-50 border border-cyan-100 rounded-2xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
+                  className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-cyan-100 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none"
                 >
                   <option value="">Peu importe</option>
                   <option value="true">Meublé</option>
@@ -226,19 +274,19 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
                 </select>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2.5">
                 <button
                   onClick={fetchProperties}
-                  className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2"
+                  className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold py-3 rounded-xl transition-all shadow-sm shadow-cyan-600/20 flex items-center justify-center gap-2"
                 >
                   <Search className="w-4 h-4" />
                   Rechercher
                 </button>
                 <button
                   onClick={clearFilters}
-                  className="p-3.5 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-2xl transition-all"
+                  className="p-3 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl transition-all"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-[18px] h-[18px]" />
                 </button>
               </div>
             </div>
@@ -249,8 +297,8 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
 
             {/* Infos Résultats & Toggle Vue */}
             <div className="flex justify-between items-center">
-              <p className="text-slate-600">
-                <span className="font-bold text-slate-900">{totalElements}</span> biens trouvés
+              <p className="text-sm text-slate-600">
+                <span className="font-bold text-slate-900 tabular-nums">{totalElements}</span> biens trouvés
               </p>
 
               <div className="flex items-center gap-4">
@@ -291,14 +339,19 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ title }) => {
             ) : properties.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {properties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
+                  <PropertyCard
+                    key={property.id}
+                    property={property}
+                    onFavorisToggle={user ? handleFavorisToggle : undefined}
+                    isFavoris={favorisIds.has(Number(property.id))}
+                  />
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-3xl p-12 text-center border border-dashed border-slate-200">
-                <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Aucun résultat trouvé</h3>
-                <p className="text-slate-500">Essayez de modifier vos critères de recherche pour trouver plus de biens.</p>
+              <div className="bg-white rounded-2xl p-10 text-center border border-dashed border-slate-200">
+                <Search className="w-11 h-11 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-slate-900 mb-1.5">Aucun résultat trouvé</h3>
+                <p className="text-sm text-slate-500">Essayez de modifier vos critères de recherche pour trouver plus de biens.</p>
                 <button
                   onClick={clearFilters}
                   className="mt-6 text-cyan-600 font-bold hover:underline"

@@ -25,6 +25,8 @@ interface PropertyCardProps {
   /** Compact = version liste. Default = version grille (plus grande). */
   variant?: 'grid' | 'list';
   onFavorisToggle?: (id: number | string) => void;
+  /** Indique si le bien est dans les favoris (cœur rempli). */
+  isFavoris?: boolean;
   className?: string;
 }
 
@@ -34,6 +36,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   property,
   variant = 'grid',
   onFavorisToggle,
+  isFavoris = false,
   className,
 }) => {
   const [imgError, setImgError] = useState(false);
@@ -106,7 +109,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                   <Heart
                     className={cn(
                       'w-4 h-4 transition-colors',
-                      'text-slate-400'
+                      isFavoris ? 'text-red-500 fill-red-500' : 'text-slate-400'
                     )}
                   />
                 </button>
@@ -132,7 +135,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 </span>
               )}
             </div>
-            <p className="font-mono text-[15px] font-semibold text-cyan-700">
+            <p className="font-mono text-[15px] font-semibold text-cyan-700 tabular-nums">
               {formatPrix(prix, typeOperation)}
             </p>
           </div>
@@ -189,7 +192,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <Heart
               className={cn(
                 'w-4 h-4 transition-colors',
-                'text-slate-400'
+                isFavoris ? 'text-red-500 fill-red-500' : 'text-slate-400'
               )}
             />
           </button>
@@ -227,7 +230,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
         {/* Prix */}
         <div className="flex items-center justify-between mt-auto">
-          <p className="font-mono text-[16px] font-bold text-cyan-700">
+          <p className="font-mono text-[15px] font-bold text-cyan-700 tabular-nums">
             {formatPrix(prix, typeOperation)}
           </p>
         </div>
