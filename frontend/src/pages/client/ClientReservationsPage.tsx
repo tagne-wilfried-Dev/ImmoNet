@@ -52,7 +52,7 @@ const ClientReservationsPage: React.FC = () => {
   };
 
   const handlePay = async (id: number) => {
-    if (!window.confirm('Confirmer le paiement de cette réservation ? (simulation, aucun débit réel)')) return;
+    if (!window.confirm('Confirmer le paiement de cette réservation ?')) return;
     try {
       await reservationService.updateStatus(id, StatutReservation.PAYEE);
       toast.success('Paiement confirmé, votre séjour est réservé !');

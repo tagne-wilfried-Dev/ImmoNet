@@ -83,6 +83,11 @@ public class BienService {
         Bien nouveauBien = bienMapper.toEntity(request);
         nouveauBien.setProprietaire(proprietaire);
         
+        // Règle de robustesse : assurer que les champs booléens ne soient pas null
+        if (nouveauBien.getChargesIncluses() == null) nouveauBien.setChargesIncluses(false);
+        if (nouveauBien.getPrixNegoceable() == null) nouveauBien.setPrixNegoceable(false);
+        if (nouveauBien.getEstMeuble() == null) nouveauBien.setEstMeuble(false);
+        
         //  Une annonce est créée avec le statut BROUILLON en attendant la validation
         nouveauBien.setStatut(StatutAnnonce.BROUILLON);
         

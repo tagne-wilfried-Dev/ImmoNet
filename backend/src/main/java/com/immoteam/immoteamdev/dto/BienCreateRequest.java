@@ -33,10 +33,10 @@ public class BienCreateRequest {
     private BigDecimal caution;
 
     @Builder.Default
-    private boolean chargesIncluses = false;
+    private Boolean chargesIncluses = false;
 
     @Builder.Default
-    private boolean prixNegoceable = false;
+    private Boolean prixNegoceable = false;
 
     private BigDecimal surface;
     private Integer nbPieces;
@@ -45,5 +45,5 @@ public class BienCreateRequest {
     private Integer etage;
 
     @Builder.Default
-    private boolean estMeuble = false;
+    private Boolean estMeuble = false;
 }

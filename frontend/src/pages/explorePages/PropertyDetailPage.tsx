@@ -314,7 +314,7 @@ const PropertyDetailPage: React.FC = () => {
               {/* Widget de Réservation Rapide */}
               {!isVente && (
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-md overflow-hidden relative group">
-                  <div className="absolute inset-0 bg-linear-to-br from-cyan-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  <div className="absolute inset-0 bg-linear-to-br from-cyan-50 to-transparent opacity-0 transition-opacity pointer-events-none" />
 
                   <h4 className="font-display text-lg font-bold text-slate-900 mb-5">Réserver un séjour</h4>
 

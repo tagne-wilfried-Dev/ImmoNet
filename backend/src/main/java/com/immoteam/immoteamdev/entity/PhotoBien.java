@@ -19,7 +19,7 @@ public class PhotoBien {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bien_id", nullable = false)
     private Bien bien;
 
@@ -28,18 +28,18 @@ public class PhotoBien {
     private String urlCloudinary;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column
     private String publicIdCloudinary;
 
-    @Column(nullable = false)
+    @Column
     @Builder.Default
     private Integer ordre = 0;
 
-    @Column(nullable = false)
+    @Column
     @Builder.Default
     private boolean estPrincipale = false;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column
     private LocalDateTime createdAt;
 }
