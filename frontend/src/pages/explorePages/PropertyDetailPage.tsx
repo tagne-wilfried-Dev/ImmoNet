@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 const PropertyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   
   const [property, setProperty] = useState<PropertyDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,6 +72,7 @@ const PropertyDetailPage: React.FC = () => {
   }
 
   const isVente = property.typeOperation === 'VENTE';
+  const isOwner = user?.id === property.proprietaire.id;
 
   const handleContactOwner = () => {
     if (!isAuthenticated) {
@@ -396,6 +397,26 @@ const PropertyDetailPage: React.FC = () => {
                     <MessageSquare className="w-[18px] h-[18px]" />
                     Contacter l'annonceur
                   </button>
+                  {!isOwner && (
+                    <button
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          navigate('/login', { 
+                            state: { 
+                              from: `/biens/${id}`,
+                              message: 'Veuillez vous connecter pour planifier une visite.' 
+                            } 
+                          });
+                          return;
+                        }
+                        setIsVisitModalOpen(true);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 bg-white border border-cyan-600 hover:bg-cyan-50 text-cyan-600 text-sm font-bold py-3 rounded-xl transition-all shadow-sm active:scale-95"
+                    >
+                      <Calendar className="w-[18px] h-[18px]" />
+                      Planifier une visite
+                    </button>
+                  )}
                   <button className="w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-500 text-sm font-semibold py-3 rounded-xl transition-all cursor-not-allowed">
                     <Phone className="w-[18px] h-[18px]" />
                     {property.proprietaire.telephone || 'Non disponible'}
@@ -414,6 +435,14 @@ const PropertyDetailPage: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Visit Request Modal */}
+      <VisitRequestModal
+        isOpen={isVisitModalOpen}
+        onClose={() => setIsVisitModalOpen(false)}
+        propertyId={property.id}
+        propertyTitle={property.titre}
+      />
 
       <Footer />
     </div>

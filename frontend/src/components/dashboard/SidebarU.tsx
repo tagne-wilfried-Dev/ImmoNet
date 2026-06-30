@@ -121,12 +121,6 @@ const MENU_ITEMS: MenuItem[] = [
     roles: ['CLIENT', 'PRO', 'ADMIN'],
   },
   {
-    icon: Wallet,
-    label: 'Transactions',
-    path: '/dashboard/transactions',
-    roles: ['CLIENT', 'PRO', 'ADMIN'],
-  },
-  {
     icon: Bell,
     label: 'Notifications',
     path: '/dashboard/notifications',

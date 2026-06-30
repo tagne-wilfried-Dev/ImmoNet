@@ -27,12 +27,9 @@ const menuItems = [
   { icon: Building2, label: 'Mes biens', path: '/dashboard/biens' },
   { icon: CalendarDays, label: 'Réservations', path: '/dashboard/reservations' },
   { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
-  { icon: Wallet, label: 'Transactions', path: '/dashboard/transactions' },
   { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
   { icon: CheckCircle, label: 'Validations', path: '/dashboard/validations' },
   { icon: Grid3X3, label: 'Équipements', path: '/dashboard/equipements' },
-  { icon: Tag, label: 'Promotions', path: '/dashboard/promotions' },
-  { icon: Lock, label: 'Sécurité', path: '/dashboard/securite' },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, userRole }) => {
