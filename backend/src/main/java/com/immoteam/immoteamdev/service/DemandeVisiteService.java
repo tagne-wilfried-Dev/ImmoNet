@@ -79,4 +79,38 @@ public class DemandeVisiteService {
                 .map(demandeVisiteMapper::toResponse)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public DemandeVisiteResponse updateStatut(Long id, StatutVisite nouveauStatut, String motif, String userEmail) {
+        DemandeVisite demande = demandeVisiteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Demande de visite non trouvée"));
+
+        boolean isProprio = demande.getProprietaire().getEmail().equals(userEmail);
+        boolean isClient = demande.getClient().getEmail().equals(userEmail);
+
+        if (!isProprio && !isClient) {
+            throw new org.springframework.security.access.AccessDeniedException("Vous n'êtes pas autorisé à modifier cette demande.");
+        }
+
+        if (nouveauStatut == StatutVisite.CONFIRMEE || nouveauStatut == StatutVisite.REFUSEE || nouveauStatut == StatutVisite.REALISEE) {
+            if (!isProprio) {
+                throw new org.springframework.security.access.AccessDeniedException("Seul le propriétaire peut confirmer, refuser ou finaliser la visite.");
+            }
+            if (nouveauStatut == StatutVisite.REFUSEE) {
+                demande.setMotifRefus(motif);
+            }
+            if (nouveauStatut == StatutVisite.CONFIRMEE) {
+                demande.setDateConfirmation(java.time.LocalDateTime.now());
+            }
+        } else if (nouveauStatut == StatutVisite.ANNULEE) {
+            if (!isClient) {
+                throw new org.springframework.security.access.AccessDeniedException("Seul le client peut annuler sa demande de visite.");
+            }
+        }
+
+        demande.setStatut(nouveauStatut);
+        DemandeVisite saved = demandeVisiteRepository.save(demande);
+        return demandeVisiteMapper.toResponse(saved);
+    }
 }
+

@@ -27,6 +27,9 @@ import { fetchCurrentUser } from './store/slices/authSlice';
 import ClientReservationsPage from './pages/client/ClientReservationsPage';
 import DevenirProprietairePage from './pages/client/DevenirProprietairePage';
 import FavorisPage from './pages/client/FavorisPage';
+import ClientVisitsPage from './pages/client/ClientVisitsPage';
+import VisitsPage from './pages/proprietaire/VisitsPage';
+
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -181,6 +184,16 @@ const App: React.FC = () => {
               <ClientReservationsPage />
             ) : (
               <ReservationsPage />
+            )
+          }
+        />
+        <Route
+          path="/dashboard/visites"
+          element={
+            userRole === 'CLIENT' ? (
+              <ClientVisitsPage />
+            ) : (
+              <VisitsPage />
             )
           }
         />

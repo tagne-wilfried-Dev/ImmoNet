@@ -26,6 +26,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard' },
   { icon: Building2, label: 'Mes biens', path: '/dashboard/biens' },
   { icon: CalendarDays, label: 'Réservations', path: '/dashboard/reservations' },
+  { icon: Calendar, label: 'Visites', path: '/dashboard/visites' },
   { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
   { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
   { icon: CheckCircle, label: 'Validations', path: '/dashboard/validations' },

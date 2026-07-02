@@ -1,5 +1,6 @@
 package com.immoteam.immoteamdev.controller;
 
+import com.immoteam.immoteamdev.entity.enums.StatutVisite;
 import com.immoteam.immoteamdev.dto.DemandeVisiteRequest;
 import com.immoteam.immoteamdev.dto.DemandeVisiteResponse;
 import com.immoteam.immoteamdev.service.DemandeVisiteService;
@@ -47,4 +48,16 @@ public class DemandeVisiteController {
     public ResponseEntity<List<DemandeVisiteResponse>> getMesDemandesRecues(Authentication authentication) {
         return ResponseEntity.ok(demandeVisiteService.getMesDemandesProprietaire(authentication.getName()));
     }
+
+    @PatchMapping("/{id}/statut")
+    @PreAuthorize("hasAnyRole('CLIENT', 'PRO', 'ADMIN')")
+    @Operation(summary = "Mettre à jour le statut d'une demande de visite")
+    public ResponseEntity<DemandeVisiteResponse> updateStatut(
+            @PathVariable Long id,
+            @RequestParam StatutVisite statut,
+            @RequestParam(required = false) String motif,
+            Authentication authentication) {
+        return ResponseEntity.ok(demandeVisiteService.updateStatut(id, statut, motif, authentication.getName()));
+    }
 }
+

@@ -21,6 +21,7 @@ import {
   X,
   Megaphone,
   ChevronDown,
+  Calendar,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import RoleBadge from '../ui/RoleBadge';
@@ -112,6 +113,12 @@ const MENU_ITEMS: MenuItem[] = [
     icon: CalendarDays,
     label: 'Réservations',
     path: '/dashboard/reservations',
+    roles: ['CLIENT', 'PRO', 'ADMIN'],
+  },
+  {
+    icon: Calendar,
+    label: 'Visites',
+    path: '/dashboard/visites',
     roles: ['CLIENT', 'PRO', 'ADMIN'],
   },
   {
