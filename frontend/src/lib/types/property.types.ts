@@ -71,6 +71,38 @@ export interface PropertyCreateRequest {
   estMeuble?: boolean;
 }
 
+// ─── Requête de mise à jour (DTO Backend BienUpdateRequest) ───────────────────
+
+export interface PropertyUpdateRequest {
+  titre: string;
+  typeBien: PropertyType;
+  typeOperation: OperationType;
+  adresse?: string;
+  ville: string;
+  quartier?: string;
+  prix: number;
+  caution?: number;
+  chargesIncluses?: boolean;
+  prixNegoceable?: boolean;
+  periodeLocation?: PeriodeLocation;
+  surface: number;
+  nbPieces?: number;
+  nbChambres?: number;
+  nbSdb?: number;
+  etage?: number;
+  estMeuble?: boolean;
+  description: string;
+}
+
+// ─── Photo d'un bien (vue édition, DTO Backend PhotoResponse) ─────────────────
+
+export interface PhotoResponse {
+  id: number;
+  url: string;
+  estPrincipale: boolean;
+  ordre: number;
+}
+
 // ─── Bien immobilier (vue liste/carte) ────────────────────────────────────────
 
 export interface PropertySummary {

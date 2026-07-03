@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Building2,
   CalendarDays,
+  Calendar,
   MessageSquare,
   Wallet,
   Bell,

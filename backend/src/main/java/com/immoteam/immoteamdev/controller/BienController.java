@@ -26,6 +26,7 @@ import com.immoteam.immoteamdev.dto.BienDetailResponse;
 import com.immoteam.immoteamdev.dto.BienFilterRequest;
 import com.immoteam.immoteamdev.dto.BienSummaryResponse;
 import com.immoteam.immoteamdev.dto.BienUpdateRequest;
+import com.immoteam.immoteamdev.dto.PhotoResponse;
 import com.immoteam.immoteamdev.entity.enums.StatutAnnonce;
 import com.immoteam.immoteamdev.service.BienService;
 
@@ -97,6 +98,32 @@ public class BienController {
         
         List<String> urls = bienService.ajouterPhotos(id, files);
         return ResponseEntity.ok(urls);
+    }
+
+    @GetMapping("/{id}/photos")
+    @PreAuthorize("hasAnyRole('PRO', 'ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Lister les photos d'un bien", description = "Retourne les photos avec leur ID (pour l'édition : suppression, photo principale).")
+    public ResponseEntity<List<PhotoResponse>> getPhotos(@PathVariable Long id) {
+        return ResponseEntity.ok(bienService.getPhotosByBienId(id));
+    }
+
+    @DeleteMapping("/{id}/photos/{photoId}")
+    @PreAuthorize("hasAnyRole('PRO', 'ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Supprimer une photo", description = "Réservé au propriétaire du bien ou à un ADMIN.")
+    public ResponseEntity<Void> supprimerPhoto(@PathVariable Long id, @PathVariable Long photoId) {
+        bienService.supprimerPhoto(id, photoId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/photos/{photoId}/principale")
+    @PreAuthorize("hasAnyRole('PRO', 'ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Définir la photo principale", description = "Marque cette photo comme principale et retire ce statut aux autres.")
+    public ResponseEntity<Void> definirPhotoPrincipale(@PathVariable Long id, @PathVariable Long photoId) {
+        bienService.definirPhotoPrincipale(id, photoId);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")

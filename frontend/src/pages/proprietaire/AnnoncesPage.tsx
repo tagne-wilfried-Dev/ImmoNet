@@ -204,7 +204,8 @@ const MesBiensPage: React.FC = () => {
                           className="p-2 text-slate-500 hover:bg-white hover:text-cyan-600 rounded-xl border border-transparent hover:border-cyan-100 transition-all shadow-sm group" title="Détails">
                           <Eye size={16} className="group-hover:scale-110 transition-transform" />
                         </button>
-                        <button 
+                        <button
+                          onClick={() => navigate(`/dashboard/biens/${bien.id}/edit`)}
                           className="p-2 text-slate-500 hover:bg-white hover:text-cyan-600 rounded-xl border border-transparent hover:border-cyan-100 transition-all shadow-sm group" title="Modifier">
                           <Edit size={16} className="group-hover:scale-110 transition-transform" />
                         </button>

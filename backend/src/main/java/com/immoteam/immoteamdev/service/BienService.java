@@ -5,6 +5,7 @@ import com.immoteam.immoteamdev.dto.BienDetailResponse;
 import com.immoteam.immoteamdev.dto.BienFilterRequest;
 import com.immoteam.immoteamdev.dto.BienSummaryResponse;
 import com.immoteam.immoteamdev.dto.BienUpdateRequest;
+import com.immoteam.immoteamdev.dto.PhotoResponse;
 import com.immoteam.immoteamdev.entity.Bien;
 import com.immoteam.immoteamdev.entity.PhotoBien;
 import com.immoteam.immoteamdev.entity.Utilisateur;
@@ -132,6 +133,101 @@ public class BienService {
         }
 
         return urls;
+    }
+
+    /**
+     * Liste les photos d'un bien avec leur ID (nécessaire pour la suppression / photo principale côté édition).
+     */
+    public List<PhotoResponse> getPhotosByBienId(Long bienId) {
+        if (!bienRepository.existsById(bienId)) {
+            throw new IllegalArgumentException("Bien non trouvé avec l'ID : " + bienId);
+        }
+        return photoBienRepository.findByBienIdOrderByOrdreAsc(bienId)
+                .stream()
+                .map(photo -> PhotoResponse.builder()
+                        .id(photo.getId())
+                        .url(photo.getUrlCloudinary())
+                        .estPrincipale(photo.isEstPrincipale())
+                        .ordre(photo.getOrdre())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Supprime une photo d'un bien (réservé au propriétaire ou ADMIN).
+     * Note : seul l'enregistrement en base est supprimé, le fichier physique reste (suffisant pour la démo).
+     */
+    @Transactional
+    public void supprimerPhoto(Long bienId, Long photoId) {
+        Bien bien = bienRepository.findById(bienId)
+                .orElseThrow(() -> new IllegalArgumentException("Bien non trouvé avec l'ID : " + bienId));
+
+        verifierProprietaireOuAdmin(bien);
+
+        PhotoBien photo = photoBienRepository.findById(photoId)
+                .orElseThrow(() -> new IllegalArgumentException("Photo non trouvée avec l'ID : " + photoId));
+
+        if (!photo.getBien().getId().equals(bienId)) {
+            throw new IllegalArgumentException("Cette photo n'appartient pas au bien indiqué.");
+        }
+
+        boolean etaitPrincipale = photo.isEstPrincipale();
+        photoBienRepository.delete(photo);
+
+        // Si on a supprimé la photo principale, on promeut la première photo restante.
+        if (etaitPrincipale) {
+            photoBienRepository.findByBienIdOrderByOrdreAsc(bienId).stream()
+                    .findFirst()
+                    .ifPresent(p -> {
+                        p.setEstPrincipale(true);
+                        photoBienRepository.save(p);
+                    });
+        }
+    }
+
+    /**
+     * Définit une photo comme principale et retire ce statut aux autres photos du bien.
+     */
+    @Transactional
+    public void definirPhotoPrincipale(Long bienId, Long photoId) {
+        Bien bien = bienRepository.findById(bienId)
+                .orElseThrow(() -> new IllegalArgumentException("Bien non trouvé avec l'ID : " + bienId));
+
+        verifierProprietaireOuAdmin(bien);
+
+        List<PhotoBien> photos = photoBienRepository.findByBienIdOrderByOrdreAsc(bienId);
+        boolean trouvee = false;
+        for (PhotoBien photo : photos) {
+            boolean estCible = photo.getId().equals(photoId);
+            photo.setEstPrincipale(estCible);
+            if (estCible) {
+                trouvee = true;
+            }
+        }
+
+        if (!trouvee) {
+            throw new IllegalArgumentException("Photo non trouvée pour ce bien avec l'ID : " + photoId);
+        }
+
+        photoBienRepository.saveAll(photos);
+    }
+
+    /**
+     * Vérifie que l'utilisateur authentifié est le propriétaire du bien ou un ADMIN.
+     */
+    private void verifierProprietaireOuAdmin(Bien bien) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Utilisateur non authentifié.");
+        }
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+        boolean isOwner = bien.getProprietaire().getEmail().equals(authentication.getName());
+
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("Accès refusé : Vous n'êtes pas le propriétaire de ce bien.");
+        }
     }
 
     public BienDetailResponse getDetailById(Long id) {

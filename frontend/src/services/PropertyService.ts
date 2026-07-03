@@ -1,10 +1,12 @@
 import axios from 'axios';
-import type { 
-  PropertyDetail, 
-  PropertySummary, 
-  SearchFilters, 
+import type {
+  PropertyDetail,
+  PropertySummary,
+  SearchFilters,
   PaginatedProperties,
-  PropertyCreateRequest 
+  PropertyCreateRequest,
+  PropertyUpdateRequest,
+  PhotoResponse
 } from '@/lib/types/property.types';
 
 const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -58,6 +60,36 @@ export const propertyService = {
   createProperty: async (data: PropertyCreateRequest): Promise<PropertySummary> => {
     const response = await api.post<PropertySummary>('/biens', data);
     return response.data;
+  },
+
+  /**
+   * Met à jour les informations d'un bien existant (réservé au propriétaire / ADMIN)
+   */
+  updateProperty: async (id: number | string, data: PropertyUpdateRequest): Promise<PropertyDetail> => {
+    const response = await api.put<PropertyDetail>(`/biens/${id}`, data);
+    return response.data;
+  },
+
+  /**
+   * Récupère les photos d'un bien avec leur ID (pour l'édition : suppression, photo principale)
+   */
+  getPropertyPhotos: async (id: number | string): Promise<PhotoResponse[]> => {
+    const response = await api.get<PhotoResponse[]>(`/biens/${id}/photos`);
+    return response.data;
+  },
+
+  /**
+   * Supprime une photo d'un bien
+   */
+  deletePhoto: async (id: number | string, photoId: number): Promise<void> => {
+    await api.delete(`/biens/${id}/photos/${photoId}`);
+  },
+
+  /**
+   * Définit la photo principale d'un bien
+   */
+  setMainPhoto: async (id: number | string, photoId: number): Promise<void> => {
+    await api.patch(`/biens/${id}/photos/${photoId}/principale`);
   },
 
   /**

@@ -8,6 +8,7 @@ import MessagesPage from './pages/proprietaire/MessagesPage';
 import ValidationsPage from './pages/proprietaire/ValidationsPage';
 import EquipementsPage from './pages/proprietaire/CataloguesPage';
 import CreateAnnoncePage from './pages/proprietaire/CreateAnnoncePage';
+import EditBienPage from './pages/proprietaire/EditBienPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -176,6 +177,7 @@ const App: React.FC = () => {
         <Route path="/explore/vente" element={<ExploreSellings />} />
         <Route path="/recherche" element={<SearchResults />} />
         <Route path="/dashboard/biens" element={<MesBiensPage />} />
+        <Route path="/dashboard/biens/:id/edit" element={<EditBienPage />} />
         <Route path="/dashboard/annonces" element={<MesAnnoncesPage />} />
         <Route
           path="/dashboard/reservations"
