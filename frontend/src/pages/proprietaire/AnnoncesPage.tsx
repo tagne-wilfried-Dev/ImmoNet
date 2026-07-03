@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { 
-  Building2, Edit, Eye, Trash2, Plus, 
-  CheckCircle2, RotateCcw, Loader2, 
-  Search, Filter, X 
+  Building2, Edit, Eye, Trash2, Plus,
+  CheckCircle2, Loader2,
+  Search
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { propertyService } from '@/services/PropertyService';

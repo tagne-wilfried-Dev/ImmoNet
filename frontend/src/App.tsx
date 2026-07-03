@@ -21,6 +21,8 @@ import NotificationsPage from './pages/proprietaire/NotificationsPage';
 import ClientDashboardPage from './pages/client/ClientDashboardPage';
 import AdminDashboardPage from './pages/admin/AdminDashboard';
 import ModerationPage from './pages/admin/ModerationPage';
+import UtilisateursPage from './pages/admin/UtilisateursPage';
+import AdminAnnoncesPage from './pages/admin/AdminAnnoncesPage';
 import { ChangePasswordForm } from './pages/auth/ChangePasswordForm';
 import Home from './pages/basePages/Home';
 import { useAppDispatch, useAppSelector } from './store/hooks';
@@ -165,7 +167,8 @@ const App: React.FC = () => {
           path="/admin/moderation"
           element={<ModerationPage />}
         />
-        <Route path="/admin/utilisateurs" element={<PlaceholderPage title="Gestion des utilisateurs" />} />
+        <Route path="/admin/utilisateurs" element={<UtilisateursPage />} />
+        <Route path="/admin/annonces" element={<AdminAnnoncesPage />} />
         <Route path="/admin/statistiques" element={<PlaceholderPage title="Statistiques" />} />
         <Route path="/admin/configuration" element={<PlaceholderPage title="Configuration" />} />
 
