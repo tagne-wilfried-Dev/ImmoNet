@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { MEDIA_BASE_URL } from "./apiConfig"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -18,9 +19,7 @@ export function getMediaUrl(url: string | undefined | null): string {
   }
   
   if (url.startsWith('/uploads')) {
-    const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    const baseUrl = rawApiUrl.replace('/api', '');
-    return `${baseUrl}${url}`;
+    return `${MEDIA_BASE_URL}${url}`;
   }
   
   return url;

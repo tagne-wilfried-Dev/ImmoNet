@@ -63,7 +63,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173","http://192.168.1.189:5173"));
+        // setAllowedOriginPatterns (et non setAllowedOrigins) autorise les jokers tout en gardant allowCredentials(true).
+        // Les motifs 192.168.*.* / 10.*.* couvrent n'importe quelle IP du réseau local (robuste au DHCP) pour tester
+        // depuis un téléphone ou un autre PC du même Wi-Fi.
+        config.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "http://192.168.*.*:5173",
+                "http://10.*.*.*:5173",
+                "http://172.16.*.*:5173"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

@@ -1,8 +1,6 @@
 import axios from 'axios';
 import type { VisitRequest, VisitResponse, StatutVisite } from '@/lib/types/visit.types';
-
-const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const API_BASE_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
+import { API_BASE_URL } from '@/lib/apiConfig';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
